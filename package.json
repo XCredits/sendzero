@@ -4,8 +4,8 @@
   "license": "MIT",
   "scripts": {
     "ng": "ng",
-    "start": "npm-run-all -p client server",
-    "start-dev": "nodemon server.js",
+    "start": "node server.js",
+    "start-dev": "npm-run-all -p client server",
     "build": "ng build --prod",
     "test": "ng test",
     "lint": "ng lint",
