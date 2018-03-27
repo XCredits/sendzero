@@ -119,6 +119,7 @@ An alternative method for getting going with Angular Progressive Web Apps can be
 Install required libraries for the service worker, and for the PWA tools that help us build the manifest files for the app.
 ~~~
 npm install --save @angular/service-worker
+npm install --save @angular/platform-server
 npm install --save ng-pwa-tools
 ~~~
 
@@ -152,6 +153,11 @@ If there are routes that need custom configuration, you can create your own `ngs
 
 If this file is present and ngu-sw-manifest is run, then the ngsw-manifest file is combined. 
 
+### Add the tool to the npm scripts
+Add the following to package.json in the `scripts` array.
+~~~
+"ngu-sw-manifest": "node ./node_modules/ng-pwa-tools/bin/ngu-sw-manifest.js" 
+~~~
 
 ### Use the following to start the server
 ngu-sw-manifest --module src/app/app.module.ts --out dist/ngsw-manifest.json
