@@ -113,6 +113,7 @@ npm install express body-parser --save
 ## Add the server.js file
 
 ## Setting up the progressive elements of the app
+These instructions are put together using [this article](https://moduscreate.com/blog/creating-progressive-web-apps-using-angular/), [this video from I/o '17](https://www.youtube.com/watch?v=C8KcW1Nj3Mw) and  
 Install required libraries for the service worker, and for the PWA tools that help us build the manifest files for the app.
 ~~~
 npm install --save @angular/service-worker
@@ -121,6 +122,10 @@ npm install --save ng-pwa-tools
 
 Note: there are errors indicating missing peer dependencies. At this point, we are ignoring the errors.
 
+### Update the app to allow service workers
+~~~
+ng set apps.0.serviceWorker=true
+~~~
 
 # NOTE: the below information was created as part of the 'ng build' process 
 
