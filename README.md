@@ -147,9 +147,16 @@ platformBrowserDynamic()
     .catch(err => console.log(err));
 ~~~
 
+### Optionally creare a ngsw-manifest.json file
+If there are routes that need custom configuration, you can create your own `ngsw-manifest.json` and place it in src.
+
+If this file is present and ngu-sw-manifest is run, then the ngsw-manifest file is combined. 
 
 
+### Use the following to start the server
+ngu-sw-manifest --module src/app/app.module.ts --out dist/ngsw-manifest.json
 
+ngu-app-shell --module src/app/app.module.ts --url /loading --insert-module src/app/loading/module.ts
 
 
 
