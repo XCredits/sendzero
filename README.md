@@ -156,7 +156,7 @@ If this file is present and ngu-sw-manifest is run, then the ngsw-manifest file 
 ### Use the following to start the server
 ngu-sw-manifest --module src/app/app.module.ts --out dist/ngsw-manifest.json
 
-NOTE: If the above doesn't work and you're on Windows, it is probably because you are not using bash. More recent versions of Windows contain bash, just press the Windows key, type `Windows Features`, then select `Windows Subsystem for Linux`. More information on how to do this [here](https://www.howtogeek.com/249966/how-to-install-and-use-the-linux-bash-shell-on-windows-10/).
+NOTE: If the above doesn't work and you're on Windows, it is probably because you are not using bash. More recent versions of Windows contain bash, just press the Windows key, type `Windows Features`, then select `Windows Subsystem for Linux`. Restart, then install Ubuntu form the Microsoft Store. When Ubuntu is setup, run, from the command line `bash`. More information on how to do this [here](https://www.howtogeek.com/249966/how-to-install-and-use-the-linux-bash-shell-on-windows-10/).
 
 ngu-app-shell --module src/app/app.module.ts --url /loading --insert-module src/app/loading/module.ts
 
