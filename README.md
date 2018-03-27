@@ -113,7 +113,7 @@ npm install express body-parser --save
 ## Add the server.js file
 
 ## Setting up the progressive elements of the app
-These instructions are put together using [this article](https://moduscreate.com/blog/creating-progressive-web-apps-using-angular/), [this video from I/o '17](https://www.youtube.com/watch?v=C8KcW1Nj3Mw) and  
+These instructions are put together using [this article](https://moduscreate.com/blog/creating-progressive-web-apps-using-angular/), [this video from I/o '17](https://www.youtube.com/watch?v=C8KcW1Nj3Mw) and [this repo](https://github.com/alxhub/io17).
 Install required libraries for the service worker, and for the PWA tools that help us build the manifest files for the app.
 ~~~
 npm install --save @angular/service-worker
