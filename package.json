@@ -9,7 +9,8 @@
     "build": "ng build --prod",
     "test": "ng test",
     "lint": "ng lint",
-    "e2e": "ng e2e"
+    "e2e": "ng e2e",
+    "ngu-sw-manifest": "node ./node_modules/ng-pwa-tools/bin/ngu-sw-manifest.js"
   },
   "private": true,
   "dependencies": {
