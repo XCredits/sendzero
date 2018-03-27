@@ -113,7 +113,9 @@ npm install express body-parser --save
 ## Add the server.js file
 
 ## Setting up the progressive elements of the app
-These instructions are put together using [this article](https://moduscreate.com/blog/creating-progressive-web-apps-using-angular/), [this video from I/o '17](https://www.youtube.com/watch?v=C8KcW1Nj3Mw) and [this repo](https://github.com/alxhub/io17).
+These instructions are put together using [this article](https://moduscreate.com/blog/creating-progressive-web-apps-using-angular/), [this video from I/o '17](https://www.youtube.com/watch?v=C8KcW1Nj3Mw) and [this repo](https://github.com/alxhub/io17). We also used the [service worker documentation](https://angular.io/guide/service-worker-getting-started).
+
+An alternative method for getting going with Angular Progressive Web Apps can be found in [this article](https://medium.com/@nsmirnova/creating-pwa-with-angular-5-e36ea2378b5d) and [the follow up](https://medium.com/@nsmirnova/creating-pwa-with-angular-5-part-2-progressifying-the-application-449e3a706129).
 Install required libraries for the service worker, and for the PWA tools that help us build the manifest files for the app.
 ~~~
 npm install --save @angular/service-worker
@@ -126,6 +128,32 @@ Note: there are errors indicating missing peer dependencies. At this point, we a
 ~~~
 ng set apps.0.serviceWorker=true
 ~~~
+
+### Import required modules
+Put the following line into `src/app/app.module.ts`
+~~~
+import { ServiceWorkerModule } from '@angular/service-worker';
+~~~
+Then into the imports array in the same file, put the following code after platformBrowserDynamic
+~~~
+platformBrowserDynamic()
+    .bootstrapModule(AppModule)
+    .then(() => {
+      if ('serviceWorker' in navigator) {
+        ServiceWorkerModule.register('/ngsw-worker.js', 
+            {enabled: environment.production})
+      }
+    })
+    .catch(err => console.log(err));
+~~~
+
+
+
+
+
+
+
+
 
 # NOTE: the below information was created as part of the 'ng build' process 
 
