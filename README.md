@@ -112,6 +112,14 @@ npm install express body-parser --save
 ~~~
 ## Add the server.js file
 
+## Setting up the progressive elements of the app
+Install required libraries for the service worker, and for the PWA tools that help us build the manifest files for the app.
+~~~
+npm install --save @angular/service-worker
+npm install --save ng-pwa-tools
+~~~
+
+Note: there are errors indicating missing peer dependencies. At this point, we are ignoring the errors.
 
 
 # NOTE: the below information was created as part of the 'ng build' process 
