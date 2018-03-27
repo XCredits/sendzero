@@ -113,17 +113,16 @@ npm install express body-parser --save
 ## Add the server.js file
 
 ## Setting up the progressive elements of the app
-These instructions are put together using [this article](https://moduscreate.com/blog/creating-progressive-web-apps-using-angular/), [this video from I/o '17](https://www.youtube.com/watch?v=C8KcW1Nj3Mw) and [this repo](https://github.com/alxhub/io17). We also used the [service worker documentation](https://angular.io/guide/service-worker-getting-started).
+These instructions were mostly put together using the [service worker documentation](https://angular.io/guide/service-worker-getting-started).
+
+The old method is described in [this article](https://moduscreate.com/blog/creating-progressive-web-apps-using-angular/), [this video from I/o '17](https://www.youtube.com/watch?v=C8KcW1Nj3Mw) and [this repo](https://github.com/alxhub/io17). 
 
 An alternative method for getting going with Angular Progressive Web Apps can be found in [this article](https://medium.com/@nsmirnova/creating-pwa-with-angular-5-e36ea2378b5d) and [the follow up](https://medium.com/@nsmirnova/creating-pwa-with-angular-5-part-2-progressifying-the-application-449e3a706129).
-Install required libraries for the service worker, and for the PWA tools that help us build the manifest files for the app.
+Install required libraries for the service worker tools that help us build the manifest files for the app.
 ~~~
 npm install --save @angular/service-worker
 npm install --save @angular/platform-server
-npm install --save ng-pwa-tools
 ~~~
-
-Note: there are errors indicating missing peer dependencies. At this point, we are ignoring the errors.
 
 ### Update the app to allow service workers
 ~~~
@@ -151,7 +150,7 @@ platformBrowserDynamic()
 ### Optionally creare a ngsw-manifest.json file
 If there are routes that need custom configuration, you can create your own `ngsw-manifest.json` and place it in src.
 
-If this file is present and ngu-sw-manifest is run, then the ngsw-manifest file is combined. 
+If this file is present and `npm build --prod` is run, then the ngsw-manifest file is combined. 
 
 ### Add boiler plate ndsw-config.json file
 As per the [docs](https://angular.io/guide/service-worker-getting-started), adding this file is used to configure the serevice worker.
@@ -186,17 +185,29 @@ As per the [docs](https://angular.io/guide/service-worker-getting-started), addi
 ~~~
 
 
+
+
+### Use the following to start the server
+~~~
+ng build --prod
+node server.js
+~~~
+
+
+
+# Disused notes about using ng-pwa-tools
+
+// npm install --save ng-pwa-tools not actually used in this process
+// Note: there are errors indicating missing peer dependencies. At this point, we are ignoring the errors.
+
 ### Add the tool to the npm scripts
 Add the following to package.json in the `scripts` array.
 ~~~
-"ngu-sw-manifest": "node ./node_modules/ng-pwa-tools/bin/ngu-sw-manifest.js" 
+// "ngu-sw-manifest": "node ./node_modules/ng-pwa-tools/bin/ngu-sw-manifest.js" 
 ~~~
 
-### Use the following to start the server
-ng build --prod
 
 npm run ngu-sw-manifest --module src/app/app.module.ts --out dist/ngsw-manifest.json
-
 
 The `ngu-sw-manifest` command goes through the router in Angular, and copies all the routes, and uses it to generate a `ngsw-manifest.json` file.
 
