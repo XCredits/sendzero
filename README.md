@@ -153,6 +153,39 @@ If there are routes that need custom configuration, you can create your own `ngs
 
 If this file is present and ngu-sw-manifest is run, then the ngsw-manifest file is combined. 
 
+### Add boiler plate ndsw-config.json file
+As per the [docs](https://angular.io/guide/service-worker-getting-started), adding this file is used to configure the serevice worker.
+~~~
+{
+  "index": "/index.html",
+  "assetGroups": [{
+    "name": "app",
+    "installMode": "prefetch",
+    "resources": {
+    "files": [
+      "/favicon.ico",
+      "/index.html"
+    ],
+    "versionedFiles": [
+      "/*.bundle.css",
+      "/*.bundle.js",
+      "/*.chunk.js"
+    ]
+    }
+  }, {
+    "name": "assets",
+    "installMode": "lazy",
+    "updateMode": "prefetch",
+    "resources": {
+    "files": [
+      "/assets/**"
+    ]
+    }
+  }]
+}
+~~~
+
+
 ### Add the tool to the npm scripts
 Add the following to package.json in the `scripts` array.
 ~~~
@@ -160,8 +193,14 @@ Add the following to package.json in the `scripts` array.
 ~~~
 
 ### Use the following to start the server
-ngu-sw-manifest --module src/app/app.module.ts --out dist/ngsw-manifest.json
+ng build --prod
 
+npm run ngu-sw-manifest --module src/app/app.module.ts --out dist/ngsw-manifest.json
+
+
+The `ngu-sw-manifest` command goes through the router in Angular, and copies all the routes, and uses it to generate a `ngsw-manifest.json` file.
+
+# If you don't have Bash
 NOTE: If the above doesn't work and you're on Windows, it is probably because you are not using bash. More recent versions of Windows contain bash, just press the Windows key, type `Windows Features`, then select `Windows Subsystem for Linux`. Restart, then install Ubuntu form the Microsoft Store. When Ubuntu is setup, run, from the command line `bash`. More information on how to do this [here](https://www.howtogeek.com/249966/how-to-install-and-use-the-linux-bash-shell-on-windows-10/).
 
 ngu-app-shell --module src/app/app.module.ts --url /loading --insert-module src/app/loading/module.ts
