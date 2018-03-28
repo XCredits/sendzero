@@ -6,12 +6,6 @@ const http = require('http');
 const WebSocketServer = require('websocket').server;
 const url = require('url');
 const https = require('https');
-var ExpressPeerServer = require('peer').ExpressPeerServer;
-
-var p2pConnection;
-var options = {
-  debug: true
-}
 
 app.use(express.static(path.join(__dirname, 'dist')));
 
