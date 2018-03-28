@@ -22,12 +22,15 @@
 <div class="messageBox">
   <label for="message">Enter a message:
     <input type="text" name="message" id="message" placeholder="Message text" 
-            inputmode="latin" size=60 maxlength=120 disabled>
+            inputmode="latin" size=60 maxlength=120 [(ngModel)]="messageText" disabled>
   </label>
-  <button (click)="sendMessage()" id="sendButton" name="sendButton" class="sendButton" disabled>
+  <button (click)="sendMessage(messageText)" id="sendButton" name="sendButton" class="sendButton" disabled>
     Send
   </button>
 </div>
 <div class="receiveBox" id="receiveBox">
   <p>Messages received:</p>
+  <ul>
+    <li *ngFor="let message of messages">{{message.sender}}: {{message.text}}</li>
+  </ul>
 </div>
