@@ -49,7 +49,7 @@ export class AppComponent implements OnInit {
     peer_id = peer_id.replace(/\s$/gi, "");
     var conn = this.peer.connect(peer_id, {"reliable": true});
     console.log(conn);
-    var myPeerId = this.peerId;
+    var myPeerId = this.peer.id;
     conn.on('open', function(){
       conn.send('hi! my peer id is ' + myPeerId);
       console.log('connection is open');
