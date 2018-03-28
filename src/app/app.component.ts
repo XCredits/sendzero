@@ -1,5 +1,4 @@
 import { Component, OnInit } from '@angular/core';
-//import { Peer } from '../app/peer.js';
 
 @Component({
   selector: 'app-root',
@@ -12,11 +11,7 @@ export class AppComponent implements OnInit {
   peer;
   // Bind message with angular
   // message: string;
-  localConnection = null;
-  remoteConnection = null;
-  sendChannel = null;
-  receiveChannel = null;
-
+  
   connectButton = null;
   disconnectButton = null;
   sendButton = null;
@@ -25,6 +20,7 @@ export class AppComponent implements OnInit {
 
   constructor() {
     this.title = 'SendZero Alpha';
+    // @ts-ignore
     this.peer = Peer({key: 'lwjd5qra8257b9'});
     var self = this;
     this.peer.on('open', function(id) {
@@ -47,14 +43,15 @@ export class AppComponent implements OnInit {
     this.receiveBox = document.getElementById("receiveBox");    
   }
 
-  connectPeersPartTwo() {
+  connectPeers() {
     console.log('heerrrr');
-    let peer_id = document.getElementById("peer_id").value;
+    let peer_id = (<HTMLInputElement>document.getElementById("peer_id")).value;
     peer_id = peer_id.replace(/\s$/gi, "");
-    var conn = this.peer.connect(document.getElementById("peer_id").value);
+    var conn = this.peer.connect(peer_id, {"reliable": true});
     console.log(conn);
+    var myPeerId = this.peerId;
     conn.on('open', function(){
-      conn.send('hi!');
+      conn.send('hi! my peer id is ' + myPeerId);
       console.log('connection is open');
     });
   }
