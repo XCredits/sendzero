@@ -117,7 +117,7 @@ export class AppComponent implements OnInit {
       };
       if (data.type === "file") {
         var dataView = new Uint8Array(data.data);
-        var dataBlob = new Blob([dataView], {type: "application/octet-stream"});
+        var dataBlob = new Blob([dataView]);
         var url = window.URL.createObjectURL(dataBlob);
         self.url = url;
         message.data = url;
