@@ -10,15 +10,17 @@ export class AppComponent implements OnInit {
   peerId: string;
   peer;
   connection;
-  messages: {text: string, sender: string}[];
-  // Bind message with angular
-  // message: string;
-  
+  messages: {data: string, sender: string, type: string}[];
+  file: File = null;
+  url: string = null;
+
   connectButton = null;
   disconnectButton = null;
   sendButton = null;
   messageBox = null;
   receiveBox = null;
+  fileBox = null;
+  sendFileButton = null;
 
   constructor(private ref: ChangeDetectorRef) {
     this.title = 'SendZero Alpha';
@@ -36,16 +38,52 @@ export class AppComponent implements OnInit {
       self.sendButton.disabled = false;
       self.connection = conn;
       conn.on('data', function(data){
-        console.log(data);
+        console.log(data.data);
         let message = {
-          "text": data,
-          "sender": "peer"
+          "data": data.data,
+          "sender": "peer",
+          "type": data.type,
+        }
+        if (data.type === "file") {
+          var dataView = new Uint8Array(data.data);
+          var dataBlob = new Blob([dataView], {type: "application/octet-stream"});
+          var url = window.URL.createObjectURL(dataBlob);
+          self.url = url;
+          message.data = url;
         }
         self.messages.push(message);
         self.ref.detectChanges();
       });
     });
-    
+  }
+
+  handleFileInput(files: FileList) {
+    this.file = files.item(0);
+    this.sendFileButton.disabled = false;
+  }
+
+  sendFile() {
+    let fileToBeSent = this.file;
+    this.connection.send({
+      data: fileToBeSent,
+      type: "file"
+    });
+    this.messages.push({
+      data: "You sent a file",
+      sender: "you",
+      type: "file",
+    })
+  }
+
+  doSomething(e){
+    e.preventDefault();
+    var file = e.originalEvent.dataTransfer.files[0];
+    this.connection.send(file);
+  }
+  
+  doNothing(e) {
+    e.preventDefault();
+    e.stopPropagation();
   }
 
   ngOnInit() {
@@ -53,7 +91,9 @@ export class AppComponent implements OnInit {
     this.disconnectButton = document.getElementById("disconnectButton");
     this.sendButton = document.getElementById("sendButton");
     this.messageBox = document.getElementById("message");
-    this.receiveBox = document.getElementById("receiveBox");    
+    this.receiveBox = document.getElementById("receiveBox");
+    this.fileBox = document.getElementById("fileBox");
+    this.sendFileButton = document.getElementById("sendFileButton");
   }
 
   connectPeers() {
@@ -69,9 +109,18 @@ export class AppComponent implements OnInit {
       console.log('connection is open');
     });
     this.connection.on('data', function(data) {
+      console.log(data.data);
       let message = {
-        "text": data,
-        "sender": "peer"
+        "data": data.data,
+        "sender": "peer",
+        "type": data.type,
+      };
+      if (data.type === "file") {
+        var dataView = new Uint8Array(data.data);
+        var dataBlob = new Blob([dataView], {type: "application/octet-stream"});
+        var url = window.URL.createObjectURL(dataBlob);
+        self.url = url;
+        message.data = url;
       }
       self.messages.push(message);
       self.ref.detectChanges();
@@ -84,11 +133,14 @@ export class AppComponent implements OnInit {
       return;
     }
     let message = {
-      text: text,
-      "sender": "you"
+      "data": text,
+      "sender": "you",
+      "type": "text",
     }
-    console.log(this);
     this.messages.push(message);
-    this.connection.send(text);
+    this.connection.send({
+      data: text,
+      type: "text"
+    });
   }
 }

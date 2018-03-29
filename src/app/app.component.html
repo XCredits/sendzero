@@ -28,9 +28,19 @@
     Send
   </button>
 </div>
+<div class="fileBox" id="fileBox" >
+    <label for="file">Choose File</label>
+    <input type="file"
+           id="file"
+           (change)="handleFileInput($event.target.files)">
+    <button id="sendFileButton" name="sendFileButton" (click)="sendFile()" disabled class="sendFileButton">Send File</button>
+          </div>
 <div class="receiveBox" id="receiveBox">
   <p>Messages received:</p>
   <ul>
-    <li *ngFor="let message of messages">{{message.sender}}: {{message.text}}</li>
+    <li *ngFor="let message of messages">
+      {{message.sender}}: {{message.data}}
+    </li>
   </ul>
+  <a target="_blank" href="{{url}}">Download file here</a>
 </div>
