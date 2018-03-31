@@ -239,6 +239,14 @@ body {
 }
 ~~~
 
+## Add Routes to the application
+Create some new components to navigate to using the Angular CLI generate command
+~~~
+ng g component home
+ng g component help
+ng g component settings
+~~~
+
 ## Use the following to start the server
 ~~~
 ng build --prod

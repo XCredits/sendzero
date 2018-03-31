@@ -47,10 +47,16 @@ import {
 // Below is for Progressive Web App (PWA) functionality
 import { environment } from '../environments/environment';
 import { ServiceWorkerModule } from '@angular/service-worker';
+import { HomeComponent } from './home/home.component';
+import { HelpComponent } from './help/help.component';
+import { SettingsComponent } from './settings/settings.component';
 
 @NgModule({
   declarations: [
     AppComponent,
+    HomeComponent,
+    HelpComponent,
+    SettingsComponent,
   ],
   imports: [
     BrowserModule, 
