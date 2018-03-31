@@ -1,14 +1,26 @@
-<!--The content below is only a placeholder and can be replaced.-->
-<mat-toolbar color="primary">
-  <span>{{ title }}</span>
-  <span class="navbar-spacer"></span>
-  <mat-icon class="navbar-icon">favorite</mat-icon>
-  <mat-icon class="navbar-icon">delete</mat-icon>
-</mat-toolbar>
+<mat-drawer-container>
+  <mat-drawer #drawer mode="side" opened="true">
+    Drawer<br>
+    <a routerLink='/home'>Home</a><br>
+    <a routerLink='/help'>Help</a><br>
+    <a routerLink='/settings'>Settings</a><br>
+  </mat-drawer>
+  <mat-drawer-content>
+    <mat-toolbar color="primary">
+      <button mat-icon-button (click)="drawer.toggle()">
+        <mat-icon class="mat-icon">
+          menu
+        </mat-icon>
+      </button>
+      <span>{{ title }}</span>
+      <span class="navbar-spacer"></span>
+      <mat-icon class="navbar-icon">favorite</mat-icon>
+      <mat-icon class="navbar-icon">delete</mat-icon>
+    </mat-toolbar>
+    <router-outlet></router-outlet>
+  </mat-drawer-content>
 
-<a routerLink='/home'>Home</a>
-<a routerLink='/help'>Help</a>
-<a routerLink='/settings'>Settings</a>
+  
 
+</mat-drawer-container>
 
-<router-outlet></router-outlet>
