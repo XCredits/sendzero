@@ -1,9 +1,20 @@
 <mat-drawer-container>
   <mat-drawer #drawer mode="side" opened="true">
-    Drawer<br>
-    <a routerLink='/home'>Home</a><br>
-    <a routerLink='/help'>Help</a><br>
-    <a routerLink='/settings'>Settings</a><br>
+    <mat-nav-list>
+      Drawer<br>
+      <a mat-list-item routerLink='/home'>
+        <mat-icon>home</mat-icon>
+        Home
+      </a>
+      <a mat-list-item routerLink='/help'>
+        <mat-icon>help-outline</mat-icon>
+        Help
+      </a>
+      <a mat-list-item routerLink='/settings'>
+        <mat-icon>settings</mat-icon>
+        Settings
+      </a>
+    </mat-nav-list>
   </mat-drawer>
   <mat-drawer-content>
     <mat-toolbar color="primary">
