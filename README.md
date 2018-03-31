@@ -178,7 +178,9 @@ As per the [docs](https://angular.io/guide/service-worker-getting-started), addi
 ~~~
 
 ## Install Material Design
-We based this section on [Material Getting Started Guide](https://material.angular.io/guide/getting-started). The following installs material, the CDK and animation.
+I based this section on [Material Getting Started Guide](https://material.angular.io/guide/getting-started). I also used [this tutorial](https://www.youtube.com/watch?v=UnKsoCeTdEI) to help inform some of the things we are doing below.
+
+The following installs material, the CDK and animation.
 ~~~
 npm install --save @angular/material @angular/cdk @angular/animations
 ~~~
@@ -192,8 +194,9 @@ And add to the `@NgModule` `imports` array.
 ### Add some angular components as an example into app.module.ts
 ~~~
 import { 
+      MatAutocompleteModule,
       MatButtonModule,
-      MatCheckboxModule,
+      ... etc ...
     } from '@angular/material';
 ~~~
 And add to the `@NgModule` `imports` array.
@@ -211,7 +214,30 @@ To the `index.html` file
 <link href="https://fonts.googleapis.com/icon?family=Roboto:300,400,500,700,400Italic" rel="stylesheet">
 ~~~
 
+### Add a navbar
+Put the following at the top of app.component.html
+~~~
+<mat-toolbar color="primary">
+  <span>{{ title }}</span>
+  <span class="navbar-spacer"></span>
+  <mat-icon class="navbar-icon">favorite</mat-icon>
+  <mat-icon class="navbar-icon">delete</mat-icon>
+</mat-toolbar>
+~~~
+Add the following to styles.css
+~~~
+body { 
+  margin: 0px; 
+} 
 
+.navbar-spacer { 
+  flex: 1 1 auto; 
+} 
+ 
+.navbar-icon { 
+  padding: 0 14px; 
+}
+~~~
 
 ## Use the following to start the server
 ~~~
@@ -238,7 +264,12 @@ npm run ngu-sw-manifest --module src/app/app.module.ts --out dist/ngsw-manifest.
 The `ngu-sw-manifest` command goes through the router in Angular, and copies all the routes, and uses it to generate a `ngsw-manifest.json` file.
 
 # If you don't have Bash
-NOTE: If the above doesn't work and you're on Windows, it is probably because you are not using bash. More recent versions of Windows contain bash, just press the Windows key, type `Windows Features`, then select `Windows Subsystem for Linux`. Restart, then install Ubuntu form the Microsoft Store. When Ubuntu is setup, run, from the command line `bash`. More information on how to do this [here](https://www.howtogeek.com/249966/how-to-install-and-use-the-linux-bash-shell-on-windows-10/).
+NOTE: If the above doesn't work and you're on Windows, it is probably because you are not using bash. More recent versions of Windows contain bash, just press the Windows key, type `Windows Features`, then select `Windows Subsystem for Linux`. Restart, then install Ubuntu form the Microsoft Store. When Ubuntu is setup, run, from the command line 
+~~~
+bash
+~~~ 
+
+More information on how to do this [here](https://www.howtogeek.com/249966/how-to-install-and-use-the-linux-bash-shell-on-windows-10/).
 
 ngu-app-shell --module src/app/app.module.ts --url /loading --insert-module src/app/loading/module.ts
 
