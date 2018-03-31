@@ -5,6 +5,9 @@ import { HttpModule } from '@angular/http';
 
 import { AppComponent } from './app.component';
 
+// 
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+
 // Below is for Progressive Web App (PWA) functionality
 import { environment } from '../environments/environment';
 import { ServiceWorkerModule } from '@angular/service-worker';
@@ -17,6 +20,8 @@ import { ServiceWorkerModule } from '@angular/service-worker';
     BrowserModule, 
     FormsModule,
     HttpModule,
+    BrowserAnimationsModule,
+    
 
     ServiceWorkerModule.register('/ngsw-worker.js', 
         {enabled: environment.production})

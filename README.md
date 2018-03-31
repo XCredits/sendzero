@@ -190,6 +190,18 @@ We based this section on [Material Getting Started Guide](https://material.angul
 npm install --save @angular/material @angular/cdk @angular/animations
 ~~~
 
+### Import Angular into app.module.ts
+~~~
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+~~~
+And add to the `@NgModule` `imports` array.
+
+### Import a global theme in styles.css
+~~~
+@import "~@angular/material/prebuilt-themes/indigo-pink.css";
+~~~
+
+
 
 
 ## Use the following to start the server
