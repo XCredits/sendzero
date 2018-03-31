@@ -293,6 +293,16 @@ app.get('*', function(req, res) {
 });
 ~~~
 
+### Set the default route
+Add the following redirect to the `RouterModule.forRoot`
+~~~
+{ 
+  path: '', 
+  redirectTo: '/home', 
+  pathMatch: 'full',
+}
+~~~
+
 ## Use the following to start the server
 ~~~
 ng build --prod

@@ -77,6 +77,11 @@ import { SettingsComponent } from './settings/settings.component';
         path: 'settings',
         component: SettingsComponent,
       },
+      { 
+        path: '', 
+        redirectTo: '/home', 
+        pathMatch: 'full',
+      },
     ]),
 
     BrowserAnimationsModule,
