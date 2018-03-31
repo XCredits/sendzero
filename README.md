@@ -134,17 +134,10 @@ Put the following line into `src/app/app.module.ts`
 ~~~
 import { ServiceWorkerModule } from '@angular/service-worker';
 ~~~
-Then into the imports array in the same file, put the following code after platformBrowserDynamic
+Then into the imports array in the same file
 ~~~
-platformBrowserDynamic()
-    .bootstrapModule(AppModule)
-    .then(() => {
-      if ('serviceWorker' in navigator) {
-        ServiceWorkerModule.register('/ngsw-worker.js', 
-            {enabled: environment.production})
-      }
-    })
-    .catch(err => console.log(err));
+ServiceWorkerModule.register('/ngsw-worker.js', 
+    {enabled: environment.production})
 ~~~
 
 ### Optionally creare a ngsw-manifest.json file
