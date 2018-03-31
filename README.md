@@ -303,6 +303,19 @@ Add the following redirect to the `RouterModule.forRoot`
 }
 ~~~
 
+### Add a Page Not Found route
+Run
+~~~
+ng g component page-not-found
+~~~
+Add the component to the routes
+~~~
+{  
+  path: '**',  
+  component: PageNotFoundComponent, 
+}
+~~~
+
 ## Use the following to start the server
 ~~~
 ng build --prod

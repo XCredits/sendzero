@@ -52,6 +52,7 @@ import { ServiceWorkerModule } from '@angular/service-worker';
 import { HomeComponent } from './home/home.component';
 import { HelpComponent } from './help/help.component';
 import { SettingsComponent } from './settings/settings.component';
+import { PageNotFoundComponent } from './page-not-found/page-not-found.component';
 
 @NgModule({
   declarations: [
@@ -59,6 +60,7 @@ import { SettingsComponent } from './settings/settings.component';
     HomeComponent,
     HelpComponent,
     SettingsComponent,
+    PageNotFoundComponent,
   ],
   imports: [
     BrowserModule, 
@@ -81,6 +83,10 @@ import { SettingsComponent } from './settings/settings.component';
         path: '', 
         redirectTo: '/home', 
         pathMatch: 'full',
+      },
+      { 
+        path: '**', 
+        component: PageNotFoundComponent,
       },
     ]),
 
