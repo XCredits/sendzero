@@ -9,6 +9,10 @@ app.use(express.static(path.join(__dirname, 'dist')));
 const port = process.env.PORT || '3000';
 app.set('port', port);
 
+app.get('*', function(req, res) {
+  res.sendFile(path.join(__dirname, 'dist/index.html'));
+});
+
 const server = http.createServer(app);
 
 server.listen(port, function () {

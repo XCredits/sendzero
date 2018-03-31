@@ -239,6 +239,83 @@ body {
 }
 ~~~
 
+## Add Routes to the application
+Create some new components to navigate to using the Angular CLI generate command
+~~~
+ng g component home
+ng g component help
+ng g component settings
+~~~
+### Set up the router module
+Add the following to `app.module.ts`
+~~~
+import { RouterModule } from '@angular/router';
+~~~
+
+Add the routes to the RouterModule
+
+~~~
+RouterModule.forRoot([
+      {
+        path: 'home',
+        component: HomeComponent,
+      },
+      {
+        path: 'help',
+        component: HelpComponent,
+      },
+      {
+        path: 'settings',
+        component: SettingsComponent,
+      },
+    ]),
+~~~
+
+### Add routes to HTML
+In `app.component.html` add
+~~~
+<router-outlet></router-outlet>
+~~~
+to where the routes should be displayed on the page.
+
+Add the following links so that the user can navigate to the routes:
+~~~
+<a routerLink='/home'>Home</a>
+<a routerLink='/help'>Help</a>
+<a routerLink='/settings'>Settings</a>
+~~~
+
+### Update express to handle all get routes to default to serving index.js
+Add the following to `server.js` towards the end of the file:
+~~~
+app.get('*', function(req, res) {
+  res.sendFile(path.join(__dirname, 'dist/index.html'));
+});
+~~~
+
+### Set the default route
+Add the following redirect to the `RouterModule.forRoot`
+~~~
+{ 
+  path: '', 
+  redirectTo: '/home', 
+  pathMatch: 'full',
+}
+~~~
+
+### Add a Page Not Found route
+Run
+~~~
+ng g component page-not-found
+~~~
+Add the component to the routes
+~~~
+{  
+  path: '**',  
+  component: PageNotFoundComponent, 
+}
+~~~
+
 ## Use the following to start the server
 ~~~
 ng build --prod
