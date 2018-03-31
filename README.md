@@ -189,11 +189,27 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 ~~~
 And add to the `@NgModule` `imports` array.
 
+### Add some angular components as an example into app.module.ts
+~~~
+import { 
+      MatButtonModule,
+      MatCheckboxModule,
+    } from '@angular/material';
+~~~
+And add to the `@NgModule` `imports` array.
+
+
 ### Import a global theme in styles.css
 ~~~
 @import "~@angular/material/prebuilt-themes/indigo-pink.css";
 ~~~
 
+### Add font and font icons
+To the `index.html` file
+~~~
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+<link href="https://fonts.googleapis.com/icon?family=Roboto:300,400,500,700,400Italic" rel="stylesheet">
+~~~
 
 
 
