@@ -184,10 +184,15 @@ As per the [docs](https://angular.io/guide/service-worker-getting-started), addi
 }
 ~~~
 
+## Install Material Design
+We based this section on [Material Getting Started Guide](https://material.angular.io/guide/getting-started). The following installs material, the CDK and animation.
+~~~
+npm install --save @angular/material @angular/cdk @angular/animations
+~~~
 
 
 
-### Use the following to start the server
+## Use the following to start the server
 ~~~
 ng build --prod
 node server.js
