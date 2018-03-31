@@ -5,6 +5,45 @@ import { HttpModule } from '@angular/http';
 
 import { AppComponent } from './app.component';
 
+// 
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+
+// Material modules 
+import { 
+  MatAutocompleteModule,
+  MatButtonModule,
+  MatButtonToggleModule,
+  MatCardModule,
+  MatCheckboxModule,
+  MatChipsModule,
+  MatDatepickerModule,
+  MatDialogModule,
+  MatDividerModule,
+  MatExpansionModule,
+  MatGridListModule,
+  MatIconModule,
+  MatInputModule,
+  MatListModule,
+  MatMenuModule,
+  MatNativeDateModule,
+  MatPaginatorModule,
+  MatProgressBarModule,
+  MatProgressSpinnerModule,
+  MatRadioModule,
+  MatRippleModule,
+  MatSelectModule,
+  MatSidenavModule,
+  MatSliderModule,
+  MatSlideToggleModule,
+  MatSnackBarModule,
+  MatSortModule,
+  MatStepperModule,
+  MatTableModule,
+  MatTabsModule,
+  MatToolbarModule,
+  MatTooltipModule,
+} from '@angular/material';
+
 // Below is for Progressive Web App (PWA) functionality
 import { environment } from '../environments/environment';
 import { ServiceWorkerModule } from '@angular/service-worker';
@@ -17,7 +56,43 @@ import { ServiceWorkerModule } from '@angular/service-worker';
     BrowserModule, 
     FormsModule,
     HttpModule,
+    BrowserAnimationsModule,
+    
+    // Material modules 
+    MatAutocompleteModule,
+    MatButtonModule,
+    MatButtonToggleModule,
+    MatCardModule,
+    MatCheckboxModule,
+    MatChipsModule,
+    MatDatepickerModule,
+    MatDialogModule,
+    MatDividerModule,
+    MatExpansionModule,
+    MatGridListModule,
+    MatIconModule,
+    MatInputModule,
+    MatListModule,
+    MatMenuModule,
+    MatNativeDateModule,
+    MatPaginatorModule,
+    MatProgressBarModule,
+    MatProgressSpinnerModule,
+    MatRadioModule,
+    MatRippleModule,
+    MatSelectModule,
+    MatSidenavModule,
+    MatSliderModule,
+    MatSlideToggleModule,
+    MatSnackBarModule,
+    MatSortModule,
+    MatStepperModule,
+    MatTableModule,
+    MatTabsModule,
+    MatToolbarModule,
+    MatTooltipModule,
 
+    // Below is for Progressive Web App (PWA) functionality
     ServiceWorkerModule.register('/ngsw-worker.js', 
         {enabled: environment.production})
   ],
