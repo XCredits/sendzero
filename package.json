@@ -9,7 +9,8 @@
     "build": "ng build --prod",
     "test": "ng test",
     "lint": "ng lint",
-    "e2e": "ng e2e"
+    "e2e": "ng e2e",
+    "ngu-sw-manifest": "node ./node_modules/ng-pwa-tools/bin/ngu-sw-manifest.js"
   },
   "private": true,
   "dependencies": {
@@ -21,7 +22,9 @@
     "@angular/http": "^5.2.0",
     "@angular/platform-browser": "^5.2.0",
     "@angular/platform-browser-dynamic": "^5.2.0",
+    "@angular/platform-server": "^5.2.9",
     "@angular/router": "^5.2.0",
+    "@angular/service-worker": "^5.2.9",
     "body-parser": "^1.18.2",
     "core-js": "^2.4.1",
     "express": "^4.16.3",
