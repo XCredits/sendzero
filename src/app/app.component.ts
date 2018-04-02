@@ -10,9 +10,35 @@ export class AppComponent {
   screenWidth: number;
   mobileWidth: boolean = false;
 
+  // Edit the area below to create main nav links
+  // There should be 
+  mainNavLinks: { routerLink: string, icon: string, text: string }[] = [
+    {
+      routerLink: '/home',
+      icon: 'home',
+      text: 'Home',
+    },
+    {
+      routerLink: '/help',
+      icon: 'help',
+      text: 'Help',
+    },
+    {
+      routerLink: '/settings',
+      icon: 'settings',
+      text: 'Settings',
+    },
+  ];
+
 
   toggleNavigationDrawer() {
     this.navigationDrawer.toggle();
+  }
+
+  hideNavAfterClick () {
+    if (this.mobileWidth) {
+      this.toggleNavigationDrawer();
+    }
   }
 
   setSideBar() {

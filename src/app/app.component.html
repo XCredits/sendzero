@@ -2,34 +2,38 @@
   <mat-drawer #navigationDrawer mode="push" opened="false" class="unicorn-dark-theme">
     <mat-toolbar>App name/logo</mat-toolbar>
     <mat-nav-list>
-      <a mat-list-item routerLink='/home'>
-        <mat-icon>home</mat-icon>
-        Home
-      </a>
-      <a mat-list-item routerLink='/help'>
-        <mat-icon>help</mat-icon>Help
-      </a>
-      <a mat-list-item routerLink='/settings'>
-        <mat-icon>settings</mat-icon>
-        Settings
+      <a *ngFor="let navLink of mainNavLinks" mat-list-item routerLink="{{navLink.routerLink}}" (click)="hideNavAfterClick()">
+        <mat-icon>{{navLink.icon}}</mat-icon>
+        {{navLink.text}}
       </a>
     </mat-nav-list>
   </mat-drawer>
   <mat-drawer-content>
     <mat-toolbar color="primary">
-      <button mat-icon-button (click)="toggleNavigationDrawer()">
-        <mat-icon>
-          menu
-        </mat-icon>
-      </button>
-      <span [hidden]="!mobileWidth">
+      <div class="mobile-visible">
+        <button mat-icon-button  class="mobile-visible" (click)="toggleNavigationDrawer()">
+          <mat-icon>
+            menu
+          </mat-icon>
+        </button>
         <mat-icon>collections</mat-icon>
-        Yo{{ title }}</span>
+      </div>
+      <span>
+        Page title
+      </span>
       <span class="navbar-spacer"></span>
-      <mat-icon class="navbar-icon">favorite</mat-icon>
-      <mat-icon class="navbar-icon">delete</mat-icon>
+      <mat-icon class="navbar-icon">person_add</mat-icon>
     </mat-toolbar>
-    <router-outlet></router-outlet>
+    <div class="content">
+      <router-outlet></router-outlet>
+      <div class="mobile-visible">
+        <mat-toolbar class="bottom-mobile-nav">
+          <button *ngFor="let navLink of mainNavLinks" mat-icon-button routerLink="{{navLink.routerLink}}" >
+            <mat-icon>{{navLink.icon}}</mat-icon>
+          </button>
+        </mat-toolbar>
+      </div>
+    </div>
   </mat-drawer-content>
 </mat-drawer-container>
 
