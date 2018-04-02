@@ -7,9 +7,8 @@ import { Component, ViewChild } from '@angular/core';
 })
 export class AppComponent {
   @ViewChild('navigationDrawer') navigationDrawer;
-  title = 'app';
   screenWidth: number;
-  sideBarMode: string;
+  mobileWidth: boolean = false;
 
 
   toggleNavigationDrawer() {
@@ -21,9 +20,11 @@ export class AppComponent {
     if (this.screenWidth < 768) {
       this.navigationDrawer.mode = 'push'; // push or over
       this.navigationDrawer.opened = false;
+      this.mobileWidth = true;
     } else {
       this.navigationDrawer.mode = 'side';
       this.navigationDrawer.opened = true;
+      this.mobileWidth = false;
     }
   }
 

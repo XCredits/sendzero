@@ -1,5 +1,5 @@
-<mat-drawer-container class="unicorn-dark-theme">
-  <mat-drawer #navigationDrawer mode="push" opened="true">
+<mat-drawer-container>
+  <mat-drawer #navigationDrawer mode="push" opened="false" class="unicorn-dark-theme">
     <mat-nav-list>
       <div>Drawer </div><br>
       <a mat-list-item routerLink='/home'>
@@ -22,7 +22,9 @@
           menu
         </mat-icon>
       </button>
-      <span>{{ title }}</span>
+      <span [hidden]="!mobileWidth">
+        <mat-icon>collections</mat-icon>
+        Yo{{ title }}</span>
       <span class="navbar-spacer"></span>
       <mat-icon class="navbar-icon">favorite</mat-icon>
       <mat-icon class="navbar-icon">delete</mat-icon>
