@@ -70,14 +70,17 @@ import { PageNotFoundComponent } from './page-not-found/page-not-found.component
       {
         path: 'home',
         component: HomeComponent,
+        data: { title: 'Home' },
       },
       {
         path: 'help',
         component: HelpComponent,
+        data: { title: 'Help' },
       },
       {
         path: 'settings',
         component: SettingsComponent,
+        data: { title: 'Settings' },
       },
       { // Default route
         path: '', 
@@ -87,6 +90,7 @@ import { PageNotFoundComponent } from './page-not-found/page-not-found.component
       { 
         path: '**', 
         component: PageNotFoundComponent,
+        data: { title: 'Page Not Found' },
       },
     ]),
 
