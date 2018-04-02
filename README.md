@@ -316,6 +316,12 @@ Add the component to the routes
 }
 ~~~
 
+## Set up the project to use Sass
+Sass is better than CSS, 
+~~~
+ng set defaults.styleExt scss
+~~~
+
 ## Use the following to start the server
 ~~~
 ng build --prod
