@@ -7,3 +7,12 @@ mat-drawer-container {
   left: 0;
   right: 0;
 }
+
+mat-drawer {
+  width: 300px;
+}
+
+mat-icon {
+color: rgba(0,0,0,0.54);
+margin-right: 16px;
+}

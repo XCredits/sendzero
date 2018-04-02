@@ -1,14 +1,13 @@
 <mat-drawer-container>
-  <mat-drawer #drawer mode="side" opened="true">
+  <mat-drawer #navigationDrawer mode="push" opened="true">
     <mat-nav-list>
-      Drawer<br>
+      <div>Drawer </div><br>
       <a mat-list-item routerLink='/home'>
         <mat-icon>home</mat-icon>
         Home
       </a>
       <a mat-list-item routerLink='/help'>
-        <mat-icon>help-outline</mat-icon>
-        Help
+        <mat-icon>help</mat-icon>Help
       </a>
       <a mat-list-item routerLink='/settings'>
         <mat-icon>settings</mat-icon>
@@ -18,7 +17,7 @@
   </mat-drawer>
   <mat-drawer-content>
     <mat-toolbar color="primary">
-      <button mat-icon-button (click)="drawer.toggle()">
+      <button mat-icon-button (click)="toggleNavigationDrawer()">
         <mat-icon class="mat-icon">
           menu
         </mat-icon>
