@@ -14,10 +14,13 @@ mat-drawer {
 }
 
 mat-drawer mat-icon {
-  color: rgba(0,0,0,0.54);
   margin-right: 16px;
 }
 
-.mat-drawer .mat-drawer-side {
-  
+.navbar-spacer {
+  flex: 1 1 auto;
+}
+
+.navbar-icon {
+  padding: 0 14px;
 }

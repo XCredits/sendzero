@@ -79,7 +79,7 @@ import { PageNotFoundComponent } from './page-not-found/page-not-found.component
         path: 'settings',
         component: SettingsComponent,
       },
-      { 
+      { // Default route
         path: '', 
         redirectTo: '/home', 
         pathMatch: 'full',
