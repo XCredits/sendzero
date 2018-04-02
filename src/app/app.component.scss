@@ -1,3 +1,6 @@
+$drawerWidth: 300px;
+$navDrawerImage: 'https://images.pexels.com/photos/1562/italian-landscape-mountains-nature.jpg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260';
+
 mat-drawer-container {
   display: flex;
   flex-direction: column;
@@ -9,16 +12,26 @@ mat-drawer-container {
 }
 
 .mat-drawer {
-  width: 300px;
+  width: $drawerWidth;
   box-shadow: 0 8px 10px -5px rgba(0,0,0,.2), 0 16px 24px 2px rgba(0,0,0,.14), 0 6px 30px 5px rgba(0,0,0,.12);
   background-image: 
-    linear-gradient( rgba(0,0,0,.8), rgba(0,0,0,.8) ),
-    url('https://images.pexels.com/photos/55766/pexels-photo-55766.jpeg');
+    linear-gradient( rgba(0, 0, 0, 0.8), rgba(0,0,0,.8) ),
+    url($navDrawerImage);
   background-size: cover;
+}
+
+.logo-toolbar {
+  background-color: rgba(0, 0, 0, 0.2)
 }
 
 mat-drawer mat-icon {
   margin-right: 16px;
+}
+
+.top-navbar {
+  position: -webkit-sticky; 
+  position: sticky;
+  top: 0;
 }
 
 .navbar-spacer {
@@ -30,8 +43,9 @@ mat-drawer mat-icon {
 }
 
 .bottom-mobile-nav {
-  position: absolute;
+  position: fixed;
   bottom: 0;
   display: flex;
   justify-content: space-between;
 }
+

@@ -1,6 +1,6 @@
 <mat-drawer-container>
   <mat-drawer #navigationDrawer mode="push" opened="false" class="unicorn-dark-theme">
-    <mat-toolbar>App name/logo</mat-toolbar>
+    <mat-toolbar class="logo-toolbar">App name/logo</mat-toolbar>
     <mat-nav-list>
       <a *ngFor="let navLink of mainNavLinks" mat-list-item routerLink="{{navLink.routerLink}}" (click)="hideNavAfterClick()">
         <mat-icon>{{navLink.icon}}</mat-icon>
@@ -9,7 +9,7 @@
     </mat-nav-list>
   </mat-drawer>
   <mat-drawer-content>
-    <mat-toolbar color="primary">
+    <mat-toolbar color="primary" class="top-navbar">
       <div class="mobile-visible">
         <button mat-icon-button  class="mobile-visible" (click)="toggleNavigationDrawer()">
           <mat-icon>
@@ -24,15 +24,15 @@
       <span class="navbar-spacer"></span>
       <mat-icon class="navbar-icon">person_add</mat-icon>
     </mat-toolbar>
-    <div class="content">
-      <router-outlet></router-outlet>
-      <div class="mobile-visible">
-        <mat-toolbar class="bottom-mobile-nav">
-          <button *ngFor="let navLink of mainNavLinks" mat-icon-button routerLink="{{navLink.routerLink}}" >
-            <mat-icon>{{navLink.icon}}</mat-icon>
-          </button>
-        </mat-toolbar>
-      </div>
+    <router-outlet></router-outlet>
+    <div class="mobile-visible">
+      <!-- Below mat-toolbar if for lazy spacing -->
+      <mat-toolbar></mat-toolbar>
+      <mat-toolbar class="bottom-mobile-nav">
+        <button *ngFor="let navLink of mainNavLinks" mat-icon-button routerLink="{{navLink.routerLink}}" >
+          <mat-icon>{{navLink.icon}}</mat-icon>
+        </button>
+      </mat-toolbar>
     </div>
   </mat-drawer-content>
 </mat-drawer-container>
