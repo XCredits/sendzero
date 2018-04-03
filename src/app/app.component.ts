@@ -1,4 +1,7 @@
 import { Component, ViewChild } from '@angular/core';
+// Imports needed for router import for title
+import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
+import 'rxjs/add/operator/filter'
 
 @Component({
   selector: 'app-root',
@@ -9,7 +12,7 @@ export class AppComponent {
   @ViewChild('navigationDrawer') navigationDrawer;
   screenWidth: number;
   mobileWidth: boolean = false;
-
+  title: string;
   // Edit the area below to create main nav links
   // There should be 
   primaryNavLinks: { routerLink: string, icon: string, text: string }[] = [
@@ -67,13 +70,20 @@ export class AppComponent {
     }
   }
 
-  constructor() {
+  constructor(router:Router, route:ActivatedRoute) {
     // Set side bar mode
     this.screenWidth = window.innerWidth;
     window.onresize = () => {
       this.screenWidth = window.innerWidth;
       this.setSideBar();
     };
+
+    // 
+    router.events
+      .filter(e => e instanceof NavigationEnd)
+      .forEach(e => {
+        this.title = route.root.firstChild.snapshot.data['title'];
+      });
   }
 
   ngAfterViewInit() {
