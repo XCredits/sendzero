@@ -1,10 +1,92 @@
-import { Component } from '@angular/core';
+import { Component, ViewChild } from '@angular/core';
+// Imports needed for router import for title
+import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
+import 'rxjs/add/operator/filter'
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
-  styleUrls: ['./app.component.css']
+  styleUrls: ['./app.component.scss']
 })
 export class AppComponent {
-  title = 'app';
+  @ViewChild('navigationDrawer') navigationDrawer;
+  screenWidth: number;
+  mobileWidth: boolean = false;
+  title: string;
+  // Edit the area below to create main nav links
+  // There should be 
+  primaryNavLinks: { routerLink: string, icon: string, text: string }[] = [
+    {
+      routerLink: '/home',
+      icon: 'home',
+      text: 'Home',
+    },
+    {
+      routerLink: '/feed',
+      icon: 'chat',
+      text: 'Feed',
+    },
+    {
+      routerLink: '/contacts',
+      icon: 'person',
+      text: 'Contacts',
+    },
+  ];
+
+  secondaryNavLinks: { routerLink: string, icon: string, text: string }[] = [
+    {
+      routerLink: '/help',
+      icon: 'help',
+      text: 'Help',
+    },
+    {
+      routerLink: '/settings',
+      icon: 'settings',
+      text: 'Settings',
+    },
+  ];
+
+
+  toggleNavigationDrawer() {
+    this.navigationDrawer.toggle();
+  }
+
+  hideNavAfterClick () {
+    if (this.mobileWidth) {
+      this.toggleNavigationDrawer();
+    }
+  }
+
+  setSideBar() {
+    console.log(this.navigationDrawer);
+    if (this.screenWidth < 768) {
+      this.navigationDrawer.mode = 'push'; // push or over
+      this.navigationDrawer.opened = false;
+      this.mobileWidth = true;
+    } else {
+      this.navigationDrawer.mode = 'side';
+      this.navigationDrawer.opened = true;
+      this.mobileWidth = false;
+    }
+  }
+
+  constructor(router:Router, route:ActivatedRoute) {
+    // Set side bar mode
+    this.screenWidth = window.innerWidth;
+    window.onresize = () => {
+      this.screenWidth = window.innerWidth;
+      this.setSideBar();
+    };
+
+    // 
+    router.events
+      .filter(e => e instanceof NavigationEnd)
+      .forEach(e => {
+        this.title = route.root.firstChild.snapshot.data['title'];
+      });
+  }
+
+  ngAfterViewInit() {
+    this.setSideBar();
+  }
 }

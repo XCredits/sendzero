@@ -1,14 +1,49 @@
-<!--The content below is only a placeholder and can be replaced.-->
-<mat-toolbar color="primary">
-  <span>{{ title }}</span>
-  <span class="navbar-spacer"></span>
-  <mat-icon class="navbar-icon">favorite</mat-icon>
-  <mat-icon class="navbar-icon">delete</mat-icon>
-</mat-toolbar>
+<mat-drawer-container>
+  <mat-drawer #navigationDrawer mode="push" opened="false" class="unicorn-dark-theme">
+    <mat-toolbar class="logo-toolbar">
+      <!-- Below line was added to prevent the mat-drawer form highlighting the logo with an orange box -->
+      <a routerLink="/" (click)="hideNavAfterClick()"></a>
+      <a routerLink="/" (click)="hideNavAfterClick()">
+        <img class="logo-long" src="/assets/img/logo-long-white.png" />
+      </a>
+    </mat-toolbar>
+    <mat-nav-list>
+      <a *ngFor="let navLink of primaryNavLinks" mat-list-item routerLink="{{navLink.routerLink}}" (click)="hideNavAfterClick()">
+        <mat-icon>{{navLink.icon}}</mat-icon>
+        {{navLink.text}}
+      </a>
+      <a *ngFor="let navLink of secondaryNavLinks" mat-list-item routerLink="{{navLink.routerLink}}" (click)="hideNavAfterClick()">
+        <mat-icon>{{navLink.icon}}</mat-icon>
+        {{navLink.text}}
+      </a>
+    </mat-nav-list>
+  </mat-drawer>
+  <mat-drawer-content>
+    <mat-toolbar color="primary" class="top-navbar">
+      <div class="mobile-visible" >
+        <button mat-icon-button (click)="toggleNavigationDrawer()">
+          <mat-icon>
+            menu
+          </mat-icon>
+        </button>
+      </div>
+      <img class="logo-square mobile-visible" src="/assets/img/logo-square-white.png" />
+      <span>
+        {{title}}
+      </span>
+      <span class="navbar-spacer"></span>
+      <mat-icon class="navbar-icon">person_add</mat-icon>
+    </mat-toolbar>
+    <router-outlet></router-outlet>
+    <div class="mobile-visible">
+      <!-- Below mat-toolbar if for lazy spacing -->
+      <mat-toolbar></mat-toolbar>
+      <mat-toolbar class="bottom-mobile-nav">
+        <button *ngFor="let navLink of primaryNavLinks" mat-icon-button routerLink="{{navLink.routerLink}}" >
+          <mat-icon>{{navLink.icon}}</mat-icon>
+        </button>
+      </mat-toolbar>
+    </div>
+  </mat-drawer-content>
+</mat-drawer-container>
 
-<a routerLink='/home'>Home</a>
-<a routerLink='/help'>Help</a>
-<a routerLink='/settings'>Settings</a>
-
-
-<router-outlet></router-outlet>

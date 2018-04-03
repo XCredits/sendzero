@@ -53,6 +53,8 @@ import { HomeComponent } from './home/home.component';
 import { HelpComponent } from './help/help.component';
 import { SettingsComponent } from './settings/settings.component';
 import { PageNotFoundComponent } from './page-not-found/page-not-found.component';
+import { FeedComponent } from './feed/feed.component';
+import { ContactsComponent } from './contacts/contacts.component';
 
 @NgModule({
   declarations: [
@@ -61,6 +63,8 @@ import { PageNotFoundComponent } from './page-not-found/page-not-found.component
     HelpComponent,
     SettingsComponent,
     PageNotFoundComponent,
+    FeedComponent,
+    ContactsComponent,
   ],
   imports: [
     BrowserModule, 
@@ -70,16 +74,29 @@ import { PageNotFoundComponent } from './page-not-found/page-not-found.component
       {
         path: 'home',
         component: HomeComponent,
+        data: { title: 'Home' },
+      },
+      {
+        path: 'feed',
+        component: FeedComponent,
+        data: { title: 'Feed' },
+      },
+      {
+        path: 'contacts',
+        component: ContactsComponent,
+        data: { title: 'Contacts' },
       },
       {
         path: 'help',
         component: HelpComponent,
+        data: { title: 'Help' },
       },
       {
         path: 'settings',
         component: SettingsComponent,
+        data: { title: 'Settings' },
       },
-      { 
+      { // Default route
         path: '', 
         redirectTo: '/home', 
         pathMatch: 'full',
@@ -87,6 +104,7 @@ import { PageNotFoundComponent } from './page-not-found/page-not-found.component
       { 
         path: '**', 
         component: PageNotFoundComponent,
+        data: { title: 'Page Not Found' },
       },
     ]),
 

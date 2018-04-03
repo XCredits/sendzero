@@ -316,6 +316,29 @@ Add the component to the routes
 }
 ~~~
 
+## Set up the project to use Sass
+Sass is better than CSS, 
+~~~
+ng set defaults.styleExt scss
+~~~
+Convert all the .css files (and all references to those files) to .scss files. 
+
+## Add an app manifest to make it phone home screen compatible
+Using the [instructions from Google](https://developers.google.com/web/fundamentals/web-app-manifest/) a manifest.json file was added to the project, and the following line added to `index.js`
+~~~
+<link rel="manifest" href="/manifest.json">
+~~~
+This file is needed in the `dist` folder, so we need to add it to the assets array in the `.angular.cli,json` file:
+~~~
+"assets": [
+  "assets",
+  "favicon.ico",
+  "manifest.json"
+]
+~~~
+
+
+
 ## Use the following to start the server
 ~~~
 ng build --prod
