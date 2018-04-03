@@ -8,9 +8,12 @@
     <h2>Send text using WebRTC!</h2>
 </div>
 <div class="connectionBox">
-  {{peerId}}
-  <input type="text" name="peer_id" id="peer_id" placeholder="Enter peer id">
-  <button (click)="connectPeers()" id="connectButton" name="connectButton"
+  <input type="text" name="offer" id="offer" value="{{offer}}" [(ngModel)]="offerString">
+  <button (click)="getAnswer(offerString)" id="getAnswerButton" name="getAnswerButton" class="getAnswerButton">
+      Get Answer
+  </button>
+  <input type="text" name="answer" id="answer" placeholder="Paste answer" [(ngModel)]="answer">
+  <button (click)="connectPeers(answer)" id="connectButton" name="connectButton"
       class="connectButton">
     Connect
   </button>
