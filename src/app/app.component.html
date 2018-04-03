@@ -1,6 +1,8 @@
 <mat-drawer-container>
   <mat-drawer #navigationDrawer mode="push" opened="false" class="unicorn-dark-theme">
-    <mat-toolbar class="logo-toolbar">App name/logo</mat-toolbar>
+    <mat-toolbar class="logo-toolbar">
+      <img class="logo-long" src="/assets/img/logo-long-white.png" />
+    </mat-toolbar>
     <mat-nav-list>
       <a *ngFor="let navLink of primaryNavLinks" mat-list-item routerLink="{{navLink.routerLink}}" (click)="hideNavAfterClick()">
         <mat-icon>{{navLink.icon}}</mat-icon>
@@ -14,14 +16,14 @@
   </mat-drawer>
   <mat-drawer-content>
     <mat-toolbar color="primary" class="top-navbar">
-      <div class="mobile-visible">
-        <button mat-icon-button  class="mobile-visible" (click)="toggleNavigationDrawer()">
+      <div class="mobile-visible" >
+        <button mat-icon-button (click)="toggleNavigationDrawer()">
           <mat-icon>
             menu
           </mat-icon>
         </button>
-        <mat-icon>collections</mat-icon>
       </div>
+      <img class="logo-square mobile-visible" src="/assets/img/logo-square-white.png" />
       <span>
         Page title
       </span>

@@ -21,7 +21,10 @@ mat-drawer-container {
 }
 
 .logo-toolbar {
-  background-color: rgba(0, 0, 0, 0.2)
+  background-color: rgba(0, 0, 0, 0.2);
+  img {
+    height: 30px;
+  }
 }
 
 mat-drawer mat-icon {
@@ -32,6 +35,11 @@ mat-drawer mat-icon {
   position: -webkit-sticky; 
   position: sticky;
   top: 0;
+  .logo-square {
+    height: 30px;
+    position: relative;
+    margin-right: 8px;
+  }
 }
 
 .navbar-spacer {
@@ -41,6 +49,8 @@ mat-drawer mat-icon {
 .navbar-icon {
   padding: 0 14px;
 }
+
+
 
 .bottom-mobile-nav {
   position: fixed;
