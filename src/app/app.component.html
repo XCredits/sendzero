@@ -2,7 +2,11 @@
   <mat-drawer #navigationDrawer mode="push" opened="false" class="unicorn-dark-theme">
     <mat-toolbar class="logo-toolbar">App name/logo</mat-toolbar>
     <mat-nav-list>
-      <a *ngFor="let navLink of mainNavLinks" mat-list-item routerLink="{{navLink.routerLink}}" (click)="hideNavAfterClick()">
+      <a *ngFor="let navLink of primaryNavLinks" mat-list-item routerLink="{{navLink.routerLink}}" (click)="hideNavAfterClick()">
+        <mat-icon>{{navLink.icon}}</mat-icon>
+        {{navLink.text}}
+      </a>
+      <a *ngFor="let navLink of secondaryNavLinks" mat-list-item routerLink="{{navLink.routerLink}}" (click)="hideNavAfterClick()">
         <mat-icon>{{navLink.icon}}</mat-icon>
         {{navLink.text}}
       </a>
@@ -29,7 +33,7 @@
       <!-- Below mat-toolbar if for lazy spacing -->
       <mat-toolbar></mat-toolbar>
       <mat-toolbar class="bottom-mobile-nav">
-        <button *ngFor="let navLink of mainNavLinks" mat-icon-button routerLink="{{navLink.routerLink}}" >
+        <button *ngFor="let navLink of primaryNavLinks" mat-icon-button routerLink="{{navLink.routerLink}}" >
           <mat-icon>{{navLink.icon}}</mat-icon>
         </button>
       </mat-toolbar>
