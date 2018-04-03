@@ -1,7 +1,9 @@
 <mat-drawer-container>
   <mat-drawer #navigationDrawer mode="push" opened="false" class="unicorn-dark-theme">
     <mat-toolbar class="logo-toolbar">
-      <img class="logo-long" src="/assets/img/logo-long-white.png" />
+      <a routerLink="/" (click)="hideNavAfterClick()">
+        <img class="logo-long" src="/assets/img/logo-long-white.png" />
+      </a>
     </mat-toolbar>
     <mat-nav-list>
       <a *ngFor="let navLink of primaryNavLinks" mat-list-item routerLink="{{navLink.routerLink}}" (click)="hideNavAfterClick()">
