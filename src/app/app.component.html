@@ -18,6 +18,7 @@
       </a>
     </mat-nav-list>
   </mat-drawer>
+  <!-- Top nav -->
   <mat-drawer-content>
     <mat-toolbar color="primary" class="top-navbar">
       <div class="mobile-visible" >
@@ -34,7 +35,11 @@
       <span class="navbar-spacer"></span>
       <mat-icon class="navbar-icon">person_add</mat-icon>
     </mat-toolbar>
-    <router-outlet></router-outlet>
+    <!-- Route content -->
+    <div class="content">
+      <router-outlet></router-outlet>
+    </div>
+    <!-- Bottom mobile nav -->
     <div class="mobile-visible">
       <!-- Below mat-toolbar if for lazy spacing -->
       <mat-toolbar style="visibility:hidden"></mat-toolbar>
