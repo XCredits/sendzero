@@ -1,9 +1,15 @@
 declare var require: any
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { isObject, isString } from 'util';
-// import Peer from 'simple-peer';
+import io from 'socket.io-client';
+let io = require('socket.io-client');
 let Peer = require('simple-peer');
+let SimpleSignalClient = require('simple-signal-client');
+// import SimpleSignalClient from 'simple-signal-client';
+// let socket = io();
+// import Peer from 'simple-peer';
 
+// let signalClient = new SimpleSignalClient(socket);
 
 
 @Component({
@@ -30,6 +36,8 @@ export class AppComponent implements OnInit {
   fileBox = null;
   sendFileButton = null;
   reader;
+  socket;
+  simpleSignalClient;
   
 
   constructor(private ref: ChangeDetectorRef) {
@@ -138,6 +146,9 @@ export class AppComponent implements OnInit {
     this.receiveBox = document.getElementById("receiveBox");
     this.fileBox = document.getElementById("fileBox");
     this.sendFileButton = document.getElementById("sendFileButton");
+    // this has to change
+    this.socket = io("http://localhost:3000");
+    this.simpleSignalClient = new SimpleSignalClient(this.socket);
   }
 
   connectPeers(answer) {
