@@ -7,14 +7,13 @@
 <div>
     <h2>Send text using WebRTC!</h2>
 </div>
+Your id is: {{id}}
+<br>
+{{prompt}}
 <div class="connectionBox">
-  <input type="text" name="offer" id="offer" value="{{offer}}" [(ngModel)]="offerString">
-  <button (click)="getAnswer(offerString)" id="getAnswerButton" name="getAnswerButton" class="getAnswerButton">
-      Get Answer
-  </button>
-  <input type="text" name="answer" id="answer" placeholder="Paste answer" [(ngModel)]="answer">
-  <button (click)="connectPeers(answer)" id="connectButton" name="connectButton"
-      class="connectButton">
+  <input type="text" name="peerId" id="peerId" [(ngModel)]="peerId">
+  <button (click)="connectPeers()" id="connectButton" name="connectButton"
+      class="connectButton" disabled>
     Connect
   </button>
   <button (click)="disconnectPeers()" id="disconnectButton" name="disconnectButton"
@@ -45,5 +44,6 @@
       {{message.sender}}: {{message.data}}
     </li>
   </ul>
+  <button (click)="getBlob()">Get blob</button>
   <a target="_blank" href="{{url}}" download>Download file here</a>
 </div>

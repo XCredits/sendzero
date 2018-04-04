@@ -19,7 +19,6 @@ let SimpleSignalClient = require('simple-signal-client');
 })
 export class AppComponent implements OnInit {
   title: string;
-  peerId: string;
   peer;
   offer;
   connection;
@@ -27,6 +26,9 @@ export class AppComponent implements OnInit {
   file: File = null;
   url: string = null;
   fileType;
+  id: string;
+  peerId: string;
+  prompt: string;
   
   connectButton = null;
   disconnectButton = null;
@@ -37,72 +39,67 @@ export class AppComponent implements OnInit {
   sendFileButton = null;
   reader;
   socket;
-  simpleSignalClient;
-  
+  signalClient;
+  fileArray = [];  
 
   constructor(private ref: ChangeDetectorRef) {
     this.title = 'SendZero Alpha';
-    // @ts-ignore
-    this.peer = new Peer({ initiator: location.hash === '#1', trickle: false });
     var self = this;
-    this.peer.on('open', function(id) {
-      self.peerId = id;
-      console.log('My Peer Id is:' + id);
+    // this has to change
+    this.socket = io("http://localhost:3000");
+    this.signalClient = new SimpleSignalClient(this.socket);
+    this.signalClient.on('ready', function() {
+      // self.signalClient.connect();
+      self.id = self.signalClient.id;
+      self.prompt = "Enter peer's id below";
+      self.connectButton.disabled = false;
+    });
+    this.signalClient.on('request', function (request) {
+      console.log('request received');
+      request.accept(); // Accept a request to connect
+    });
+    this.signalClient.on('peer', function (peer) {
+      //peer // A fully signalled SimplePeer object
+      // console.log(peer);
+      self.sendButton.disabled = false;
+      self.messageBox.disabled = false;
+      self.peer = peer;
+      // Use as you would any SimplePeer object
+      peer.on('connect', function () {
+        self.peer.send(JSON.stringify({a:'b'}));
+        console.log('CONNECTED');
+      })
+      peer.on('data', function(data) {
+        // @ts-ignore
+        console.log(JSON.parse(new TextDecoder('utf-8').decode(data)));
+        let message = {
+          "data": "file",
+          "sender": "peer",
+          "type": "file",
+        }
+        console.log(data);
+      //   self.fileArray = new Uint8Array(data);
+      //   self.offset = data.length;
+      // }
+      //   var dataBlob = new Blob([data], {type: 'application/octet-stream'}); 
+      //   message.data = url;
+        // }
+        self.fileArray.push(data);
+        self.messages.push(message);
+        self.ref.detectChanges();
+      })
+      peer.on('error', function (err) { console.log('error', err) })
     })
     this.messages = [];
-    var self = this;
-    this.peer.on('signal', function (data) {
-      console.log('SIGNAL', JSON.stringify(data))
-      self.offer = JSON.stringify(data);
-      self.ref.detectChanges();
-    })
-    this.peer.on('connect', function() {
-      self.messageBox.disabled = false;
-      self.sendButton.disabled = false;
-      console.log('CONNECTED');
-      // console.log(data.data);
-      // let message = {
-      //   "data": data.data,
-      //   "sender": "peer",
-      //   "type": data.type,
-      // }
-      // if (data.type === "file") {
-      //   var dataView = new Uint8Array(data.data);
-      //   var dataBlob = new Blob([dataView], {type: "application/octet-stream"});
-      //   var url = window.URL.createObjectURL(dataBlob);
-      //   self.url = url;
-      //   message.data = url;
-      // }
-      // self.messages.push(message);
-      // self.ref.detectChanges();
-    });
-    this.peer.on('data', function (data) {
-      console.log('DATA RECEIVED: ');
-      console.log(JSON.stringify(data))
-      // data = JSON.stringify(JSON.parse(data));
-      let message = {
-        "data": data,
-        "sender": "peer",
-        "type": "file",
-      }
-      if (message.type === "file") {     
-        var dataBlob = new Blob([data], {type: 'application/octet-stream'}); 
-        var url = window.URL.createObjectURL(dataBlob);
-        self.url = url;
-        message.data = url;
-        console.log(url);
-      }
-      self.messages.push(message);
-      self.ref.detectChanges();
-    });
-    this.peer.on('error', function (err) { console.log('error', err) })
     this.reader = new FileReader();
     this.reader.onload = function () {
       console.log('Finished reading the file');
       console.log(self.reader.readyState);
-      console.log(self.reader.result);
+      let fileView = new Uint8Array(self.reader.result);
+      console.log(fileView);
       // var dataBlob = new Blob([self.reader.result], {type: self.fileType});
-      self.peer.send(self.reader.result);
+      // self.peer.send(self.reader.result);
+      self.peer.send(fileView);
     }
   }
 
@@ -115,8 +112,9 @@ export class AppComponent implements OnInit {
     let fileToBeSent = this.file;
     this.reader.readAsArrayBuffer(fileToBeSent);
     this.fileType = fileToBeSent.type;
-    //@ts-ignore
-    // var dataView = new Uint8Array(fileToBeSent);
+    // this.peer.send(fileToBeSent);
+    // @ts-ignore
+    // var dataView = new Uint8Array(fileBuffer);
     // this.peer.send(dataView);
     // this.peer.send(dataView);
     console.log(fileToBeSent.name, fileToBeSent.type);
@@ -146,11 +144,29 @@ export class AppComponent implements OnInit {
     this.receiveBox = document.getElementById("receiveBox");
     this.fileBox = document.getElementById("fileBox");
     this.sendFileButton = document.getElementById("sendFileButton");
-    // this has to change
-    this.socket = io("http://localhost:3000");
-    this.simpleSignalClient = new SimpleSignalClient(this.socket);
+    
   }
 
+  getBlob() {
+    // var totalLength =  0;
+    // var offset = this.fileArray[0].length;
+    // this.fileArray.forEach(element => {
+    //   totalLength = element.length;
+    // });
+    // var newFileArray = new Uint8Array(totalLength);
+    // // make this dyanmic
+    // // and delete stuff from array as soon as you put it into new array
+    // newFileArray.set(this.fileArray[0]);
+    // newFileArray.set(this.fileArray[1], offset);
+    var dataBlob = new Blob(this.fileArray, {type: 'application/octet-stream'});
+    var url = window.URL.createObjectURL(dataBlob);
+    this.url = url;
+    window.open(url);
+    console.log(url);
+    // TODO: revoke url
+    console.log(this.fileArray);
+    this.fileArray = [];
+  }
   connectPeers(answer) {
     var self = this;
     // this.connection.on('open', function(){
@@ -165,34 +181,18 @@ export class AppComponent implements OnInit {
     //     "sender": "peer",
     //     "type": data.type,
     //   };
-    //   if (data.type === "file") {
-    //     var dataView = new Uint8Array(data.data);
-    //     var dataBlob = new Blob([dataView]);
-    //     var url = window.URL.createObjectURL(dataBlob);
-    //     self.url = url;
-    //     message.data = url;
-    //   }
+  //     var dataView = new Uint8Array(data.data);
+  //     var dataBlob = new Blob([dataView]);
+  //     message.data = url;
     //   self.messages.push(message);
     //   self.ref.detectChanges();
     // });
-    this.peer.signal(JSON.parse(answer));
+    // this.peer.signal(JSON.parse(answer));
+    this.signalClient.connect(this.peerId);
   }
 
   sendMessage(text) {
-    if (this.peer.disconnected) {
-      alert('Not connected to peer!')
-      return;
-    }
-    let message = {
-      "data": text,
-      "sender": "you",
-      "type": "text",
-    }
-    this.messages.push(message);
-    this.connection.send({
-      data: text,
-      type: "text"
-    });
+    this.peer.send(text);
   }
 
   getAnswer(offer) {
