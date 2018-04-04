@@ -337,9 +337,46 @@ This file is needed in the `dist` folder, so we need to add it to the assets arr
 ]
 ~~~
 
+## Set up the dev platform to work with Nodemon
+The following configuration was inspired by [this answer on StackOverflow](https://stackoverflow.com/a/42907043).
 
+Install `concurrently` to run multiple commands at once
+~~~
+npm install concurrently --save 
+~~~
+
+Add `proxy.config.json` to root of Angular project:
+~~~
+{
+  "/api/*":{
+    "target":"http://localhost:3000",
+    "secure":false,
+    "logLevel":"debug"
+  }
+}
+~~~
+Add the following to `scripts` in `package.json`
+~~~
+"dev": "concurrently --kill-others \"npm run dev-server\" \"npm run dev-angular\"",
+"dev-server": "nodemon server.js --watch server",
+"dev-angular": "ng serve --proxy-config proxy.config.json",
+~~~
+The above will allow you to run `npm run dev`, which will start a Nodemon server that restarts when the 
 
 ## Use the following to start the server
+### To serve only the front-end
+~~~
+ng serve
+~~~
+Visit `localhost:4200`
+
+### To run the Express server with Nodemon and the Angular app
+~~~
+npm run dev
+~~~
+Visit `localhost:4200`
+
+### To test the Service Worker and Progressive Web App elements
 ~~~
 ng build --prod
 node server.js

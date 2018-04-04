@@ -5,7 +5,9 @@
   "scripts": {
     "ng": "ng",
     "start": "node server.js",
-    "start-dev": "nodemon server.js",
+    "dev": "concurrently --kill-others \"npm run dev-server\" \"npm run dev-angular\"",
+    "dev-server": "nodemon server.js --watch server",
+    "dev-angular": "ng serve --proxy-config proxy.config.json",
     "build": "ng build --prod",
     "test": "ng test",
     "lint": "ng lint",
@@ -28,8 +30,10 @@
     "@angular/router": "^5.2.0",
     "@angular/service-worker": "^5.2.9",
     "body-parser": "^1.18.2",
+    "concurrently": "^3.5.1",
     "core-js": "^2.4.1",
     "express": "^4.16.3",
+    "nodemon": "^1.17.3",
     "rxjs": "^5.5.6",
     "zone.js": "^0.8.19"
   },
