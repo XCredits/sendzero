@@ -37,7 +37,7 @@
     <router-outlet></router-outlet>
     <div class="mobile-visible">
       <!-- Below mat-toolbar if for lazy spacing -->
-      <mat-toolbar></mat-toolbar>
+      <mat-toolbar style="visibility:hidden"></mat-toolbar>
       <mat-toolbar class="bottom-mobile-nav">
         <button *ngFor="let navLink of primaryNavLinks" mat-icon-button routerLink="{{navLink.routerLink}}" >
           <mat-icon>{{navLink.icon}}</mat-icon>
