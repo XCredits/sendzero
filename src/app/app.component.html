@@ -1,18 +1,19 @@
 <mat-drawer-container>
-  <mat-drawer #navigationDrawer mode="push" opened="false" class="lwa-dark-theme">
+  <!-- Side nav -->
+  <mat-drawer #sideNavDrawer mode="push" opened="false" class="lwa-dark-theme">
     <mat-toolbar class="logo-toolbar">
       <!-- Below line was added to prevent the mat-drawer form highlighting the logo with an orange box -->
-      <a routerLink="/" (click)="hideNavAfterClick()"></a>
-      <a routerLink="/" (click)="hideNavAfterClick()">
+      <a routerLink="/" (click)="hideSideNavAfterClick()"></a>
+      <a routerLink="/" (click)="hideSideNavAfterClick()">
         <img class="logo-long" src="/assets/img/logo-long-white.png" />
       </a>
     </mat-toolbar>
     <mat-nav-list>
-      <a *ngFor="let navLink of primaryNavLinks" mat-list-item routerLink="{{navLink.routerLink}}" (click)="hideNavAfterClick()">
+      <a *ngFor="let navLink of primaryNavLinks" mat-list-item routerLink="{{navLink.routerLink}}" (click)="hideSideNavAfterClick()">
         <mat-icon>{{navLink.icon}}</mat-icon>
         {{navLink.text}}
       </a>
-      <a *ngFor="let navLink of secondaryNavLinks" mat-list-item routerLink="{{navLink.routerLink}}" (click)="hideNavAfterClick()">
+      <a *ngFor="let navLink of secondaryNavLinks" mat-list-item routerLink="{{navLink.routerLink}}" (click)="hideSideNavAfterClick()">
         <mat-icon>{{navLink.icon}}</mat-icon>
         {{navLink.text}}
       </a>
@@ -22,7 +23,7 @@
   <mat-drawer-content>
     <mat-toolbar color="primary" class="top-navbar">
       <div class="mobile-visible" >
-        <button mat-icon-button (click)="toggleNavigationDrawer()">
+        <button mat-icon-button (click)="toggleSideNavDrawer()">
           <mat-icon>
             menu
           </mat-icon>

@@ -9,7 +9,7 @@ import 'rxjs/add/operator/filter'
   styleUrls: ['./app.component.scss']
 })
 export class AppComponent {
-  @ViewChild('navigationDrawer') navigationDrawer;
+  @ViewChild('sideNavDrawer') sideNavDrawer;
   screenWidth: number;
   mobileWidth: boolean = false;
   title: string;
@@ -47,25 +47,25 @@ export class AppComponent {
   ];
 
 
-  toggleNavigationDrawer() {
-    this.navigationDrawer.toggle();
+  toggleSideNavDrawer() {
+    this.sideNavDrawer.toggle();
   }
 
-  hideNavAfterClick () {
+  hideSideNavAfterClick () {
     if (this.mobileWidth) {
-      this.toggleNavigationDrawer();
+      this.toggleSideNavDrawer();
     }
   }
 
   setSideBar() {
-    console.log(this.navigationDrawer);
+    console.log(this.sideNavDrawer);
     if (this.screenWidth < 768) {
-      this.navigationDrawer.mode = 'push'; // push or over
-      this.navigationDrawer.opened = false;
+      this.sideNavDrawer.mode = 'push'; // push or over
+      this.sideNavDrawer.opened = false;
       this.mobileWidth = true;
     } else {
-      this.navigationDrawer.mode = 'side';
-      this.navigationDrawer.opened = true;
+      this.sideNavDrawer.mode = 'side';
+      this.sideNavDrawer.opened = true;
       this.mobileWidth = false;
     }
   }
