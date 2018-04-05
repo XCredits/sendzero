@@ -44,6 +44,7 @@ Your id is: {{id}}
       {{message.sender}}: {{message.data}}
     </li>
   </ul>
+  <progress [value]="fileProgress" [max]="maxFileChunks">Progress</progress>
   <button (click)="getBlob()">Get blob</button>
-  <a target="_blank" href="{{url}}" download>Download file here</a>
+  <a target="_blank" [href]="url" download="{{receiveFileName}}">Download file here</a>
 </div>

@@ -1,10 +1,12 @@
 declare var require: any
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { DomSanitizer } from '@angular/platform-browser';
 import { isObject, isString } from 'util';
 import io from 'socket.io-client';
 let io = require('socket.io-client');
 let Peer = require('simple-peer');
 let SimpleSignalClient = require('simple-signal-client');
+let chunkSize = 60000
 // import SimpleSignalClient from 'simple-signal-client';
 // let socket = io();
 // import Peer from 'simple-peer';
@@ -24,7 +26,7 @@ export class AppComponent implements OnInit {
   connection;
   messages: {data: string, sender: string, type: string}[];
   file: File = null;
-  url: string = null;
+  url = null;
   fileType;
   id: string;
   peerId: string;
@@ -40,9 +42,14 @@ export class AppComponent implements OnInit {
   reader;
   socket;
   signalClient;
-  fileArray = [];  
+  fileArray;
+  receiveFileMetadata;
+  receiveFileName;
+  receivedChunkCounter = 0;  
+  fileProgress = 0;
+  maxFileChunks = 1;
 
-  constructor(private ref: ChangeDetectorRef) {
+  constructor(private ref: ChangeDetectorRef, private sanitizer: DomSanitizer) {
     this.title = 'SendZero Alpha';
     var self = this;
     // this has to change
@@ -66,27 +73,36 @@ export class AppComponent implements OnInit {
       self.peer = peer;
       // Use as you would any SimplePeer object
       peer.on('connect', function () {
-        self.peer.send(JSON.stringify({a:'b'}));
         console.log('CONNECTED');
       })
       peer.on('data', function(data) {
         // @ts-ignore
-        console.log(JSON.parse(new TextDecoder('utf-8').decode(data)));
-        let message = {
-          "data": "file",
-          "sender": "peer",
-          "type": "file",
+        // console.log(JSON.parse(new TextDecoder('utf-8').decode(data)));
+        try {
+          // @ts-ignore
+          self.receiveFileMetadata = JSON.parse(new TextDecoder('utf-8').decode(data));
+          self.maxFileChunks = self.receiveFileMetadata.numberOfChunks;
+          self.fileArray = Array(self.receiveFileMetadata.numberOfChunks);
+          console.log(self.receiveFileMetadata);
+        } catch(e) {
+          let message = {
+            "data": "file",
+            "sender": "peer",
+            "type": "file",
+          }
+          if (self.receivedChunkCounter < self.receiveFileMetadata.numberOfChunks - 1) {
+            self.fileArray.push(data);
+            self.fileProgress++;
+            self.receivedChunkCounter++;
+            self.ref.detectChanges();
+          } else {
+            self.fileArray.push(data);            
+            console.log(self.fileArray);
+            self.messages.push(message);
+            self.ref.detectChanges();
+            self.getBlob();
+          }
         }
-        console.log(data);
-      //   self.fileArray = new Uint8Array(data);
-      //   self.offset = data.length;
-      // }
-      //   var dataBlob = new Blob([data], {type: 'application/octet-stream'}); 
-      //   message.data = url;
-        // }
-        self.fileArray.push(data);
-        self.messages.push(message);
-        self.ref.detectChanges();
       })
       peer.on('error', function (err) { console.log('error', err) })
     })
@@ -96,10 +112,26 @@ export class AppComponent implements OnInit {
       console.log('Finished reading the file');
       console.log(self.reader.readyState);
       let fileView = new Uint8Array(self.reader.result);
-      console.log(fileView);
-      // var dataBlob = new Blob([self.reader.result], {type: self.fileType});
-      // self.peer.send(self.reader.result);
-      self.peer.send(fileView);
+      console.log(fileView.byteLength);
+      let fileByteLength = fileView.byteLength;
+      let numberOfChunks = Math.ceil(fileByteLength/chunkSize);
+      let chunks = [];
+      for (let i = 0; i < numberOfChunks - 1; i++) {
+        chunks.push(fileView.slice(chunkSize*i, chunkSize*(i+1)))
+      }
+      chunks.push(fileView.slice(chunkSize*(numberOfChunks-1)));
+      console.log(chunks);
+      let metadata = {
+        fileName: self.file.name,
+        fileType: self.file.type,
+        fileSize: self.file.size,
+        fileByteSize: fileByteLength,
+        numberOfChunks: numberOfChunks,
+      };
+      self.peer.send(JSON.stringify(metadata));
+      chunks.forEach(element => {
+        self.peer.write(element);  
+      });
     }
   }
 
@@ -148,46 +180,24 @@ export class AppComponent implements OnInit {
   }
 
   getBlob() {
-    // var totalLength =  0;
-    // var offset = this.fileArray[0].length;
-    // this.fileArray.forEach(element => {
-    //   totalLength = element.length;
-    // });
-    // var newFileArray = new Uint8Array(totalLength);
-    // // make this dyanmic
-    // // and delete stuff from array as soon as you put it into new array
-    // newFileArray.set(this.fileArray[0]);
-    // newFileArray.set(this.fileArray[1], offset);
-    var dataBlob = new Blob(this.fileArray, {type: 'application/octet-stream'});
-    var url = window.URL.createObjectURL(dataBlob);
-    this.url = url;
-    window.open(url);
+    this.receiveFileName = this.receiveFileMetadata.fileName; 
+    var dataBlob = new Blob(this.fileArray, {type: this.receiveFileMetadata.fileType});
+    let url = window.URL.createObjectURL(dataBlob);
+    this.url = this.sanitizer.bypassSecurityTrustResourceUrl(url);
+    // window.open(url);
     console.log(url);
+    console.log(this.receiveFileName);
+    this.ref.detectChanges();
     // TODO: revoke url
-    console.log(this.fileArray);
-    this.fileArray = [];
+    // console.log(this.fileArray);
+    this.fileArray = null;
+    this.receiveFileMetadata = {};
+    this.receivedChunkCounter = 0;
+    this.maxFileChunks = null;
+    this.fileProgress = null;
   }
   connectPeers(answer) {
     var self = this;
-    // this.connection.on('open', function(){
-    //   self.messageBox.disabled = false;
-    //   self.sendButton.disabled = false;
-    //   console.log('connection is open');
-    // });
-    // this.connection.on('data', function(data) {
-    //   console.log(data.data);
-    //   let message = {
-    //     "data": data.data,
-    //     "sender": "peer",
-    //     "type": data.type,
-    //   };
-  //     var dataView = new Uint8Array(data.data);
-  //     var dataBlob = new Blob([dataView]);
-  //     message.data = url;
-    //   self.messages.push(message);
-    //   self.ref.detectChanges();
-    // });
-    // this.peer.signal(JSON.parse(answer));
     this.signalClient.connect(this.peerId);
   }
 
