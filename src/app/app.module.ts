@@ -1,11 +1,8 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-
-
-
-
 import { AppComponent } from './app.component';
+import { SendZeroConnectService } from './send-zero-connect.service';
 
 
 @NgModule({
@@ -16,7 +13,9 @@ import { AppComponent } from './app.component';
     BrowserModule,
     FormsModule
   ],
-  providers: [],
+  providers: [
+    SendZeroConnectService,
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

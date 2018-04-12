@@ -1,8 +1,7 @@
 declare var require: any
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { DomSanitizer } from '@angular/platform-browser';
-import { isObject, isString } from 'util';
-import io from 'socket.io-client';
+
 let io = require('socket.io-client');
 let Peer = require('simple-peer');
 let SimpleSignalClient = require('simple-signal-client');
