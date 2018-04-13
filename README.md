@@ -220,8 +220,9 @@ Put the following at the top of app.component.html
 <mat-toolbar color="primary">
   <span>{{ title }}</span>
   <span class="navbar-spacer"></span>
-  <mat-icon class="navbar-icon">favorite</mat-icon>
-  <mat-icon class="navbar-icon">delete</mat-icon>
+  <button mat-icon-button routerLink="/contacts">
+    <mat-icon>person</mat-icon>
+  </button>
 </mat-toolbar>
 ~~~
 Add the following to styles.css

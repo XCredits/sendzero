@@ -21,7 +21,7 @@
   </mat-drawer>
   <!-- Top nav -->
   <mat-drawer-content>
-    <mat-toolbar color="primary" class="top-navbar">
+    <mat-toolbar color="primary" class="top-navbar" role="header">
       <div class="mobile-visible" >
         <button mat-icon-button (click)="toggleSideNavDrawer()">
           <mat-icon>
@@ -34,7 +34,9 @@
         {{title}}
       </span>
       <span class="navbar-spacer"></span>
-      <mat-icon class="navbar-icon">person_add</mat-icon>
+      <button mat-icon-button routerLink="/contacts">
+        <mat-icon>person</mat-icon>
+      </button>
     </mat-toolbar>
     <!-- Route content -->
     <div class="content">
