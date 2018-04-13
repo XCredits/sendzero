@@ -55,6 +55,7 @@ import { SettingsComponent } from './settings/settings.component';
 import { PageNotFoundComponent } from './page-not-found/page-not-found.component';
 import { FeedComponent } from './feed/feed.component';
 import { ContactsComponent } from './contacts/contacts.component';
+import { AboutComponent } from './about/about.component';
 
 @NgModule({
   declarations: [
@@ -65,6 +66,7 @@ import { ContactsComponent } from './contacts/contacts.component';
     PageNotFoundComponent,
     FeedComponent,
     ContactsComponent,
+    AboutComponent,
   ],
   imports: [
     BrowserModule, 
@@ -95,6 +97,11 @@ import { ContactsComponent } from './contacts/contacts.component';
         path: 'settings',
         component: SettingsComponent,
         data: { title: 'Settings' },
+      },
+      {
+        path: 'about',
+        component: AboutComponent,
+        data: { title: 'About' },
       },
       { // Default route
         path: '', 

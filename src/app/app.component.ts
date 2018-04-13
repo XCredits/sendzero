@@ -31,6 +31,11 @@ export class AppComponent {
       icon: 'person',
       text: 'Contacts',
     },
+    {
+      routerLink: '/about',
+      icon: 'view_carousel',
+      text: 'About',
+    },
   ];
 
   secondaryNavLinks: { routerLink: string, icon: string, text: string }[] = [
