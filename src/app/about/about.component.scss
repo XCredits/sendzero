@@ -1,11 +1,15 @@
 #intro-top {
   padding: 16px;
+  padding-top: 64px;
+  padding-bottom: 64px;
+  min-height: calc(70vh -64px);
+
   background-color: #6bc7cc;
-  min-height: 100vh;
   text-align: center;
   color: #fff;
   // display: -webkit-flex; /* Safari */
   // -webkit-align-items: center; /* Safari 7.0+ */
+  // -webkit-justify-content: center; /* Safari 7.0+ */
   // display: flex;
   // align-items: center;
   // justify-content: center;
