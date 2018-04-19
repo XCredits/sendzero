@@ -26,15 +26,17 @@
   display: flex;
   -webkit-flex-wrap: wrap;
   flex-wrap: wrap;
+  -webkit-justify-content: center;
+  justify-content:         center;
   
   .container {
     flex-grow: 1;
-    max-width: 900px;
-    -webkit-justify-content: center; /* Safari */
+    max-width: 1200px;
+    -webkit-justify-content: center;
     justify-content:         center;
     .row-side {
-      min-width: 200px;
-      max-width: 400px;
+      min-width: 300px;
+      max-width: 600px;
       flex-basis: auto; /* default value */
       flex-grow: 1;
     }
