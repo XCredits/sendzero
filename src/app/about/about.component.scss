@@ -21,7 +21,25 @@
   }
   text-shadow: 0px 2px 20px #000;
 }
-#c2 {
-  background-color : tan;
+.row {
+  display: -webkit-flex;
+  display: flex;
+  -webkit-flex-wrap: wrap;
+  flex-wrap: wrap;
+  
+  .container {
+    flex-grow: 1;
+    max-width: 900px;
+    -webkit-justify-content: center; /* Safari */
+    justify-content:         center;
+    .row-side {
+      min-width: 200px;
+      max-width: 400px;
+      flex-basis: auto; /* default value */
+      flex-grow: 1;
+    }
+  }
 }
+
+
 
