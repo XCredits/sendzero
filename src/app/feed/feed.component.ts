@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
 
 @Component({
   selector: 'app-feed',
@@ -7,9 +8,13 @@ import { Component, OnInit } from '@angular/core';
 })
 export class FeedComponent implements OnInit {
 
-  constructor() { }
+  constructor( private http: HttpClient ) { }
 
   ngOnInit() {
+    this.http.get('/api/test')
+      .subscribe(data => {
+        console.log(data); // using the HttpClient instance, http to call the API then subscribe to the data and display to console
+      });
   }
 
 }

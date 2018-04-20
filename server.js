@@ -9,6 +9,11 @@ app.use(express.static(path.join(__dirname, 'dist')));
 const port = process.env.PORT || '3000';
 app.set('port', port);
 
+app.get('/api/test', function(req, res) {
+  res.status.send("Hello from express");
+});
+
+
 app.get('*', function(req, res) {
   res.sendFile(path.join(__dirname, 'dist/index.html'));
 });
