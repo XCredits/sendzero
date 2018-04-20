@@ -16,16 +16,16 @@ let SERVER_URL = "http://localhost:3000";
 @Injectable()
 export class SendZeroService {
   // Typed definitions
-  id: string;
-  peerId: string; 
-  prompt: string;
-  url: SafeResourceUrl;
-  disableConnectButton: boolean; 
-  disableSendButton: boolean;
-  fileName: string;
+  public id: string;
+  public peerId: string; 
+  public prompt: string;
+  public url: SafeResourceUrl;
+  public disableConnectButton: boolean; 
+  public disableSendButton: boolean;
+  public fileName: string;
   // For progress element
-  maxFileChunks: number = 0;
-  receivedChunks: number = 0;
+  public maxFileChunks: number = 0;
+  public receivedChunks: number = 0;
   private receivedFileMetadata: {
     fileName: string,
     fileType: string,
