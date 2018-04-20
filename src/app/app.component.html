@@ -5,7 +5,7 @@
   </h1>
 </div>
 <div>
-    <h2>Send text using WebRTC!</h2>
+    <h2>Send files using WebRTC!</h2>
 </div>
 Your id is: {{sendZeroService.id}}
 <br>
@@ -15,10 +15,6 @@ Your id is: {{sendZeroService.id}}
   <button (click)="connectToPeer()" id="connectButton" name="connectButton"
       class="connectButton" [disabled]="sendZeroService.disableConnectButton">
     Connect
-  </button>
-  <button (click)="disconnectPeers()" id="disconnectButton" name="disconnectButton"
-      class="disconnectButton" disabled>
-    Disconnect
   </button>
 </div>
 <div class="fileBox" id="fileBox" >
