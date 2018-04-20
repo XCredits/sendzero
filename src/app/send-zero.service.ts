@@ -9,7 +9,10 @@ let SimpleSignalClient = require('simple-signal-client');
 // Simple peer splits files greater that 64k, so we make our lives easier
 // by splitting up files ino 60k chunks
 let CHUNK_SIZE = 60000
-let SERVER_URL = "http://localhost:3000";
+let SERVER_URL;
+if (String(window.location.hostname) === "localhost") {
+  SERVER_URL = "http://localhost:3000";
+}
 
 
 
@@ -50,11 +53,11 @@ export class SendZeroService {
     this.disableSendButton = true; 
    }
 
-  init(): void {
+  public init(): void {
     var self = this;
     
     // Set up socket
-    this.socket = io(SERVER_URL);
+    this.socket = io(SERVER_URL, {transports: ['websocket']});
 
     // Set up signal client
     this.signalClient = new SimpleSignalClient(this.socket);  
@@ -211,21 +214,21 @@ export class SendZeroService {
     })
   }
 
-  connectToPeer(): void {
+  public connectToPeer(): void {
     this.prompt = "Connecting...";
     this.signalClient.connect(this.peerId.trim());
   }
 
-  getId(): string {
+  public getId(): string {
     console.log(this.id);
     return this.id;
   }
 
-  getPeerId(): string {
+  public getPeerId(): string {
     return this.peerId.trim();
   }
 
-  sendFile(file: File): void {
+  public sendFile(file: File): void {
     this.prompt = "Now processing file!";
     this.file = file;
     this.fileReader.readAsArrayBuffer(file);

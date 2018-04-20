@@ -20,7 +20,7 @@ export class AppComponent implements OnInit {
   
   constructor(private ref: ChangeDetectorRef,
               private sanitizer: DomSanitizer,
-              private sendZeroService: SendZeroService) {
+              public sendZeroService: SendZeroService) {
     this.title = 'SendZero Alpha';
     var self = this;
   }
