@@ -7,13 +7,13 @@
 <div>
     <h2>Send text using WebRTC!</h2>
 </div>
-Your id is: {{id}}
+Your id is: {{sendZeroService.id}}
 <br>
-{{prompt}}
+{{sendZeroService.prompt}}
 <div class="connectionBox">
-  <input type="text" name="peerId" id="peerId" [(ngModel)]="peerId">
-  <button (click)="connectPeers()" id="connectButton" name="connectButton"
-      class="connectButton" disabled>
+  <input type="text" name="peerId" id="peerId" [(ngModel)]="sendZeroService.peerId">
+  <button (click)="connectToPeer()" id="connectButton" name="connectButton"
+      class="connectButton" [disabled]="sendZeroService.disableConnectButton">
     Connect
   </button>
   <button (click)="disconnectPeers()" id="disconnectButton" name="disconnectButton"
@@ -21,30 +21,14 @@ Your id is: {{id}}
     Disconnect
   </button>
 </div>
-<div class="messageBox">
-  <label for="message">Enter a message:
-    <input type="text" name="message" id="message" placeholder="Message text" 
-            inputmode="latin" size=60 maxlength=120 [(ngModel)]="messageText" disabled>
-  </label>
-  <button (click)="sendMessage(messageText)" id="sendButton" name="sendButton" class="sendButton" disabled>
-    Send
-  </button>
-</div>
 <div class="fileBox" id="fileBox" >
     <label for="file">Choose File</label>
     <input type="file"
            id="file"
            (change)="handleFileInput($event.target.files)">
-    <button id="sendFileButton" name="sendFileButton" (click)="sendFile()" disabled class="sendFileButton">Send File</button>
+    <button id="sendFileButton" name="sendFileButton" (click)="sendFile()" [disabled]="sendZeroService.disableSendButton" class="sendFileButton">Send File</button>
           </div>
 <div class="receiveBox" id="receiveBox">
-  <p>Messages received:</p>
-  <ul>
-    <li *ngFor="let message of messages">
-      {{message.sender}}: {{message.data}}
-    </li>
-  </ul>
-  <progress [value]="fileProgress" [max]="maxFileChunks">Progress</progress>
-  <button (click)="getBlob()">Get blob</button>
-  <a target="_blank" [href]="url" download="{{receiveFileName}}">Download file here</a>
+  <progress [value]="sendZeroService.receivedChunks" [max]="sendZeroService.maxFileChunks">Progress</progress>
+  <a target="_blank" [href]="sendZeroService.url" [download]="sendZeroService.fileName">Download file here</a>
 </div>

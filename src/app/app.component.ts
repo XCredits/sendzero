@@ -9,8 +9,14 @@ import { SendZeroService } from './send-zero.service'
   styleUrls: ['./app.component.css']
 })
 export class AppComponent implements OnInit {
+  // Typed defintions
   title: string;
+  prompt: string;
+  id: string;
+  peerId: string;
   file: File;
+  fileProgress: number = 0;
+  maxFileChunks: number = 0;
   
   constructor(private ref: ChangeDetectorRef,
               private sanitizer: DomSanitizer,
@@ -24,12 +30,15 @@ export class AppComponent implements OnInit {
   }
 
   sendFile() {
+    if (!this.file) return;
+    this.sendZeroService.sendFile(this.file);
   }
 
   ngOnInit() {
+    this.sendZeroService.init();
   }
 
-
-  connectPeers() {
+  connectToPeer() {
+    this.sendZeroService.connectToPeer();
   }
 }
