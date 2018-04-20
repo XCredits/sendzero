@@ -25,20 +25,20 @@ export class AppComponent implements OnInit {
     var self = this;
   }
 
-  handleFileInput(files: FileList) {
+  handleFileInput(files: FileList): void {
     this.file = files.item(0);
   }
 
-  sendFile() {
+  sendFile(): void {
     if (!this.file) return;
     this.sendZeroService.sendFile(this.file);
   }
 
-  ngOnInit() {
+  ngOnInit(): void {
     this.sendZeroService.init();
   }
 
-  connectToPeer() {
+  connectToPeer(): void {
     this.sendZeroService.connectToPeer();
   }
 }

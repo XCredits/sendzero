@@ -50,7 +50,7 @@ export class SendZeroService {
     this.disableSendButton = true; 
    }
 
-  init() {
+  init(): void {
     var self = this;
     
     // Set up socket
@@ -70,18 +70,18 @@ export class SendZeroService {
     this.fileReader.onload = this.finishReadingFile.bind(this);
   }
 
-  private handleSignalClientReadyState() {
+  private handleSignalClientReadyState(): void {
     this.prompt = "Ready to connect! Enter peer's id below!" 
     this.disableConnectButton = false; 
     this.id = this.signalClient.id;
   }
 
   // Maybe add more logic here - esp for some domains/IPs
-  private handleSignalClientRequest(request: any) {
+  private handleSignalClientRequest(request: any): void {
     request.accept();
   }
 
-  private handleSignalClientPeer(peer: any) {
+  private handleSignalClientPeer(peer: any): void {
     this.peer = peer;
 
     // Set up peer handling functions
@@ -90,13 +90,13 @@ export class SendZeroService {
     this.peer.on('error', this.handlePeerError.bind(this));
   }
 
-  private handlePeerConnect() {
+  private handlePeerConnect(): void {
     this.prompt = 'Now connected to peer! Select a file to send!';
     this.disableSendButton = false;
   }
 
   // Data always comes in as Uint8Array of size CHUNK_SIZE
-  private handlePeerReceiveData(data: Uint8Array) {
+  private handlePeerReceiveData(data: Uint8Array): void {
     // We first try to convert data to JSON as metadata of the file is always
     // received as JSON.
     // If this doesn't work, then we assume that we've received a file.
@@ -129,7 +129,7 @@ export class SendZeroService {
     }
   }
 
-  private makeBlob() {
+  private makeBlob():void {
     let blob = new Blob(this.fileArray,
         {type: this.receivedFileMetadata.fileType});
     let url = window.URL.createObjectURL(blob);
@@ -143,7 +143,7 @@ export class SendZeroService {
     this.ref.tick();
   }
 
-  private resetReceiveVariables() {
+  private resetReceiveVariables(): void {
     this.fileArray = null;
     // We don't do filename so that user doesn't have to immediately download it
     // It will get overwritten with the next file anyway.
@@ -154,12 +154,12 @@ export class SendZeroService {
   }
 
   // TODO: Error handling.
-  private handlePeerError(err: any) {
+  private handlePeerError(err: any): void {
     console.log(err);
   }
 
   // TODO: Check if return behaviour is correct
-  private finishReadingFile() {
+  private finishReadingFile(): void {
     this.prompt = 'Finished processing file, now sending!';
     // Make sure the file has actually been read
     if (this.fileReader.readyState !== 2) {
@@ -169,7 +169,7 @@ export class SendZeroService {
     this.chunkAndSendFile();
   }
 
-  private chunkAndSendFile() {
+  private chunkAndSendFile(): void {
     // Make the file into a typed array to send it as the WebRTC API doesn't
     // support sending blobs at this point.
     let fileView = new Uint8Array(this.fileReader.result);
@@ -211,7 +211,7 @@ export class SendZeroService {
     })
   }
 
-  connectToPeer() {
+  connectToPeer(): void {
     this.prompt = "Connecting...";
     this.signalClient.connect(this.peerId.trim());
   }
