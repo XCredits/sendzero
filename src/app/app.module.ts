@@ -7,6 +7,7 @@ import { AppComponent } from './app.component';
 
 // 
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
 
 // Material modules 
 import { 
@@ -116,6 +117,7 @@ import { AboutComponent } from './about/about.component';
     ]),
 
     BrowserAnimationsModule,
+    NgbModule,
     
     // Material modules 
     MatAutocompleteModule,
