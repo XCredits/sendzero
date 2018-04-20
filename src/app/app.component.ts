@@ -12,7 +12,9 @@ export class AppComponent implements OnInit {
   title: string;
   file: File;
   
-  constructor(private ref: ChangeDetectorRef, private sanitizer: DomSanitizer) {
+  constructor(private ref: ChangeDetectorRef,
+              private sanitizer: DomSanitizer,
+              private sendZeroService: SendZeroService) {
     this.title = 'SendZero Alpha';
     var self = this;
   }
