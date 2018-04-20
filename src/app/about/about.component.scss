@@ -34,9 +34,11 @@
     max-width: 1200px;
     -webkit-justify-content: center;
     justify-content:         center;
+    -webkit-flex-wrap: wrap;
+    flex-wrap: wrap;
     .row-side {
       min-width: 300px;
-      max-width: 600px;
+      max-width: 599px;
       flex-basis: auto; /* default value */
       flex-grow: 1;
     }
