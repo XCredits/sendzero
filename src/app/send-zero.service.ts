@@ -15,7 +15,7 @@ let SERVER_URL = "http://localhost:3000";
 
 
 @Injectable()
-export class SendZeroConnectService implements OnInit {
+export class SendZeroService implements OnInit {
   // Typed definitions
   socket: Socket;
   id: string;

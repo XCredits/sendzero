@@ -1,6 +1,7 @@
 declare var require: any
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { DomSanitizer } from '@angular/platform-browser';
+import { SendZeroService } from './send-zero.service'
 
 @Component({
   selector: 'app-root',
