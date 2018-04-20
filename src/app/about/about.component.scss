@@ -21,7 +21,24 @@
   }
   text-shadow: 0px 2px 20px #000;
 }
-.row {
+
+.panel1 {
+  background-image:linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.7)),
+    url('https://images.pexels.com/photos/1562/italian-landscape-mountains-nature.jpg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260');
+  .container {
+    padding: 16px;
+
+    .image-col {
+      img {
+        -webkit-filter: drop-shadow(0px 5px 20px #000 );
+        filter: drop-shadow(0px 5px 20px #000);
+        max-width: 90%;
+      }
+    }
+  }
+}
+
+.arow {
   display: -webkit-flex;
   display: flex;
   -webkit-flex-wrap: wrap;
@@ -29,7 +46,7 @@
   -webkit-justify-content: center;
   justify-content:         center;
   
-  .container {
+  .acontainer {
     flex-grow: 1;
     max-width: 1200px;
     -webkit-justify-content: center;
