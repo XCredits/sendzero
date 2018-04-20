@@ -22,7 +22,21 @@
   text-shadow: 0px 2px 20px #000;
 }
 
+.panel-text {
+  text-shadow: 0px 2px 20px #000;
+  display: -webkit-flex;
+  display: flex;
+  -webkit-align-items: center;
+  align-items: center;
+}
+
+.dark-panel-text {
+  @extend .panel-text;
+  color: #fff;
+}
+
 .panel1 {
+  
   background-image:linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.7)),
     url('https://images.pexels.com/photos/1562/italian-landscape-mountains-nature.jpg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260');
   .container {
