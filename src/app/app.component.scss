@@ -36,6 +36,8 @@ mat-drawer mat-icon {
   position: -webkit-sticky; 
   position: sticky;
   top: 0;
+  z-index: 1000;
+  box-shadow: 0 8px 10px -5px rgba(0,0,0,.2), 0 16px 24px 2px rgba(0,0,0,.14), 0 6px 30px 5px rgba(0,0,0,.12);
   .logo-square {
     height: 30px;
     position: relative;
@@ -47,12 +49,6 @@ mat-drawer mat-icon {
   flex: 1 1 auto;
 }
 
-.content{
-  padding-left: 16px;
-  padding-right: 16px;
-}
-
-
 .bottom-mobile-nav {
   position: fixed;
   bottom: 0;
@@ -60,3 +56,13 @@ mat-drawer mat-icon {
   justify-content: space-around;
 }
 
+.content {
+  height: calc(100vh - 64px);
+  @media (max-width: 768px) {
+    height: calc(100vh - 64px - 64px);
+  }
+  @media (max-width: 599px) {
+    height: calc(100vh - 56px - 56px);
+  }
+  overflow: auto;
+}

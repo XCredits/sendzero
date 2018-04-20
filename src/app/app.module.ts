@@ -7,6 +7,7 @@ import { AppComponent } from './app.component';
 
 // 
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
 
 // Material modules 
 import { 
@@ -55,6 +56,7 @@ import { SettingsComponent } from './settings/settings.component';
 import { PageNotFoundComponent } from './page-not-found/page-not-found.component';
 import { FeedComponent } from './feed/feed.component';
 import { ContactsComponent } from './contacts/contacts.component';
+import { AboutComponent } from './about/about.component';
 
 @NgModule({
   declarations: [
@@ -65,6 +67,7 @@ import { ContactsComponent } from './contacts/contacts.component';
     PageNotFoundComponent,
     FeedComponent,
     ContactsComponent,
+    AboutComponent,
   ],
   imports: [
     BrowserModule, 
@@ -96,6 +99,11 @@ import { ContactsComponent } from './contacts/contacts.component';
         component: SettingsComponent,
         data: { title: 'Settings' },
       },
+      {
+        path: 'about',
+        component: AboutComponent,
+        data: { title: 'About' },
+      },
       { // Default route
         path: '', 
         redirectTo: '/home', 
@@ -109,6 +117,7 @@ import { ContactsComponent } from './contacts/contacts.component';
     ]),
 
     BrowserAnimationsModule,
+    NgbModule,
     
     // Material modules 
     MatAutocompleteModule,
