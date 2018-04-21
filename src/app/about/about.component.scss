@@ -60,6 +60,25 @@
 }
 
 
+$footerBackgroundColor:rgb(30,30,30);
+$footerTextColor: white;
+.footer {
+  background-color: $footerBackgroundColor;
+  color: $footerTextColor;
+}
 
 
-
+// Social buttons
+// Creating social media circles like the below
+// https://www.w3schools.com/howto/tryit.asp?filename=tryhow_css_social_media_buttons2
+.fa-button {
+  padding: 20px;
+  font-size: 30px;
+  width: 30px;
+  text-align: center;
+  text-decoration: none;
+  margin: 5px 2px;
+  border-radius: 50%;
+  background-color: $footerTextColor;
+  color: $footerBackgroundColor;
+}
