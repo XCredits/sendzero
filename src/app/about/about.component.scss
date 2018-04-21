@@ -26,6 +26,11 @@
   padding: 24px;
   padding-top: 56px;
   padding-bottom: 56px;
+  @media (max-width: 767px) {
+    padding: 0px;
+    padding-top: 24px;
+    padding-bottom: 24px;
+  }
 }
 
 .panel-text {
@@ -79,7 +84,7 @@ $footerBackgroundColor:rgb(30,30,30);
 $footerTextColor: white;
 .footer {
   @extend .white-text;
-  padding: 24px;
+  @extend .panel;
   background-color: $footerBackgroundColor;
   color: $footerTextColor;
 }
