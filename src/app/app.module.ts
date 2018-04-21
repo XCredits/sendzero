@@ -7,7 +7,7 @@ import { AppComponent } from './app.component';
 
 // 
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
+// import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
 import { AngularFontAwesomeModule } from 'angular-font-awesome';
 
 // Material modules 
@@ -118,7 +118,7 @@ import { AboutComponent } from './about/about.component';
     ]),
 
     BrowserAnimationsModule,
-    NgbModule,
+    // NgbModule,
     AngularFontAwesomeModule,
     
     // Material modules 
