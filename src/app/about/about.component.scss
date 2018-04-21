@@ -25,6 +25,7 @@
 .panel {
   padding: 24px;
   padding-top: 56px;
+  padding-bottom: 56px;
 }
 
 .panel-text {
@@ -33,6 +34,20 @@
   display: flex;
   -webkit-align-items: center;
   align-items: center;
+}
+
+.white-text {
+  a {
+    text-decoration: underline;
+  }
+  a:link, 
+  a:visited{
+    color: white;
+  }
+  a:hover, 
+  a:active{
+    color: #aaa
+  }
 }
 
 .dark-panel-text {
@@ -63,6 +78,8 @@
 $footerBackgroundColor:rgb(30,30,30);
 $footerTextColor: white;
 .footer {
+  @extend .white-text;
+  padding: 24px;
   background-color: $footerBackgroundColor;
   color: $footerTextColor;
 }
@@ -81,5 +98,6 @@ $footerTextColor: white;
   margin: 5px 2px;
   border-radius: 50%;
   background-color: $footerTextColor;
-  color: $footerBackgroundColor;
+  color: $footerBackgroundColor !important;
+  text-decoration: none !important;
 }
