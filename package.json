@@ -31,6 +31,7 @@
     "@angular/service-worker": "^5.2.9",
     "@ng-bootstrap/ng-bootstrap": "^1.1.2",
     "@types/lodash": "^4.14.106",
+    "angular-font-awesome": "^3.1.2",
     "body-parser": "^1.18.2",
     "concurrently": "^3.5.1",
     "core-js": "^2.4.1",
