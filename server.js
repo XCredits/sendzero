@@ -10,7 +10,7 @@ const port = process.env.PORT || '3000';
 app.set('port', port);
 
 app.get('/api/test', function(req, res) {
-  res.status.send("Hello from express");
+  res.json({message:"Hello from express"});
 });
 
 
