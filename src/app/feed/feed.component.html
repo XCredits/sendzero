@@ -1,16 +1,16 @@
 <div class="container">
   <div class="row">
-    <div class="col-md-6 offset-md-4">
+    <div class="col-lg-6 offset-lg-4">
       <p>
         Enter two strings to send to the server, and join together.
       </p>
-      <form [formGroup]="lengthCheckForm" (ngSubmit)="lengthCheckSubmit(lengthCheckForm.value)">
+      <form [formGroup]="joinStringForm" (ngSubmit)="joinStringSubmit(joinStringForm.value)">
         <div class="form-group">
           <mat-form-field>
-            <input matInput placeholder="Text1 field" name="text1" formControlName="text1" required>
+            <input matInput placeholder="Text1 field" name="text1" formControlName="text1">
           </mat-form-field>
           <mat-form-field>
-            <input matInput placeholder="Text2 field" name="text2" formControlName="text2" required>
+            <input matInput placeholder="Text2 field" name="text2" formControlName="text2">
           </mat-form-field>
           <button color="primary" mat-raised-button type="submit" value="submit">Submit</button>
         </div>
