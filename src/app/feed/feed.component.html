@@ -1,20 +1,25 @@
-<p>
-  feed works!
-</p>
-<p>
-  Check the console for data from the express server.
-</p>
-<form [formGroup]="lengthCheckForm" (ngSubmit)="lengthCheckSubmit(lengthCheckForm.value)">
-  <div class="form-group">
-    <mat-form-field>
-      <input matInput placeholder="Text1 field" name="text1" formControlName="text1" required>
-    </mat-form-field>
-    <mat-form-field>
-      <input matInput placeholder="Text2 field" name="text2" formControlName="text2" required>
-    </mat-form-field>
-    <button color="primary" mat-raised-button type="submit" value="submit">Submit</button>
-  </div>
-</form>
+<div class="container">
+  <div class="row">
+    <div class="col-md-6 offset-md-4">
+      <p>
+        Enter two strings to send to the server, and join together.
+      </p>
+      <form [formGroup]="lengthCheckForm" (ngSubmit)="lengthCheckSubmit(lengthCheckForm.value)">
+        <div class="form-group">
+          <mat-form-field>
+            <input matInput placeholder="Text1 field" name="text1" formControlName="text1" required>
+          </mat-form-field>
+          <mat-form-field>
+            <input matInput placeholder="Text2 field" name="text2" formControlName="text2" required>
+          </mat-form-field>
+          <button color="primary" mat-raised-button type="submit" value="submit">Submit</button>
+        </div>
+      </form>
 
-<!-- https://scotch.io/tutorials/using-angular-2s-model-driven-forms-with-formgroup-and-formcontrol -->
-<!-- https://plnkr.co/edit/fYxjHY5xALoLuqaQze6u?p=preview -->
+      <!-- https://scotch.io/tutorials/using-angular-2s-model-driven-forms-with-formgroup-and-formcontrol -->
+      <!-- https://plnkr.co/edit/fYxjHY5xALoLuqaQze6u?p=preview -->
+
+    </div>
+  </div>
+</div>
+
