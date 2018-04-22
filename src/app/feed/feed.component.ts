@@ -17,4 +17,7 @@ export class FeedComponent implements OnInit {
       });
   }
 
+  lengthCheckSubmit = function (formData) {
+    console.log(formData);
+  }
 }

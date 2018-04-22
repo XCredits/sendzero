@@ -4,3 +4,9 @@
 <p>
   Check the console for data from the express server.
 </p>
+<form #userForm = "ngForm" (ngSubmit)="lengthCheckSubmit(userForm.value)">
+  <mat-form-field>
+    <input matInput placeholder="Text to check" name="textToCheck" ngModel>
+  </mat-form-field>
+  <input type="submit" value="submit">
+</form>
