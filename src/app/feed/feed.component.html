@@ -4,9 +4,14 @@
 <p>
   Check the console for data from the express server.
 </p>
-<form #userForm = "ngForm" (ngSubmit)="lengthCheckSubmit(userForm.value)">
-  <mat-form-field>
-    <input matInput placeholder="Text to check" name="textToCheck" ngModel>
-  </mat-form-field>
-  <input type="submit" value="submit">
+<form [formGroup]="lengthCheckForm" (ngSubmit)="lengthCheckSubmit(lengthCheckForm.value)">
+  <div class="form-group">
+    <mat-form-field>
+      <input matInput placeholder="Text to check" name="textToCheck" formControlName="textToCheck" required>
+    </mat-form-field>
+    <input type="submit" value="submit">
+  </div>
 </form>
+
+<!-- https://scotch.io/tutorials/using-angular-2s-model-driven-forms-with-formgroup-and-formcontrol -->
+<!-- https://plnkr.co/edit/fYxjHY5xALoLuqaQze6u?p=preview -->
