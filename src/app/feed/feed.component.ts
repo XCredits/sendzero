@@ -24,5 +24,10 @@ export class FeedComponent implements OnInit {
 
   lengthCheckSubmit = function (formData) {
     console.log(formData);
+    this.http.post('/api/join-strings', 
+        {"inputString1": formData.textToCheck, "inputString2": formData.textToCheck})
+      .subscribe(data => {
+        console.log(data); // using the HttpClient instance, http to call the API then subscribe to the data and display to console
+      });
   }
 }
