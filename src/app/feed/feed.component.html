@@ -7,9 +7,12 @@
 <form [formGroup]="lengthCheckForm" (ngSubmit)="lengthCheckSubmit(lengthCheckForm.value)">
   <div class="form-group">
     <mat-form-field>
-      <input matInput placeholder="Text to check" name="textToCheck" formControlName="textToCheck" required>
+      <input matInput placeholder="Text1 field" name="text1" formControlName="text1" required>
     </mat-form-field>
-    <input type="submit" value="submit">
+    <mat-form-field>
+      <input matInput placeholder="Text2 field" name="text2" formControlName="text2" required>
+    </mat-form-field>
+    <button color="primary" mat-raised-button type="submit" value="submit">Submit</button>
   </div>
 </form>
 
