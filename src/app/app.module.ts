@@ -1,13 +1,14 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
-import { FormsModule } from '@angular/forms';
-import { HttpModule } from '@angular/http';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { HttpClientModule} from '@angular/common/http'; // Deprecation https://angular.io/api/http/HttpModule
 import { RouterModule } from '@angular/router';
 import { AppComponent } from './app.component';
 
 // 
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
+// import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
+import { AngularFontAwesomeModule } from 'angular-font-awesome';
 
 // Material modules 
 import { 
@@ -72,7 +73,8 @@ import { AboutComponent } from './about/about.component';
   imports: [
     BrowserModule, 
     FormsModule,
-    HttpModule,
+    ReactiveFormsModule ,
+    HttpClientModule,
     RouterModule.forRoot([
       {
         path: 'home',
@@ -117,7 +119,8 @@ import { AboutComponent } from './about/about.component';
     ]),
 
     BrowserAnimationsModule,
-    NgbModule,
+    // NgbModule,
+    AngularFontAwesomeModule,
     
     // Material modules 
     MatAutocompleteModule,
