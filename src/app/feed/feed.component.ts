@@ -13,11 +13,13 @@ export class FeedComponent implements OnInit {
 
   constructor( private http: HttpClient ) { }
 
+  emailPattern = "^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$"; // This is not a good regex http://emailregex.com/
+
   ngOnInit() {
     this.joinStringForm = new FormGroup ({
       text1: new FormControl("", 
         [<any>Validators.required, <any>Validators.minLength(5)]),
-      text2: new FormControl(""),
+      text2: new FormControl("", [<any>Validators.required, <any>Validators.pattern(this.emailPattern)]),
     });
   }
 
