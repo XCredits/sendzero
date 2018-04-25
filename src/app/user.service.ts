@@ -10,13 +10,18 @@ export class UserService {
 
   constructor( private http: HttpClient, 
       private router: Router ) {
-    
+    this.getUserDetails();
+    if (!user) {
+
+    }
   }
 
   getUserDetails() {
-    // http.subscribe(a=> {
-    //   user = JSON.stringify();
-    // });
+    this.http.post<Details>('/api/user/details', {})
+        .subscribe((details) => {
+          user = details.user;
+          jwt = details.jwt;
+        });
   }
 
   isLoggedIn() {
@@ -28,7 +33,7 @@ export class UserService {
   }
 
   createUser(email, password){
-    this.http.post<User>('/api/user/create-user', {email, password})
+    this.http.post<User>('/api/user/create', {email, password})
         .subscribe((data) => {
           // set the user
           user = data;
@@ -43,6 +48,7 @@ export class UserService {
         // if expired, get new JWT
     // Attach JWT to request authorisation field
     // return 
+    // https://www.youtube.com/watch?v=qnRrqH-BzJE
   }
 }
 
@@ -53,3 +59,7 @@ interface User {
   isLoggedIn: boolean;
 }
 
+interface Details {
+  user: User;
+  jwt: any;
+}
