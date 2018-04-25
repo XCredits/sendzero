@@ -2,14 +2,14 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router } from "@angular/router";
 
-let user: User;//: User;
+let user: User;
+let jwt; // To be implemented later to allow APIs to be called quickly without having to hit up the 
 
 @Injectable()
 export class UserService {
 
   constructor( private http: HttpClient, 
       private router: Router ) {
-    // Determine if the user needs to log in again
     
   }
 
@@ -38,19 +38,11 @@ export class UserService {
         });
   }
 
-  joinStringSubmit = function (formData) {
-    console.log(formData);
-    console.log(this.joinStringForm);
-
-    if (this.joinStringForm.invalid) {
-      return;
-    }
-
-    this.http.post('/api/join-strings', 
-        {"inputString1": formData.text1, "inputString2": formData.text2})
-      .subscribe(data => {
-        this.joinedStringResult = data.joinedString;
-      });
+  requestInterceptor() {
+    // Determine if JWT is expired
+        // if expired, get new JWT
+    // Attach JWT to request authorisation field
+    // return 
   }
 }
 
