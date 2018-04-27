@@ -2,6 +2,7 @@ var MailingList = require('../controllers/mailing-list.controllers.js');
 
 module.exports = {
   joinMailingList: function(req, res) {
+    console.log("Successfully called backend route");
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
         return res.status(422).json({ errors: errors.mapped() });
@@ -22,7 +23,7 @@ module.exports = {
   validateJoinMailingList: [
     check('email')
         .isEmail().withMessage('email not valid'), 
-    // check('name')
+    // check('givenName')
     //     .isLength({ min: 5 }), 
   ], 
 
