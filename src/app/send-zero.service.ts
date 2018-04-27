@@ -36,7 +36,8 @@ export class SendZeroService {
     fileByteSize: number,
     numberOfChunks: number,
   };
-  private fileArray: Array<Uint8Array>;
+  private fileArray: Uint8Array;
+  private fileArrayOffset: number = 0;
   private fileReader: FileReader;
   private file: File;
   
@@ -74,7 +75,8 @@ export class SendZeroService {
   }
 
   private handleSignalClientReadyState(): void {
-    this.prompt = "Ready to connect! Enter peer's id below!" 
+    this.prompt = "Ready to connect! Enter peer's id below!";
+    this.ref.tick(); 
     this.disableConnectButton = false; 
     this.id = this.signalClient.id;
   }
@@ -95,6 +97,7 @@ export class SendZeroService {
 
   private handlePeerConnect(): void {
     this.prompt = 'Now connected to peer! Select a file to send!';
+    this.ref.tick();
     this.disableSendButton = false;
   }
 
@@ -104,7 +107,8 @@ export class SendZeroService {
     // received as JSON.
     // If this doesn't work, then we assume that we've received a file.
     try {
-      this.prompt = "Now receiving a file!" 
+      this.prompt = "Now receiving a file!"
+      this.ref.tick(); 
       // @ts-ignore
       let metadataString = new TextDecoder('utf-8').decode(data);
       this.receivedFileMetadata = JSON.parse(metadataString);
@@ -112,20 +116,28 @@ export class SendZeroService {
       // Set up maxFileChunks for expected file - we do this for the progress
       // element
       this.maxFileChunks = this.receivedFileMetadata.numberOfChunks;
-      // Initialize an Array, this saves memory and is much quicker than
-      // dynamically pushing
-      this.fileArray = Array(this.maxFileChunks); 
+      // Initialize a Uint8Array
+      this.fileArray = new Uint8Array(this.receivedFileMetadata.fileByteSize); 
     } catch(e) {
       // We've (hopefully) received part of a file (a chunk).
-      // Start pushing the data arrays into our file array
+      // If it's the first data array, set the fileArray with it
+      // We maintain an offset so that we can set the arrays correctly
+      // Then set the rest of the data arrays into our file array
       // If it's the last data array, we get the blob.
-      if (this.receivedChunks < this.maxFileChunks - 1) {
-        this.fileArray.push(data);
+
+      if (this.receivedChunks == 0) {
+        this.fileArray.set(data);
+        this.fileArrayOffset = CHUNK_SIZE;
+        this.receivedChunks++;
+        this.ref.tick();
+      } else if (this.receivedChunks < this.maxFileChunks - 1) {
+        this.fileArray.set(data, this.fileArrayOffset);
+        this.fileArrayOffset += CHUNK_SIZE;
         this.receivedChunks++;
         // This is because Angular doesn't detect changes in callbacks.
         this.ref.tick();
       } else {
-        this.fileArray.push(data);
+        this.fileArray.set(data, this.fileArrayOffset);
         this.ref.tick();
         this.makeBlob();
       }
@@ -133,7 +145,8 @@ export class SendZeroService {
   }
 
   private makeBlob():void {
-    let blob = new Blob(this.fileArray,
+    // let u8Array = Uint8Array.from(this.fileArray);
+    let blob = new Blob([this.fileArray],
         {type: this.receivedFileMetadata.fileType});
     let url = window.URL.createObjectURL(blob);
     let safeUrl = this.sanitizer.bypassSecurityTrustResourceUrl(url);
@@ -148,6 +161,7 @@ export class SendZeroService {
 
   private resetReceiveVariables(): void {
     this.fileArray = null;
+    this.fileArrayOffset = 0;
     // We don't do filename so that user doesn't have to immediately download it
     // It will get overwritten with the next file anyway.
     //this.fileName = null;
@@ -164,6 +178,7 @@ export class SendZeroService {
   // TODO: Check if return behaviour is correct
   private finishReadingFile(): void {
     this.prompt = 'Finished processing file, now sending!';
+    this.ref.tick();
     // Make sure the file has actually been read
     if (this.fileReader.readyState !== 2) {
       this.prompt = 'Something went wrong!';
@@ -202,16 +217,18 @@ export class SendZeroService {
     // Dirty check to make sure metadata isn't too big.
     // TODO: Make sure things can't be circular because JSON.* will break
     if (jsonString.length > CHUNK_SIZE) {
-      this.prompt = 'File metadata too big, consider renaming.'
+      this.prompt = 'File metadata too big, consider renaming.';
+      this.ref.tick();
       return;
     }
     this.peer.send(jsonString);
     
     // Send chunks
     // We use write instead of send as send closes the connection on big files.
-    chunks.forEach(element => { 
+    chunks.forEach(element => {
       this.peer.write(element)
-    })
+    });
+
   }
 
   public connectToPeer(): void {
