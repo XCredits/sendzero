@@ -43,7 +43,7 @@ to connect to the server.
 Run 
 ~~~
 use LazyWebApp
-db.createUser ({user:'lazywebapp',pwd:'password', roles:[{role:'dbAdmin', db:'LazyWebApp'}]})
+db.createUser ({user:'lazywebapp',pwd:'password', roles:[{role:'dbAdmin', db:'lazywebapp'}]})
 ~~~
 
 7) Run 

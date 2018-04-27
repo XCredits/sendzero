@@ -17,7 +17,8 @@ export class FeedComponent implements OnInit {
 
   ngOnInit() {
     this.joinStringForm = new FormGroup ({
-      firstName: new FormControl(''),
+      givenName: new FormControl(''),
+      familyName: new FormControl(''),
       //   [<any>Validators.required, <any>Validators.minLength(5)]),
       email: new FormControl('', [<any>Validators.required, <any>Validators.pattern(this.emailPattern)]),
     });
@@ -37,6 +38,7 @@ export class FeedComponent implements OnInit {
         'email': formData.email
         })
         .subscribe(data => {
+          console.log('received message');
           this.joinListMessage = data.message;
         });
   };

@@ -36,6 +36,7 @@
     "body-parser": "^1.18.2",
     "concurrently": "^3.5.1",
     "core-js": "^2.4.1",
+    "dotenv": "^5.0.1",
     "express": "^4.16.3",
     "express-validator": "^5.1.2",
     "font-awesome": "^4.7.0",

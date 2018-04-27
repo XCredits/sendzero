@@ -1,7 +1,8 @@
+const mailingListController = require('./controllers/mailing-list.controller.js');
+
 module.exports = function(app) {
-  app.post('/api/join-mailing-list', 
-      validateJoinMailingList, 
-      joinMailingList);
+  mailingListController(app);
+  
 };
 
 
