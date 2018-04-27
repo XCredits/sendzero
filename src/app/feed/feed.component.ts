@@ -9,7 +9,7 @@ import { FormGroup, FormControl, Validators } from '@angular/forms';
 })
 export class FeedComponent implements OnInit {
   joinStringForm: FormGroup;
-  joinedStringResult: string;
+  joinListMessage: string;
 
   constructor( private http: HttpClient ) { }
 
@@ -17,9 +17,9 @@ export class FeedComponent implements OnInit {
 
   ngOnInit() {
     this.joinStringForm = new FormGroup ({
-      text1: new FormControl("", 
-        [<any>Validators.required, <any>Validators.minLength(5)]),
-      text2: new FormControl("", [<any>Validators.required, <any>Validators.pattern(this.emailPattern)]),
+      firstName: new FormControl(''),
+      //   [<any>Validators.required, <any>Validators.minLength(5)]),
+      email: new FormControl('', [<any>Validators.required, <any>Validators.pattern(this.emailPattern)]),
     });
   }
 
@@ -30,11 +30,14 @@ export class FeedComponent implements OnInit {
     if (this.joinStringForm.invalid) {
       return;
     }
-
-    this.http.post('/api/join-strings', 
-        {"inputString1": formData.text1, "inputString2": formData.text2})
-      .subscribe(data => {
-        this.joinedStringResult = data.joinedString;
-      });
-  }
+    this.joinListMessage = 'yo';
+    this.http.post('/api/join-mailing-list', {
+        'givenName': formData.givenName,
+        'familyName': formData.familyName,
+        'email': formData.email
+        })
+        .subscribe(data => {
+          this.joinListMessage = data.message;
+        });
+  };
 }

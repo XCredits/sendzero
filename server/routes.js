@@ -5,7 +5,9 @@ module.exports = function(app) {
     res.json({joinedString: joinedString});
   });
 
-  app.post('/api/join-mailing-list', validateJoinMailingList, joinMailingList);
+  app.post('/api/join-mailing-list', 
+      validateJoinMailingList, 
+      joinMailingList);
 };
 
 
