@@ -16,6 +16,17 @@ export class UserService {
     }
   }
 
+  createUser(email, password){
+    this.http.post<User>('/api/user/create', {email, password})
+        .subscribe((data) => {
+          // set the user
+          user = data;
+          // navigate to first page
+          this.router.navigateByUrl('/');
+          return data;
+        });
+  }
+
   getUserDetails() {
     this.http.post<Details>('/api/user/details', {})
         .subscribe((details) => {
@@ -28,19 +39,14 @@ export class UserService {
     return true;
   }
 
-  sendLogin(email, password, optional_nav) {
+  login(email, password, optional_nav) {
     // router.navigateByUrl(optional_nav)
   }
 
-  createUser(email, password){
-    this.http.post<User>('/api/user/create', {email, password})
-        .subscribe((data) => {
-          // set the user
-          user = data;
-          // navigate to first page
-          this.router.navigateByUrl('/');
-          return data;
-        });
+  logOut() {
+    // Send message to server
+    // Delete JWT
+    // Remove cookie
   }
 
   requestInterceptor() {
@@ -50,6 +56,8 @@ export class UserService {
     // return 
     // https://www.youtube.com/watch?v=qnRrqH-BzJE
   }
+
+  
 }
 
 interface User {
