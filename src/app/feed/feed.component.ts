@@ -9,17 +9,18 @@ import { FormGroup, FormControl, Validators } from '@angular/forms';
 })
 export class FeedComponent implements OnInit {
   joinStringForm: FormGroup;
-  joinedStringResult: string;
+  joinListMessage: string;
 
   constructor( private http: HttpClient ) { }
 
-  emailPattern = "^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$"; // This is not a good regex http://emailregex.com/
+  emailPattern = '^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$'; // This is not a good regex http://emailregex.com/
 
   ngOnInit() {
     this.joinStringForm = new FormGroup ({
-      text1: new FormControl("", 
-        [<any>Validators.required, <any>Validators.minLength(5)]),
-      text2: new FormControl("", [<any>Validators.required, <any>Validators.pattern(this.emailPattern)]),
+      givenName: new FormControl(''),
+      familyName: new FormControl(''),
+      //   [<any>Validators.required, <any>Validators.minLength(5)]),
+      email: new FormControl('', [<any>Validators.required, <any>Validators.pattern(this.emailPattern)]),
     });
   }
 
@@ -30,11 +31,15 @@ export class FeedComponent implements OnInit {
     if (this.joinStringForm.invalid) {
       return;
     }
-
-    this.http.post('/api/join-strings', 
-        {"inputString1": formData.text1, "inputString2": formData.text2})
-      .subscribe(data => {
-        this.joinedStringResult = data.joinedString;
-      });
-  }
+    this.joinListMessage = 'yo';
+    this.http.post('/api/join-mailing-list', {
+        'givenName': formData.givenName,
+        'familyName': formData.familyName,
+        'email': formData.email
+        })
+        .subscribe(data => {
+          console.log('received message');
+          this.joinListMessage = data.message;
+        });
+  };
 }

@@ -1,7 +1,9 @@
+const mailingListController = require('./controllers/mailing-list.controller.js');
+
 module.exports = function(app) {
-  app.post('/api/join-strings', function (req, res) {
-    console.log(req.body);
-    var joinedString = req.body.inputString1 + req.body.inputString2;
-    res.json({joinedString: joinedString});
-  });
+  mailingListController(app);
+  
 };
+
+
+
