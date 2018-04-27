@@ -19,24 +19,52 @@ npm install
 ~~~
  to add the needed files into the node_modules folder
 
-6) Run 
+6) Start the MongoDB server
+[Install MongoDB](https://www.mongodb.com/download-center?jmp=nav#community).
+Create the folder
+~~~
+C:\data\db\
+~~~
+
+Navigate to 
+~~~
+cd "C:\Program Files\MongoDB\Server\3.4\bin"
+~~~
+Run
+~~~
+mongod.exe
+~~~ 
+to start the MongoDB server.
+Run
+~~~
+mongo.exe
+~~~
+to connect to the server.
+Run 
+~~~
+use LazyWebApp
+db.createUser ({user:'lazywebapp',pwd:'password', roles:[{role:'dbAdmin', db:'lazywebapp'}]})
+~~~
+
+7) Run 
 ~~~
 ng build
 ~~~
 to compile the Angular front-end components into the `dist` folder
 
-7) Run 
-
+8) Run 
 ~~~
 node server.js
 ~~~
 
-**NOTE: You can also run the following command to have the Angular built and server restarted when code changes**
+9) Open [localhost:3000](http://localhost:3000/) in your browser. You should see a basic Angular app displayed. You are now running a local server. 
+
+## Using simple running
+Alternatively, skip steps 7-9 and instead run the following command to have the Angular built and server restarted when code changes
 ~~~
-npm start-dev
+npm run dev
 ~~~
 
-8) Open [localhost:3000](http://localhost:3000/) in your browser. You should see a basic Angular app displayed. You are now running a local server. 
 
 # Instructions for running this server on Google App Engine
 After doing the above:

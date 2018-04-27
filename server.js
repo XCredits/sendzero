@@ -1,4 +1,7 @@
 'use strict';
+require('dotenv').config();
+require('./server/config');
+require('./server/mongoose-start');
 const express = require('express');
 const app = express();
 const path = require('path');
