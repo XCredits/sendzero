@@ -12,6 +12,7 @@ const routes = require('./server/routes');
 
 app.use(bodyParser());
 app.use(cookieParser());
+// Always attempt to authorise JWT and attach to req.auth
 app.use(expressJwt({secret: process.env.jwtKey, requestProperty: 'auth'}));
 
 app.use(passport.initialize());
