@@ -10,6 +10,9 @@ const bodyParser = require('body-parser');
 const routes = require('./server/routes');
 
 app.use(bodyParser());
+app.use(cookieParser());
+app.use(passport.initialize());
+
 app.use(express.static(path.join(__dirname, 'dist')));
 
 const port = process.env.PORT || '3000';
@@ -19,6 +22,10 @@ routes(app);
 
 app.get('*', function(req, res) {
   res.sendFile(path.join(__dirname, 'dist/index.html'));
+});
+
+app.post('*', function(req, res) {
+  res.status(404).json({message: "Route not found."});
 });
 
 const server = http.createServer(app);
