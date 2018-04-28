@@ -12,5 +12,4 @@ var MailingListSchema = new Schema({
   }
 );
 
-//Export model
 module.exports = mongoose.model('MailingList', MailingListSchema);

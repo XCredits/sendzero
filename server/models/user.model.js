@@ -14,17 +14,16 @@ var UserSchema = new Schema({
   }
 );
 
-userSchema.methods.createPasswordHash = function(password) {
+UserSchema.methods.createPasswordHash = function(password) {
   this.salt = crypto.randomBytes(16).toString('hex');
   this.passwordHash = crypto.pbkdf2Sync(password, this.salt, 4096, 64, 'sha512')
       .toString('hex');
 };
 
-userSchema.methods.checkPassword = function(password) {
+UserSchema.methods.checkPassword = function(password) {
   var passwordHash = crypto.pbkdf2Sync(password, this.salt, 4096, 64, 'sha512')
       .toString('hex');
   return passwordHash === this.passwordHash;
 };
 
-//Export model
 module.exports = mongoose.model('User', UserSchema);

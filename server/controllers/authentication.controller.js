@@ -7,6 +7,7 @@ module.exports = function (app) {
   app.post('/login', login);
   app.post('/refresh-jwt', refreshJwt);
   app.post('/reset-password', resetPassword);
+  app.post('/logout', logout);
 }
 
 function register(req, res) {
@@ -18,11 +19,11 @@ function register(req, res) {
   user.createPasswordHash(req.body.password);
   user.save()
       .then((user)=>{
-        if (user) {
+        if (!user) {
+          res.status(500).send({message:"Error in creating user"});
+        } else {
           // store session
           sendJwt(user, res);
-        } else {
-          res.status(500).send({message:"Error in creating user"});
         }
       })
       .catch(()=>{
@@ -34,10 +35,10 @@ function register(req, res) {
 function login(req, res) {
   // getUserWithPassword
   // store session
-  if (user) {
-    sendJwt(user, res);
-  } else {
+  if (!user) {
     res.status(500).send({message:"Error in creating user"});
+  } else {
+    sendJwt(user, res);
   }
 }
 
@@ -56,6 +57,11 @@ function resetPassword(req, res) {
   // user.createPasswordHash(req.body.password);
   // user.save()
   // res.send()
+}
+
+function logout(req, res) {
+  // get the session, delete it
+  // return a success message
 }
 
 function sendJwt(user, res) {
