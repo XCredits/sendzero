@@ -7,11 +7,15 @@ const app = express();
 const path = require('path');
 const http = require('http');
 const bodyParser = require('body-parser');
+var expressJwt = require('express-jwt');
 const routes = require('./server/routes');
 
 app.use(bodyParser());
 app.use(cookieParser());
+app.use(expressJwt({secret: process.env.jwtKey, requestProperty: 'auth'}));
+
 app.use(passport.initialize());
+
 
 app.use(express.static(path.join(__dirname, 'dist')));
 
