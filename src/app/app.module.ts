@@ -60,6 +60,7 @@ import { ContactsComponent } from './contacts/contacts.component';
 import { AboutComponent } from './about/about.component';
 import { LoginComponent } from './login/login.component';
 import { RegisterComponent } from './register/register.component';
+import { MailingListComponent } from './mailing-list/mailing-list.component';
 
 @NgModule({
   declarations: [
@@ -73,6 +74,7 @@ import { RegisterComponent } from './register/register.component';
     AboutComponent,
     LoginComponent,
     RegisterComponent,
+    MailingListComponent,
   ],
   imports: [
     BrowserModule, 
