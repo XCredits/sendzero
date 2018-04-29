@@ -75,6 +75,6 @@ function sendJwt(user, res) {
     exp: parseInt(expiry.getTime() / 1000),
   };
 
-  var jwtResponse = jwt.sign(jwtContent, process.env.jwtKey);
+  var jwtResponse = jwt.sign(jwtContent, process.env.JWT_KEY);
   res.json({jwt: jwtResponse});
 }

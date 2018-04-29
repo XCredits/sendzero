@@ -14,8 +14,15 @@ const routes = require('./server/routes');
 
 app.use(bodyParser());
 app.use(cookieParser());
+
+// Try to catch default secret key
+if (process.env.JWT_KEY === 'defaultsecretkey') {
+  console.log('\n*\n*WARNING: USING DEFAULT JWT_KEY. Site will not be secure with this key.\n*\n*');
+}
+
+
 // Always attempt to authorise JWT and attach to req.auth
-app.use(expressJwt({secret: process.env.jwtKey, requestProperty: 'auth'}));
+app.use(expressJwt({secret: process.env.JWT_KEY, requestProperty: 'auth'}));
 
 app.use(passport.initialize());
 
