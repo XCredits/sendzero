@@ -10,11 +10,12 @@ import { FormGroup, FormControl, Validators } from '@angular/forms';
 export class MailingListComponent implements OnInit {
   joinStringForm: FormGroup;
   joinListMessage: string;
+  emailPattern = '^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$'; // This is not a good regex http://emailregex.com/
+
 
   constructor( private http: HttpClient ) { }
 
-  emailPattern = '^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$'; // This is not a good regex http://emailregex.com/
-
+  
   ngOnInit() {
     this.joinStringForm = new FormGroup ({
       givenName: new FormControl(''),
@@ -31,7 +32,6 @@ export class MailingListComponent implements OnInit {
     if (this.joinStringForm.invalid) {
       return;
     }
-    this.joinListMessage = 'yo';
     this.http.post('/api/join-mailing-list', {
         'givenName': formData.givenName,
         'familyName': formData.familyName,
