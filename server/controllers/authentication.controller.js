@@ -38,11 +38,18 @@ function register(req, res) {
 function login(req, res) {
   // getUserWithPassword
   // store session
-  if (!user) {
-    res.status(500).send({message:"Error in creating user"});
-  } else {
-    sendJwt(user, res);
-  }
+  User.findOne({email: req.body.email})
+      .then(user=> {
+        if (!user) {
+          return res.status(500).send({message:"Error in finding user"});
+        } else {
+          if (user.checkPassword(req.password)) {
+            sendJwt(user, res);
+          } else {
+
+          }
+        }
+      });
 }
 
 function refreshJwt(req, res) {
