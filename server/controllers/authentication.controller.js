@@ -1,11 +1,14 @@
 var User = require('../models/user.model.js');
 var Session = require('../models/session.model.js');
 var jwt = require('jsonwebtoken');
+var auth = require('../config/auth-express-jwt.js');
+
 
 module.exports = function (app) {
   app.post('/register', register);
   app.post('/login', login);
   app.post('/refresh-jwt', refreshJwt);
+  app.post('/change-password', auth, changePassword);
   app.post('/reset-password', resetPassword);
   app.post('/logout', logout);
 }
@@ -50,6 +53,13 @@ function refreshJwt(req, res) {
   } else {
     res.status(500).send({message:"User not found"});
   }
+}
+
+function changePassword(req, res) {
+  // look up user
+  // user.createPasswordHash(req.body.password);
+  // user.save()
+  // res.send()
 }
 
 function resetPassword(req, res) {
