@@ -59,6 +59,12 @@ function resetPassword(req, res) {
   // res.send()
 }
 
+function forgotPassword(req, res) {
+  // https://www.owasp.org/index.php/Forgot_Password_Cheat_Sheet#Step_4.29_Allow_user_to_change_password_in_the_existing_session
+  // create JWT that establishes an authetication session ONLY for reset password routes
+  // 
+}
+
 function logout(req, res) {
   // get the session, delete it
   // return a success message
