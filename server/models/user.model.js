@@ -10,26 +10,21 @@ var UserSchema = new Schema({
     email: {type: String, required: true},
     timeRegister: {type: Date, default: Date.now},
     passwordHash: String,
-    salt: String
+    saltRounds: String
   }
 );
 
 UserSchema.methods.createPasswordHash = function(password) {
-  this.salt = crypto.randomBytes(16).toString('hex');
   // https://hackernoon.com/your-node-js-authentication-tutorial-is-wrong-f1a3bf831a46
   // https://codahale.com/how-to-safely-store-a-password/
   // https://security.stackexchange.com/questions/4781/do-any-security-experts-recommend-bcrypt-for-password-storage/6415#6415
 
-  // var saltRouns = 12;
-  // var hash = bcrypt.hashSync(myPlaintextPassword, saltRounds);
-  // Store hash in your password DB.
-  this.passwordHash = crypto.pbkdf2Sync(password, this.salt, 4096, 64, 'sha512')
-      .toString('hex');
+  this.saltRounds = 12;
+  this.passwordHash = bcrypt.hashSync(password, saltRounds);
 };
 
 UserSchema.methods.checkPassword = function(password) {
-  var passwordHash = crypto.pbkdf2Sync(password, this.salt, 4096, 64, 'sha512')
-      .toString('hex');
+  var passwordHash = bcrypt.hashSync(password, this.saltRounds);
   return passwordHash === this.passwordHash;
 };
 
