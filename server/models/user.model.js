@@ -8,9 +8,9 @@ var UserSchema = new Schema({
     givenName: {type: String},
     familyName: {type: String},
     email: {type: String, required: true},
-    timeRegister: {type: Date, default: Date.now},
+    timeRegistered: {type: Date, default: Date.now},
     passwordHash: String,
-    saltRounds: String
+    saltRounds: String // stored in case we increase the salt rounds in the future
   }
 );
 
