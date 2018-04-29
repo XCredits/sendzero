@@ -20,7 +20,7 @@ UserSchema.methods.createPasswordHash = function(password) {
   // https://security.stackexchange.com/questions/4781/do-any-security-experts-recommend-bcrypt-for-password-storage/6415#6415
 
   this.saltRounds = 12;
-  this.passwordHash = bcrypt.hashSync(password, saltRounds);
+  this.passwordHash = bcrypt.hashSync(password, this.saltRounds);
 };
 
 UserSchema.methods.checkPassword = function(password) {
