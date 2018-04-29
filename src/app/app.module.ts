@@ -110,6 +110,16 @@ import { RegisterComponent } from './register/register.component';
         component: AboutComponent,
         data: { title: 'About' },
       },
+      {
+        path: 'login',
+        component: LoginComponent,
+        data: { title: 'Login' },
+      },
+      {
+        path: 'register',
+        component: RegisterComponent,
+        data: { title: 'Register' },
+      },
       { // Default route
         path: '', 
         redirectTo: '/home', 

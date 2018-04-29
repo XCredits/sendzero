@@ -7,7 +7,9 @@ const app = express();
 const path = require('path');
 const http = require('http');
 const bodyParser = require('body-parser');
+var cookieParser = require('cookie-parser');
 var expressJwt = require('express-jwt');
+var passport = require('passport');
 const routes = require('./server/routes');
 
 app.use(bodyParser());
