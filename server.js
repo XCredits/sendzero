@@ -14,10 +14,7 @@ const routes = require('./server/routes');
 
 app.use(bodyParser());
 app.use(cookieParser());
-// app.use{secret:
-//   saveUninitialised: 
-//   resave: false
-// }
+
 app.use(passport.initialize());
 
 app.use(express.static(path.join(__dirname, 'dist')));
