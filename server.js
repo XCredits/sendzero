@@ -7,14 +7,17 @@ const app = express();
 const path = require('path');
 const http = require('http');
 const bodyParser = require('body-parser');
-var cookieParser = require('cookie-parser');
-
-var passport = require('passport');
+const cookieParser = require('cookie-parser');
+const expressSession = require('express-session');
+const passport = require('passport');
 const routes = require('./server/routes');
 
 app.use(bodyParser());
 app.use(cookieParser());
-
+// app.use{secret:
+//   saveUninitialised: 
+//   resave: false
+// }
 app.use(passport.initialize());
 
 app.use(express.static(path.join(__dirname, 'dist')));

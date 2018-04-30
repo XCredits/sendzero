@@ -2,7 +2,21 @@ var User = require('../models/user.model.js');
 var Session = require('../models/session.model.js');
 var jwt = require('jsonwebtoken');
 var auth = require('../config/auth-express-jwt.js');
+const expressSession = require('express-session');
+const passport = require('passport');
 
+// Express session and passport session is only used on routes where passwords 
+// are set and entered and when the JWT is refreshed
+var sessionSettings = {
+  secret:process.env.SESSION_SECRET,
+  saveUninitialized: false,
+  resave: false
+  // store: Usermongoose
+};
+
+if (process.env.production) {
+  sessionSettings.secure = true;
+}
 
 module.exports = function (app) {
   app.post('/register', register);
