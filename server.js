@@ -8,7 +8,6 @@ const path = require('path');
 const http = require('http');
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
-const expressSession = require('express-session');
 const passport = require('passport');
 const routes = require('./server/routes');
 

@@ -1,7 +1,7 @@
 var User = require('../models/user.model.js');
 var Session = require('../models/session.model.js');
 var jwt = require('jsonwebtoken');
-var auth = require('../config/auth-express-jwt.js');
+var jwtAuth = require('../config/auth-express-jwt.js');
 const expressSession = require('express-session');
 const passport = require('passport');
 
@@ -14,15 +14,30 @@ var sessionSettings = {
   // store: Usermongoose
 };
 
-if (process.env.production) {
-  sessionSettings.secure = true;
-}
+// if (process.env.production) {
+//   sessionSettings.secure = true;
+// }
+
+// 
+const sessAuth1 = expressSession(sessionSettings);
+const sessAuth2 = passport.session();
+
+passport.serializeUser(function (user, done) {
+	done(null, user.id);
+});
+
+passport.deserializeUser(function (id, done) {
+	User.getUserById(id, function (err, user) {
+		done(err, user);
+	});
+});
+
 
 module.exports = function (app) {
   app.post('/register', register);
   app.post('/login', login);
-  app.post('/refresh-jwt', refreshJwt);
-  app.post('/change-password', auth, changePassword);
+  app.post('/refresh-jwt', sessAuth1, sessAuth2, refreshJwt);
+  app.post('/change-password', jwtAuth, changePassword);
   app.post('/reset-password', resetPassword);
   app.post('/logout', logout);
 }
@@ -46,24 +61,24 @@ function register(req, res) {
       .catch(()=>{
         res.status(500).send({message:"Error in creating user"});
       });
-
 }
 
 function login(req, res) {
   // getUserWithPassword
   // store session
-  User.findOne({email: req.body.email})
-      .then(user=> {
-        if (!user) {
-          return res.status(500).send({message:"Error in finding user"});
-        } else {
-          if (user.checkPassword(req.password)) {
-            sendJwt(user, res);
-          } else {
+  passport.authenticate('local', function(err, user, info){
+    // If Passport throws/catches an error
+    if (err) {
+      res.status(404).json(err);
+      return;
+    }
 
-          }
-        }
-      });
+    if (!user) {
+      return res.status(500).send({message:"Error in finding user"});
+    } else {
+      return sendJwt(user, res);
+    }
+  });
 }
 
 function refreshJwt(req, res) {
