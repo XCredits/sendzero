@@ -1,17 +1,22 @@
 var User = require('../models/user.model.js');
-var Session = require('../models/session.model.js');
+var SessionModel = require('../models/session.model.js');
+const mongoose = require('mongoose');
 var jwt = require('jsonwebtoken');
 var jwtAuth = require('../config/auth-express-jwt.js');
 const expressSession = require('express-session');
 const passport = require('passport');
 
+// https://www.youtube.com/watch?v=g32awc4HrLA
+
+// mongoose.connect(process.env.MONGODB_URI); // may not be needed
+
 // Express session and passport session is only used on routes where passwords 
 // are set and entered and when the JWT is refreshed
 var sessionSettings = {
-  secret:process.env.SESSION_SECRET,
+  secret: process.env.SESSION_SECRET,
   saveUninitialized: false,
-  resave: false
-  // store: Usermongoose
+  resave: false,
+  store: new MongoStore({ mongooseConnection: mongoose.connection })
 };
 
 // if (process.env.production) {
@@ -23,11 +28,11 @@ const sessAuth1 = expressSession(sessionSettings);
 const sessAuth2 = passport.session();
 
 passport.serializeUser(function (user, done) {
-	done(null, user.id);
+	done(null, user._id);
 });
 
-passport.deserializeUser(function (id, done) {
-	User.getUserById(id, function (err, user) {
+passport.deserializeUser(function (_id, done) {
+	User.findById(_id, function (err, user) {
 		done(err, user);
 	});
 });
@@ -55,6 +60,7 @@ function register(req, res) {
           res.status(500).send({message:"Error in creating user"});
         } else {
           // store session
+          // Authenticate???
           sendJwt(user, res);
         }
       })
