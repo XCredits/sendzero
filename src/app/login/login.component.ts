@@ -23,7 +23,7 @@ export class LoginComponent implements OnInit {
     if (this.loginForm.invalid) {
       return;
     }
-    this.http.post('/api/login', {
+    this.http.post('/api/user/login', {
         'username': formData.username,
         'password': formData.password,
         })

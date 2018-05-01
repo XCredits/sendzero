@@ -39,12 +39,12 @@ passport.deserializeUser(function (_id, done) {
 
 
 module.exports = function (app) {
-  app.post('/register', register);
-  app.post('/login', login);
-  app.post('/refresh-jwt', sessAuth1, sessAuth2, refreshJwt);
-  app.post('/change-password', jwtAuth, changePassword);
-  app.post('/reset-password', resetPassword);
-  app.post('/logout', logout);
+  app.post('/api/user/register', register);
+  app.post('/api/user/login', login);
+  app.post('/api/user/refresh-jwt', sessAuth1, sessAuth2, refreshJwt);
+  app.post('/api/user/change-password', jwtAuth, changePassword);
+  app.post('/api/user/reset-password', resetPassword);
+  app.post('/api/user/logout', logout);
 }
 
 function register(req, res) {

@@ -29,7 +29,7 @@ export class RegisterComponent implements OnInit {
     if (this.registerForm.invalid) {
       return;
     }
-    this.http.post('/api/login', {
+    this.http.post('/api/user/register', {
         'givenName': formData.givenName,
         'familyName': formData.familyName,
         'email': formData.email,
