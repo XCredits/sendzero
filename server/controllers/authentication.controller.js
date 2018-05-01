@@ -127,6 +127,7 @@ function sendJwt(user, res) {
   expiry.setMinutes(expiry.getMinutes() + 10);
   var jwtContent = {
     _id: user._id,
+    username: user.username,
     email: user.email,
     givenName: user.givenName,
     familyName: user.familyName,

@@ -7,7 +7,8 @@ var bcrypt = require('bcrypt');
 var UserSchema = new Schema({
     givenName: {type: String},
     familyName: {type: String},
-    email: {type: String, unique: true, required: true},
+    username: {type: String, unique: true, required: true},
+    email: {type: String},
     emailConfirmed: {type: Boolean, default: false},
     timeRegistered: {type: Date, default: Date.now},
     passwordHash: String,
@@ -15,7 +16,7 @@ var UserSchema = new Schema({
   }
 );
 
-UserSchema.index({ email: 1 });
+UserSchema.index({ username: 1 });
 
 UserSchema.methods.createPasswordHash = function(password) {
   // https://hackernoon.com/your-node-js-authentication-tutorial-is-wrong-f1a3bf831a46
