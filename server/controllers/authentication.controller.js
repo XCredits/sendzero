@@ -24,7 +24,6 @@ var sessionSettings = {
 //   sessionSettings.secure = true;
 // }
 
-// 
 const sessAuth1 = expressSession(sessionSettings);
 const sessAuth2 = passport.session();
 

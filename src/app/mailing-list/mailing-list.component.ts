@@ -15,12 +15,10 @@ export class MailingListComponent implements OnInit {
 
   constructor( private http: HttpClient ) { }
 
-  
   ngOnInit() {
     this.joinStringForm = new FormGroup ({
       givenName: new FormControl(''),
       familyName: new FormControl(''),
-      //   [<any>Validators.required, <any>Validators.minLength(5)]),
       email: new FormControl('', [<any>Validators.required, <any>Validators.pattern(this.emailPattern)]),
     });
   }
