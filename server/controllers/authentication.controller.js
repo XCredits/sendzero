@@ -52,6 +52,7 @@ function register(req, res) {
   var user = new User();
   user.givenName = req.body.givenName;
   user.familyName = req.body.familyName;
+  user.username = req.body.username;
   user.email = req.body.email;
   user.createPasswordHash(req.body.password);
   user.save()
@@ -60,7 +61,7 @@ function register(req, res) {
           res.status(500).send({message:"Error in creating user"});
         } else {
           // store session
-          // Authenticate???
+          // passport.authenticate???
           sendJwt(user, res);
         }
       })
