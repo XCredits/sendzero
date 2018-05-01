@@ -5,11 +5,14 @@ var jwt = require('jsonwebtoken');
 var jwtAuth = require('../config/auth-express-jwt.js');
 const expressSession = require('express-session');
 const passport = require('passport');
+var LocalStrategy = require('passport-local').Strategy;
 const MongoStore = require('connect-mongo')(expressSession);
 
 // https://www.youtube.com/watch?v=g32awc4HrLA
 
 // mongoose.connect(process.env.MONGODB_URI); // may not be needed
+console.log("mongoose.connection");
+console.log(mongoose.connection);
 
 // Express session and passport session is only used on routes where passwords 
 // are set and entered and when the JWT is refreshed
@@ -24,9 +27,34 @@ var sessionSettings = {
 //   sessionSettings.secure = true;
 // }
 
-const sessAuth1 = expressSession(sessionSettings);
-const sessAuth2 = passport.session();
 
+
+passport.use(new LocalStrategy({
+    usernameField: 'username',
+    passwordField: 'password'
+  },
+  function(username, password, done) {
+    console.log('Authentication starting\n sdasd\n\nsdfds\n\n');
+    User.findOne({ username: username }, function (err, user) {
+      if (err) { return done(err); }
+      // Return if user not found in database
+      if (!user) {
+        return done(null, false, {
+          message: 'User not found'
+        });
+      }
+      // Return if password is wrong
+      if (!user.checkPassword(password)) {
+        return done(null, false, {
+          message: 'Password is incorrect'
+        });
+      }
+      // If credentials are correct, return the user object
+      return done(null, user);
+    });
+  }
+));
+ 
 passport.serializeUser(function (user, done) {
 	done(null, user._id);
 });
@@ -38,10 +66,24 @@ passport.deserializeUser(function (_id, done) {
 });
 
 
+
+
+
+ 
+
+
+
 module.exports = function (app) {
+  // const sessAuth1 = ;
+  app.use(expressSession(sessionSettings));
+  app.use(passport.initialize());
+  // const sessAuth2 = ;
+  app.use(passport.session());
+
+
   app.post('/api/user/register', register);
   app.post('/api/user/login', login);
-  app.post('/api/user/refresh-jwt', sessAuth1, sessAuth2, refreshJwt);
+  app.post('/api/user/refresh-jwt', refreshJwt);
   app.post('/api/user/change-password', jwtAuth, changePassword);
   app.post('/api/user/reset-password', resetPassword);
   app.post('/api/user/logout', logout);
@@ -60,9 +102,21 @@ function register(req, res) {
         if (!user) {
           res.status(500).send({message:"Error in creating user"});
         } else {
-          // store session
-          // passport.authenticate???
-          sendJwt(user, res);
+          console.log("Starting authenticate2");
+          console.log("Pre authenticate");
+          passport.authenticate('local', function(err, userResult, info){
+            console.log("Got into authenticate");
+            // If Passport throws/catches an error
+            if (err) {
+              console.log('error')
+              console.log(err);
+              res.send(500).json(err);
+              return;
+            }
+            console.log("Succeeded");
+            sendJwt(user, res);
+          });
+          console.log("Passed over authenticate");
         }
       })
       .catch(()=>{
@@ -73,7 +127,9 @@ function register(req, res) {
 function login(req, res) {
   // getUserWithPassword
   // store session
+  console.log("Starting authenticate");
   passport.authenticate('local', function(err, user, info){
+    console.log("Got into authenticate");
     // If Passport throws/catches an error
     if (err) {
       res.status(404).json(err);
@@ -85,7 +141,7 @@ function login(req, res) {
     } else {
       return sendJwt(user, res);
     }
-  });
+  }) (req, res);
 }
 
 function refreshJwt(req, res) {

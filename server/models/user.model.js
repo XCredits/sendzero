@@ -12,7 +12,7 @@ var UserSchema = new Schema({
     emailConfirmed: {type: Boolean, default: false},
     timeRegistered: {type: Date, default: Date.now},
     passwordHash: String,
-    saltRounds: String // stored in case we increase the salt rounds in the future
+    saltRounds: Number // stored in case we increase the salt rounds in the future
   }
 );
 

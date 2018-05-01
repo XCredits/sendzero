@@ -9,12 +9,11 @@ const http = require('http');
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 const passport = require('passport');
-const routes = require('./server/routes');
 
 app.use(bodyParser());
 app.use(cookieParser());
 
-app.use(passport.initialize());
+const routes = require('./server/routes');
 
 app.use(express.static(path.join(__dirname, 'dist')));
 
