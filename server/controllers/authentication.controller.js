@@ -5,6 +5,7 @@ var jwt = require('jsonwebtoken');
 var jwtAuth = require('../config/auth-express-jwt.js');
 const expressSession = require('express-session');
 const passport = require('passport');
+const MongoStore = require('connect-mongo')(expressSession);
 
 // https://www.youtube.com/watch?v=g32awc4HrLA
 
