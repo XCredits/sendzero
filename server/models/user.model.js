@@ -17,6 +17,8 @@ var UserSchema = new Schema({
 );
 
 UserSchema.index({ username: 1 });
+UserSchema.index({ email: 1 });
+
 
 UserSchema.methods.createPasswordHash = function(password) {
   // https://hackernoon.com/your-node-js-authentication-tutorial-is-wrong-f1a3bf831a46

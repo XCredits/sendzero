@@ -2,16 +2,17 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router } from "@angular/router";
 
-let user: User;
-let jwt; // To be implemented later to allow APIs to be called quickly without having to hit up the 
 
 @Injectable()
 export class UserService {
 
+  user: User;
+  jwt; // To be implemented later to allow APIs to be called quickly without having to hit up the 
+
   constructor( private http: HttpClient, 
       private router: Router ) {
     this.getUserDetails();
-    if (!user) {
+    if (!this.user) {
 
     }
   }
@@ -20,7 +21,7 @@ export class UserService {
     this.http.post<User>('/api/user/create', {email, password})
         .subscribe((data) => {
           // set the user
-          user = data;
+          this.user = data;
           // navigate to first page
           this.router.navigateByUrl('/');
           return data;
@@ -28,10 +29,10 @@ export class UserService {
   }
 
   getUserDetails() {
-    this.http.post<Details>('/api/user/details', {})
+    this.http.get<Details>('/api/user/details')
         .subscribe((details) => {
-          user = details.user;
-          jwt = details.jwt;
+          this.user = details.user;
+          this.jwt = details.jwt;
         });
   }
 
@@ -39,14 +40,19 @@ export class UserService {
     return true;
   }
 
-  login(email, password, optional_nav) {
-    // router.navigateByUrl(optional_nav)
+  login(username, password, optional_nav) {
+    // if (optional_nav) {
+    //   router.navigateByUrl(optional_nav);
+    // } else {
+    //   router.navigateByUrl('/');
+    // }
   }
 
   logOut() {
     // Send message to server
     // Delete JWT
     // Remove cookie
+    // navigate to home page '/'
   }
 
   requestInterceptor() {
@@ -57,11 +63,18 @@ export class UserService {
     // https://www.youtube.com/watch?v=qnRrqH-BzJE
   }
 
-  
+  jwtAuthHeader() {
+    return { headers: { Authorization: `Bearer ${this.jwt}` }}
+    // usage:
+    // import {jwtAuthHeader} from '../user.service'
+    // this.http.post('/api/routename', body, jwtAuthHeader);
+    // this.http.get('/api/routename', jwtAuthHeader);
+  }
 }
 
 interface User {
   id: string;
+  username: string;
   name: string;
   email: string;
   isLoggedIn: boolean;
