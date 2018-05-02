@@ -27,6 +27,7 @@ const jwt = require('jsonwebtoken');
 const auth = require('../config/jwt-auth.js');
 const passport = require('passport');
 const crypto = require('crypto');
+require('../config/passport.js');
 
 module.exports = function (app) {
   app.use(passport.initialize());
@@ -57,10 +58,9 @@ function register(req, res) {
 }
 
 function login(req, res) {
-  passport.authenticate('local', function(err, userResult, info){
+  passport.authenticate('local', function(err, user, info){
     if (err) {
-      res.status(500).json(err);
-      return;
+      return res.status(500).json(err);
     }
     if (!user) {
       return res.status(401).send({message:"Error in finding user"});
