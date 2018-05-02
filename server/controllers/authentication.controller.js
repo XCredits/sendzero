@@ -63,7 +63,8 @@ function login(req, res) {
       return res.status(500).json(err);
     }
     if (!user) {
-      return res.status(401).send({message:"Error in finding user"});
+      return res.status(401)
+          .send({message:"Error in finding user: " + info.message});
     }
     createAndSendRefreshAndSessionJwt(user, req, res);
   }) (req, res);

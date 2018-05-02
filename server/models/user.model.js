@@ -31,7 +31,7 @@ UserSchema.methods.createPasswordHash = function(password) {
 
 UserSchema.methods.checkPassword = function(password) {
   var passwordHash = bcrypt.hashSync(password, this.saltRounds);
-  return passwordHash === this.passwordHash;
+  return bcrypt.compareSync(password, this.passwordHash);
 };
 
 /**
