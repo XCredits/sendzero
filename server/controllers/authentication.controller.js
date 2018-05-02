@@ -21,11 +21,12 @@
 // Read more:
 // https://stormpath.com/blog/where-to-store-your-jwts-cookies-vs-html5-web-storage
 
-var User = require('../models/user.model.js');
-var Session = require('../models/session.model.js');
-var jwt = require('jsonwebtoken');
+const User = require('../models/user.model.js');
+const Session = require('../models/session.model.js');
+const jwt = require('jsonwebtoken');
 const auth = require('../config/jwt-auth.js');
 const passport = require('passport');
+const crypto = require('crypto');
 
 module.exports = function (app) {
   app.use(passport.initialize());
@@ -49,8 +50,9 @@ function register(req, res) {
       .then(() => {
         createAndSendRefreshAndSessionJwt(user, res);
       })
-      .catch(()=>{
-        res.status(500).send({message:"Error in creating user during registration"});
+      .catch(err => {
+        res.status(500).send({
+            message: "Error in creating user during registration: " + err});
       });
 }
 
