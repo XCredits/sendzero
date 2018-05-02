@@ -65,18 +65,13 @@ function login(req, res) {
 }
 
 function refreshJwt(req, res) {
-  // Extract session cookie and decode
-  // look up session
-  // Determine if expired
-  // Note we look up user
-
   // Pull the user data from the JWT
-  
-  if (user) {
-    sendJwt(user, res);
-  } else {
-    res.status(500).send({message:"User not found"});
-  }
+  var user = {
+    _id: req.jwtRefreshToken.sub,
+    username: req.jwtRefreshToken.username,
+  };
+  setJwtCookie(user, req.jwtRefreshToken.xsrf, res)
+  res.send({message:"JWT successfully refreshed."});
 }
 
 function changePassword(req, res) {
@@ -117,7 +112,8 @@ function createAndSendRefreshAndSessionJwt(user, res) {
   setJwtCookie(user, xsrf, res);
   var refreshToken = setJwtRefreshTokenCookie(user, xsrf, res);
 
-  var userAgent = '';
+  var userAgent = req.get('User-Agent');
+  userAgent = userAgent.substring(0, 512);
 
   var session = new Session();
   session.userId = refreshToken.jwtObj.sub;
