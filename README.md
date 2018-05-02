@@ -42,7 +42,7 @@ mongo.exe
 to connect to the server.
 Run 
 ~~~
-use LazyWebApp
+use lazywebapp
 db.createUser ({user:'lazywebapp',pwd:'password', roles:[{role:'dbAdmin', db:'lazywebapp'}]})
 ~~~
 

@@ -7,9 +7,13 @@ const app = express();
 const path = require('path');
 const http = require('http');
 const bodyParser = require('body-parser');
-const routes = require('./server/routes');
+const cookieParser = require('cookie-parser');
 
 app.use(bodyParser());
+app.use(cookieParser());
+
+const routes = require('./server/routes');
+
 app.use(express.static(path.join(__dirname, 'dist')));
 
 const port = process.env.PORT || '3000';
@@ -19,6 +23,10 @@ routes(app);
 
 app.get('*', function(req, res) {
   res.sendFile(path.join(__dirname, 'dist/index.html'));
+});
+
+app.post('*', function(req, res) {
+  res.status(404).json({message: "Route not found."});
 });
 
 const server = http.createServer(app);
