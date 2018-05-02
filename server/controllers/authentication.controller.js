@@ -178,7 +178,7 @@ function forgotPassword(req, res) {
 }
 
 function logout(req, res) {
-  // get the session, delete it
+  // get the session from the cookie, delete it
   // return a success message
 }
 
