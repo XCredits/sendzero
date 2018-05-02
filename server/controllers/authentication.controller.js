@@ -46,15 +46,11 @@ function register(req, res) {
   user.email = req.body.email;
   user.createPasswordHash(req.body.password);
   user.save()
-      .then((user)=>{
-        if (!user) {
-          res.status(500).send({message:"Error in creating user"});
-        } else {
-          createAndSendRefreshAndSessionJwt(user, res);
-        }
+      .then(() => {
+        createAndSendRefreshAndSessionJwt(user, res);
       })
       .catch(()=>{
-        res.status(500).send({message:"Error in creating user"});
+        res.status(500).send({message:"Error in creating user during registration"});
       });
 }
 
