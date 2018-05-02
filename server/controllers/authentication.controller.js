@@ -1,5 +1,5 @@
 var User = require('../models/user.model.js');
-var SessionModel = require('../models/session.model.js');
+var Session = require('../models/session.model.js');
 const mongoose = require('mongoose');
 var jwt = require('jsonwebtoken');
 var jwtAuth = require('../config/auth-express-jwt.js');
@@ -182,34 +182,66 @@ function logout(req, res) {
   // return a success message
 }
 
-function createAndSendRefreshAndSessionJwt(user, ref) {
-  
+function createAndSendRefreshAndSessionJwt(user, res) {
   // Create JWT
+  var xrsf = crypto.randomBytes(8).toString('hex');
+  setJwtCookie(user, xrsf, res);
+  var refreshToken = setJwtRefreshTokenCookie(user, xrsf, res);
 
-  var censoredUserData = user
-  res.json({xsrf: xrsf, user: user.frontendData()});
+  var userAgent = '';
+
+  var session = new Session();
+  session.userId = refreshToken.jwtObj.sub;
+  session.sessionId = refreshToken.jwtObj.jti;
+  session.exp = refreshToken.jwtObj.exp;
+  session.userAgent = userAgent;
+  session.lastObserved = Date.now();
+  session.save()
+      .then(()=>{
+        res.json({xsrf: xrsf, user: user.frontendData()});
+      })
+      .catch(()=>{
+        res.status(500).json({message:"Error saving session."})
+      });
 }
 
 function setJwtCookie(user, xrsf, res) {
   var expiry = new Date();
-  // process.env.JWT_REFRESH_TOKEN_EXPIRY_DAYS;
-
   expiry.setMinutes(expiry.getMinutes() + process.env.JWT_EXPIRY_MINS);
-  const randBuf = crypto.randomBytes(8);
-  var jwtId = randBuf.toString('hex');
-  var jwtContent = {
+  var jwtId = crypto.randomBytes(8).toString('hex');
+  var jwtObj = {
     sub: user._id,
     jti: jwtId,
     username: user.username,
     xrsf: xrsf,
     exp: parseInt(expiry.getTime() / 1000),
   };
-  var jwtResponse = jwt.sign(jwtContent, process.env.JWT_KEY);
+  var jwtString = jwt.sign(jwtObj, process.env.JWT_KEY);
   // Set the cookie
-  res.cookie('jwt', jwtResponse, { 
-      maxAge: 900000, 
+  res.cookie('JWT', jwtString, {
       httpOnly: true,
-      secure: !process.env.IS_LOCAL
+      secure: !process.env.IS_LOCAL,
     });
-  return {xsrf};
+  return {jwtString, jwtObj};
+}
+
+function setJwtRefreshTokenCookie(user, xrsf, res) {
+  var expiry = new Date();
+  expiry.setMinutes(expiry.getDays() + 
+      process.env.JWT_REFRESH_TOKEN_EXPIRY_DAYS);
+  var jwtId = crypto.randomBytes(8).toString('hex');
+  var jwtObj = {
+    sub: user._id,
+    jti: jwtId,
+    username: user.username,
+    xrsf: xrsf,
+    exp: parseInt(expiry.getTime() / 1000),
+  };
+  var jwtString = jwt.sign(jwtObj, process.env.JWT_KEY);
+  // Set the cookie
+  res.cookie('JWT_REFRESH_TOKEN', jwtString, {
+      httpOnly: true,
+      secure: !process.env.IS_LOCAL,
+    });
+  return {jwtString, jwtObj};
 }
