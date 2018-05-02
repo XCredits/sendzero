@@ -150,7 +150,7 @@ function refreshJwt(req, res) {
   // Note we look up user
 
   // Pull the user data from the JWT
-
+  
   if (user) {
     sendJwt(user, res);
   } else {
@@ -238,7 +238,7 @@ function setJwtRefreshTokenCookie(user, xrsf, res) {
     xrsf: xrsf,
     exp: parseInt(expiry.getTime() / 1000),
   };
-  var jwtString = jwt.sign(jwtObj, process.env.JWT_KEY);
+  var jwtString = jwt.sign(jwtObj, process.env.JWT_REFRESH_TOKEN_KEY);
   // Set the cookie
   res.cookie('JWT_REFRESH_TOKEN', jwtString, {
       httpOnly: true,
