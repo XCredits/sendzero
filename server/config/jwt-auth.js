@@ -24,6 +24,8 @@ module.exports = {
     }
     // Get out XSRF header & compare to XSRF
     req.jwt = payload;
+    req.userId = payload.sub;
+    req.username = payload.username;
     next();
   },
 
@@ -48,6 +50,8 @@ module.exports = {
           }
           // Success
           req.jwtRefreshToken = payload;
+          req.userId = payload.sub;
+          req.username = payload.username;
           next();
         })
         .catch(err=>{
