@@ -11,6 +11,13 @@
 // 5) Using Cross-site request forgery tokens to ensure that the API routes
 //    cannot be exploited by loading URLs on other sites, e.g. 
 //    <img src="https://yoursite.com/api/delete-account">
+// 6) Because it relies on cookies and built-in Angular XSRF support, no 
+//    front-end middleware is required to authenticate the request 
+//    (Setting XSRF-TOKEN cookie means that Angular will automatically attach 
+//    the XSRF token to the X-XSRF-TOKEN header. Read more:
+//         https://stormpath.com/blog/angular-xsrf)
+// 7) Passport is used to define the authentication method, so it can be 
+//    extended to support all kinds of login methodologies. 
 // Read more:
 // https://stormpath.com/blog/where-to-store-your-jwts-cookies-vs-html5-web-storage
 
