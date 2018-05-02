@@ -48,7 +48,7 @@ function register(req, res) {
   user.createPasswordHash(req.body.password);
   user.save()
       .then(() => {
-        createAndSendRefreshAndSessionJwt(user, res);
+        createAndSendRefreshAndSessionJwt(user, req, res);
       })
       .catch(err => {
         res.status(500).send({
@@ -65,7 +65,7 @@ function login(req, res) {
     if (!user) {
       return res.status(401).send({message:"Error in finding user"});
     }
-    createAndSendRefreshAndSessionJwt(user, res);
+    createAndSendRefreshAndSessionJwt(user, req, res);
   }) (req, res);
 }
 
@@ -106,7 +106,7 @@ function logout(req, res) {
   // return a success message
 }
 
-function createAndSendRefreshAndSessionJwt(user, res) {
+function createAndSendRefreshAndSessionJwt(user, req, res) {
   // Create cross-site request forgery token
   var xsrf = crypto.randomBytes(8).toString('hex');
   // Setting XSRF-TOKEN cookie means that Angular will automatically attach the 
@@ -157,7 +157,7 @@ function setJwtCookie(user, xsrf, res) {
 
 function setJwtRefreshTokenCookie(user, xsrf, res) {
   var expiry = new Date();
-  expiry.setMinutes(expiry.getDays() + 
+  expiry.setMinutes(expiry.getDay() + 
       process.env.JWT_REFRESH_TOKEN_EXPIRY_DAYS);
   var jwtId = crypto.randomBytes(8).toString('hex');
   var jwtObj = {
