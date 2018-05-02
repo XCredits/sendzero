@@ -12,4 +12,7 @@ var SessionSchema = new Schema({
   }
 );
 
+SessionSchema.index({ userId: 1 });
+SessionSchema.index({ sessionId: 1 });
+
 module.exports = mongoose.model('Session', SessionSchema);

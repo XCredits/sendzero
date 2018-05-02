@@ -1,17 +1,17 @@
 var User = require('../models/user.model.js');
 var Session = require('../models/session.model.js');
 var jwt = require('jsonwebtoken');
-const {jwtAuth, jwtRefreshToken} = require('../config/jwt-auth.js');
+const auth = require('../config/jwt-auth.js');
 const passport = require('passport');
 
 module.exports = function (app) {
   app.use(passport.initialize());
   app.post('/api/user/register', register);
   app.post('/api/user/login', login);
-  app.post('/api/user/refresh-jwt', jwtRefreshToken, refreshJwt);
-  app.post('/api/user/change-password', jwtRefreshToken, changePassword);
+  app.post('/api/user/refresh-jwt', auth.jwtRefreshToken, refreshJwt);
+  app.post('/api/user/change-password', auth.jwtRefreshToken, changePassword);
   app.post('/api/user/reset-password', resetPassword);
-  app.post('/api/user/logout', jwtRefreshToken, logout);
+  app.post('/api/user/logout', auth.jwtRefreshToken, logout);
 }
 
 function register(req, res) {

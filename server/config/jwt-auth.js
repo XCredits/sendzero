@@ -1,4 +1,5 @@
 var jwt = require('jsonwebtoken');
+var Session = require('../models/session.model.js');
 
 // Try to catch default secret key
 if (process.env.JWT_KEY === 'defaultsecretkey') {
@@ -10,7 +11,7 @@ if (process.env.JWT_REFRESH_TOKEN_KEY === 'defaultsecretkey') {
 }
 
 module.exports = {
-  jwtAuth: function (req, res, next) {
+  jwt: function (req, res, next) {
     if(!req.cookies.JWT){
       return res.status(401)
         .json({message:"JWT authenthication error: JWT cookie not set"});
@@ -21,10 +22,11 @@ module.exports = {
       return res.status(401)
         .json({message:"JWT authenthication error: JWT is not verified"});
     }
+    // Get out XRSF header & compare to XRSF
     req.jwt = payload;
     next();
   },
-  jwtRefreshTokenAuth: function (req, res, next) {
+  jwtRefreshToken: function (req, res, next) {
     if(!req.cookies.JWT_REFRESH_TOKEN){
       return res.status(401)
         .json({message:"JWT Refresh Token authenthication error: JWT Refresh Token cookie not set"});
@@ -36,8 +38,23 @@ module.exports = {
       return res.status(401)
         .json({message:"JWT Refresh Token authenthication error: JWT Refresh Token is not verified"});
     }
-    req.jwtRefreshToken = payload;
-    next();
+    // Get out XRSF header & compare to XRSF
+    Session.findOne({sessionId: payload.jti})
+        .then(session=>{
+          if (!session) {
+            return res.status(401)
+                .json({message:"JWT Refresh Token authenthication error: Session not found in DB"});
+          }
+          // Success
+          req.jwtRefreshToken = payload;
+          next();
+        })
+        .catch(err=>{
+          return res.status(401)
+              .json({message:"JWT Refresh Token authenthication error: Problem getting session from DB"});
+        });
+
+    
   },
 
 };
