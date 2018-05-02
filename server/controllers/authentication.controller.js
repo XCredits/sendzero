@@ -91,8 +91,13 @@ function logout(req, res) {
 }
 
 function createAndSendRefreshAndSessionJwt(user, res) {
-  // Create JWT
+  // Create cross-site request forgery token
   var xrsf = crypto.randomBytes(8).toString('hex');
+  // Setting XSRF-TOKEN cookie means that Angular will automatically attach the 
+  // XSRF token to the X-XSRF-TOKEN header. 
+  // Read more: https://stormpath.com/blog/angular-xsrf
+  res.cookie('XSRF-TOKEN', xrsf, {secure: !process.env.IS_LOCAL});
+
   setJwtCookie(user, xrsf, res);
   var refreshToken = setJwtRefreshTokenCookie(user, xrsf, res);
 
