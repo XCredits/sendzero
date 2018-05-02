@@ -1,4 +1,4 @@
-
+var jwt = require('jsonwebtoken');
 
 // Try to catch default secret key
 if (process.env.JWT_KEY === 'defaultsecretkey') {
@@ -11,17 +11,32 @@ if (process.env.JWT_REFRESH_TOKEN_KEY === 'defaultsecretkey') {
 
 module.exports = {
   jwtAuth: function (req, res, next) {
-    var errorReason;
-    // jwt(authenticate)
-    // if failure
-    return res.status(401)
-        .json({message:"JWT authenthication error: "+ errorReason});
-    // attach jwt to be used later
-    req.jwt = jwt.payload;
+    if(!req.cookies.JWT){
+      return res.status(401)
+        .json({message:"JWT authenthication error: JWT cookie not set"});
+    }
+    try {
+      var payload = jwt.verify(req.cookies.JWT, process.env.JWT_KEY);
+    } catch (err) {
+      return res.status(401)
+        .json({message:"JWT authenthication error: JWT is not verified"});
+    }
+    req.jwt = payload;
     next();
   },
   jwtRefreshTokenAuth: function (req, res, next) {
-    req.jwtRefreshToken = jwtRefreshToken.payload;
+    if(!req.cookies.JWT_REFRESH_TOKEN){
+      return res.status(401)
+        .json({message:"JWT Refresh Token authenthication error: JWT Refresh Token cookie not set"});
+    }
+    try {
+      var payload = jwt.verify(req.cookies.JWT_REFRESH_TOKEN, 
+          process.env.JWT_REFRESH_TOKEN_KEY);
+    } catch (err) {
+      return res.status(401)
+        .json({message:"JWT Refresh Token authenthication error: JWT Refresh Token is not verified"});
+    }
+    req.jwtRefreshToken = payload;
     next();
   },
 
