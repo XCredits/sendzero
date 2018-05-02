@@ -23,6 +23,10 @@ module.exports = {
         .json({message:"JWT authenthication error: JWT is not verified"});
     }
     // Get out XSRF header & compare to XSRF
+    if (req.header('X-XSRF-TOKEN') !== payload.xsrf) {
+      return res.status(401)
+        .json({message:"JWT authenthication error: XSRF does not match"});
+    }
     req.jwt = payload;
     req.userId = payload.sub;
     req.username = payload.username;
@@ -42,6 +46,10 @@ module.exports = {
         .json({message:"JWT Refresh Token authenthication error: JWT Refresh Token is not verified"});
     }
     // Get out XSRF header & compare to XSRF
+    if (req.header('X-XSRF-TOKEN') !== payload.xsrf) {
+      return res.status(401)
+        .json({message:"JWT Refresh Token authenthication error: XSRF does not match"});
+    }
     Session.findOne({sessionId: payload.jti})
         .then(session=>{
           if (!session) {

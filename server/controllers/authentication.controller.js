@@ -112,7 +112,7 @@ function createAndSendRefreshAndSessionJwt(user, res) {
   setJwtCookie(user, xsrf, res);
   var refreshToken = setJwtRefreshTokenCookie(user, xsrf, res);
 
-  var userAgent = req.get('User-Agent');
+  var userAgent = req.header('User-Agent');
   userAgent = userAgent.substring(0, 512);
 
   var session = new Session();
