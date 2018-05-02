@@ -39,6 +39,7 @@ UserSchema.methods.checkPassword = function(password) {
  */
 UserSchema.methods.frontendData = function() {
   return {
+    id: this._id,
     givenName: this.givenName,
     familyName: this.familyName,
     username: this.username,
