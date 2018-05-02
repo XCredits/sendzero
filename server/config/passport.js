@@ -1,4 +1,4 @@
-// This file is largely copied from SitePoint. Below is their license
+// This file is largely copied from SitePoint. Below is their license:
 
 // The MIT License (MIT)
 
@@ -27,26 +27,27 @@ var passport = require('passport');
 var LocalStrategy = require('passport-local').Strategy;
 var User = require('../models/user.model.js');
 
-// passport.use(new LocalStrategy({
-//     usernameField: 'username'
-//   },
-//   function(username, password, done) {
-//     User.findOne({ username: username }, function (err, user) {
-//       if (err) { return done(err); }
-//       // Return if user not found in database
-//       if (!user) {
-//         return done(null, false, {
-//           message: 'User not found'
-//         });
-//       }
-//       // Return if password is wrong
-//       if (!user.checkPassword(password)) {
-//         return done(null, false, {
-//           message: 'Password is incorrect'
-//         });
-//       }
-//       // If credentials are correct, return the user object
-//       return done(null, user);
-//     });
-//   }
-// ));
+passport.use(new LocalStrategy({
+  usernameField: 'username',
+  passwordField: 'password'
+},
+function(username, password, done) {
+  User.findOne({ username: username }, function (err, user) {
+    if (err) { return done(err); }
+    // Return if user not found in database
+    if (!user) {
+      return done(null, false, {
+        message: 'User not found'
+      });
+    }
+    // Return if password is wrong
+    if (!user.checkPassword(password)) {
+      return done(null, false, {
+        message: 'Password is incorrect'
+      });
+    }
+    // If credentials are correct, return the user object
+    return done(null, user);
+  });
+}
+));

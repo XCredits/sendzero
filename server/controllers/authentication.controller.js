@@ -1,92 +1,17 @@
 var User = require('../models/user.model.js');
 var Session = require('../models/session.model.js');
-const mongoose = require('mongoose');
 var jwt = require('jsonwebtoken');
-var jwtAuth = require('../config/auth-express-jwt.js');
-const expressSession = require('express-session');
+const {jwtAuth, jwtRefreshToken} = require('../config/jwt-auth.js');
 const passport = require('passport');
-var LocalStrategy = require('passport-local').Strategy;
-const MongoStore = require('connect-mongo')(expressSession);
-
-// https://www.youtube.com/watch?v=g32awc4HrLA
-
-// mongoose.connect(process.env.MONGODB_URI); // may not be needed
-console.log("mongoose.connection");
-console.log(mongoose.connection);
-
-// Express session and passport session is only used on routes where passwords 
-// are set and entered and when the JWT is refreshed
-var sessionSettings = {
-  secret: process.env.SESSION_SECRET,
-  saveUninitialized: false,
-  resave: false,
-  store: new MongoStore({ mongooseConnection: mongoose.connection })
-};
-
-// if (process.env.production) {
-//   sessionSettings.secure = true;
-// }
-
-
-
-passport.use(new LocalStrategy({
-    usernameField: 'username',
-    passwordField: 'password'
-  },
-  function(username, password, done) {
-    console.log('Authentication starting\n sdasd\n\nsdfds\n\n');
-    User.findOne({ username: username }, function (err, user) {
-      if (err) { return done(err); }
-      // Return if user not found in database
-      if (!user) {
-        return done(null, false, {
-          message: 'User not found'
-        });
-      }
-      // Return if password is wrong
-      if (!user.checkPassword(password)) {
-        return done(null, false, {
-          message: 'Password is incorrect'
-        });
-      }
-      // If credentials are correct, return the user object
-      return done(null, user);
-    });
-  }
-));
- 
-passport.serializeUser(function (user, done) {
-	done(null, user._id);
-});
-
-passport.deserializeUser(function (_id, done) {
-	User.findById(_id, function (err, user) {
-		done(err, user);
-	});
-});
-
-
-
-
-
- 
-
-
 
 module.exports = function (app) {
-  // const sessAuth1 = ;
-  app.use(expressSession(sessionSettings));
   app.use(passport.initialize());
-  // const sessAuth2 = ;
-  app.use(passport.session());
-
-
   app.post('/api/user/register', register);
   app.post('/api/user/login', login);
-  app.post('/api/user/refresh-jwt', refreshJwt);
-  app.post('/api/user/change-password', jwtAuth, changePassword);
+  app.post('/api/user/refresh-jwt', jwtRefreshToken, refreshJwt);
+  app.post('/api/user/change-password', jwtRefreshToken, changePassword);
   app.post('/api/user/reset-password', resetPassword);
-  app.post('/api/user/logout', logout);
+  app.post('/api/user/logout', jwtRefreshToken, logout);
 }
 
 function register(req, res) {
@@ -102,20 +27,7 @@ function register(req, res) {
         if (!user) {
           res.status(500).send({message:"Error in creating user"});
         } else {
-          console.log("Starting authenticate2");
-          console.log("Pre authenticate");
-          passport.authenticate('local', function(err, userResult, info){
-            console.log("Got into authenticate");
-            // If Passport throws/catches an error
-            if (err) {
-              console.log('error')
-              console.log(err);
-              res.send(500).json(err);
-              return;
-            }
-            createAndSendRefreshAndSessionJwt(user, res);
-          });
-          console.log("Passed over authenticate");
+          createAndSendRefreshAndSessionJwt(user, res);
         }
       })
       .catch(()=>{
@@ -124,22 +36,15 @@ function register(req, res) {
 }
 
 function login(req, res) {
-  // getUserWithPassword
-  // store session
-  console.log("Starting authenticate");
-  passport.authenticate('local', function(err, user, info){
-    console.log("Got into authenticate");
-    // If Passport throws/catches an error
+  passport.authenticate('local', function(err, userResult, info){
     if (err) {
-      res.status(404).json(err);
+      res.status(500).json(err);
       return;
     }
-
     if (!user) {
-      return res.status(500).send({message:"Error in finding user"});
-    } else {
-      createAndSendRefreshAndSessionJwt(user, res);
+      return res.status(401).send({message:"Error in finding user"});
     }
+    createAndSendRefreshAndSessionJwt(user, res);
   }) (req, res);
 }
 
@@ -179,7 +84,9 @@ function forgotPassword(req, res) {
 }
 
 function logout(req, res) {
-  // get the session from the cookie, delete it
+  // get the session from the cookie
+  // delete it from the DB
+  // delete the cookie
   // return a success message
 }
 
