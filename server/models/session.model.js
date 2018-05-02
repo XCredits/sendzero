@@ -4,8 +4,11 @@ mongoose.Promise = global.Promise;
 var Schema = mongoose.Schema;
 
 var SessionSchema = new Schema({
-    sessionString: {type: String, required: true},
     userId: {type: String, required: true},
+    sessionId: {type: String, required: true},
+    exp: {type: Date, required: true},
+    userAgent: {type: String},
+    lastObserved: {type: Date, required: true}
   }
 );
 

@@ -114,7 +114,7 @@ function register(req, res) {
               return;
             }
             console.log("Succeeded");
-            sendJwt(user, res);
+            createAndSendRefreshAndSessionJwt(user, res);
           });
           console.log("Passed over authenticate");
         }
@@ -139,7 +139,10 @@ function login(req, res) {
     if (!user) {
       return res.status(500).send({message:"Error in finding user"});
     } else {
-      return sendJwt(user, res);
+      createAndSendRefreshAndSessionJwt(user, res);
+      // Generate refresh token with XSRF
+
+      return sendJwt(user, xrsf, res);
     }
   }) (req, res);
 }
@@ -179,18 +182,34 @@ function logout(req, res) {
   // return a success message
 }
 
-function sendJwt(user, res) {
+function createAndSendRefreshAndSessionJwt(user, ref) {
+  
+  // Create JWT
+
+  var censoredUserData = user
+  res.json({xsrf: xrsf, user: user.frontendData()});
+}
+
+function setJwtCookie(user, xrsf, res) {
   var expiry = new Date();
-  expiry.setMinutes(expiry.getMinutes() + 10);
+  // process.env.JWT_REFRESH_TOKEN_EXPIRY_DAYS;
+
+  expiry.setMinutes(expiry.getMinutes() + process.env.JWT_EXPIRY_MINS);
+  const randBuf = crypto.randomBytes(8);
+  var jwtId = randBuf.toString('hex');
   var jwtContent = {
-    _id: user._id,
+    sub: user._id,
+    jti: jwtId,
     username: user.username,
-    email: user.email,
-    givenName: user.givenName,
-    familyName: user.familyName,
+    xrsf: xrsf,
     exp: parseInt(expiry.getTime() / 1000),
   };
-
   var jwtResponse = jwt.sign(jwtContent, process.env.JWT_KEY);
-  res.json({jwt: jwtResponse});
+  // Set the cookie
+  res.cookie('jwt', jwtResponse, { 
+      maxAge: 900000, 
+      httpOnly: true,
+      secure: !process.env.IS_LOCAL
+    });
+  return {xsrf};
 }
