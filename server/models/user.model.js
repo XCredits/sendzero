@@ -34,4 +34,18 @@ UserSchema.methods.checkPassword = function(password) {
   return passwordHash === this.passwordHash;
 };
 
+/**
+ * removes secret data we don't want to send to the front-end
+ */
+UserSchema.methods.frontendData = function() {
+  return {
+    givenName: this.givenName,
+    familyName: this.familyName,
+    username: this.username,
+    email: this.email,
+    emailConfirmed: this.emailConfirmed,
+    timeRegistered: this.timeRegistered,
+  };
+};
+
 module.exports = mongoose.model('User', UserSchema);
