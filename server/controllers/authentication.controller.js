@@ -111,7 +111,7 @@ function createAndSendRefreshAndSessionJwt(user, res) {
   session.lastObserved = Date.now();
   session.save()
       .then(()=>{
-        res.json({xsrf: xsrf, user: user.frontendData()});
+        res.json(user.frontendData());
       })
       .catch(()=>{
         res.status(500).json({message:"Error saving session."})
