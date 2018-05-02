@@ -113,7 +113,6 @@ function register(req, res) {
               res.send(500).json(err);
               return;
             }
-            console.log("Succeeded");
             createAndSendRefreshAndSessionJwt(user, res);
           });
           console.log("Passed over authenticate");
@@ -140,16 +139,18 @@ function login(req, res) {
       return res.status(500).send({message:"Error in finding user"});
     } else {
       createAndSendRefreshAndSessionJwt(user, res);
-      // Generate refresh token with XSRF
-
-      return sendJwt(user, xrsf, res);
     }
   }) (req, res);
 }
 
 function refreshJwt(req, res) {
+  // Extract session cookie and decode
   // look up session
-  // look up user
+  // Determine if expired
+  // Note we look up user
+
+  // Pull the user data from the JWT
+
   if (user) {
     sendJwt(user, res);
   } else {
