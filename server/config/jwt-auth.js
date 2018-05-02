@@ -22,10 +22,11 @@ module.exports = {
       return res.status(401)
         .json({message:"JWT authenthication error: JWT is not verified"});
     }
-    // Get out XRSF header & compare to XRSF
+    // Get out XSRF header & compare to XSRF
     req.jwt = payload;
     next();
   },
+
   jwtRefreshToken: function (req, res, next) {
     if(!req.cookies.JWT_REFRESH_TOKEN){
       return res.status(401)
@@ -38,7 +39,7 @@ module.exports = {
       return res.status(401)
         .json({message:"JWT Refresh Token authenthication error: JWT Refresh Token is not verified"});
     }
-    // Get out XRSF header & compare to XRSF
+    // Get out XSRF header & compare to XSRF
     Session.findOne({sessionId: payload.jti})
         .then(session=>{
           if (!session) {

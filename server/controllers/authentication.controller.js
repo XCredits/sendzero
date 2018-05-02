@@ -92,14 +92,14 @@ function logout(req, res) {
 
 function createAndSendRefreshAndSessionJwt(user, res) {
   // Create cross-site request forgery token
-  var xrsf = crypto.randomBytes(8).toString('hex');
+  var xsrf = crypto.randomBytes(8).toString('hex');
   // Setting XSRF-TOKEN cookie means that Angular will automatically attach the 
   // XSRF token to the X-XSRF-TOKEN header. 
   // Read more: https://stormpath.com/blog/angular-xsrf
-  res.cookie('XSRF-TOKEN', xrsf, {secure: !process.env.IS_LOCAL});
+  res.cookie('XSRF-TOKEN', xsrf, {secure: !process.env.IS_LOCAL});
 
-  setJwtCookie(user, xrsf, res);
-  var refreshToken = setJwtRefreshTokenCookie(user, xrsf, res);
+  setJwtCookie(user, xsrf, res);
+  var refreshToken = setJwtRefreshTokenCookie(user, xsrf, res);
 
   var userAgent = '';
 
@@ -111,14 +111,14 @@ function createAndSendRefreshAndSessionJwt(user, res) {
   session.lastObserved = Date.now();
   session.save()
       .then(()=>{
-        res.json({xsrf: xrsf, user: user.frontendData()});
+        res.json({xsrf: xsrf, user: user.frontendData()});
       })
       .catch(()=>{
         res.status(500).json({message:"Error saving session."})
       });
 }
 
-function setJwtCookie(user, xrsf, res) {
+function setJwtCookie(user, xsrf, res) {
   var expiry = new Date();
   expiry.setMinutes(expiry.getMinutes() + process.env.JWT_EXPIRY_MINS);
   var jwtId = crypto.randomBytes(8).toString('hex');
@@ -126,7 +126,7 @@ function setJwtCookie(user, xrsf, res) {
     sub: user._id,
     jti: jwtId,
     username: user.username,
-    xrsf: xrsf,
+    xsrf: xsrf,
     exp: parseInt(expiry.getTime() / 1000),
   };
   var jwtString = jwt.sign(jwtObj, process.env.JWT_KEY);
@@ -138,7 +138,7 @@ function setJwtCookie(user, xrsf, res) {
   return {jwtString, jwtObj};
 }
 
-function setJwtRefreshTokenCookie(user, xrsf, res) {
+function setJwtRefreshTokenCookie(user, xsrf, res) {
   var expiry = new Date();
   expiry.setMinutes(expiry.getDays() + 
       process.env.JWT_REFRESH_TOKEN_EXPIRY_DAYS);
@@ -147,7 +147,7 @@ function setJwtRefreshTokenCookie(user, xrsf, res) {
     sub: user._id,
     jti: jwtId,
     username: user.username,
-    xrsf: xrsf,
+    xsrf: xsrf,
     exp: parseInt(expiry.getTime() / 1000),
   };
   var jwtString = jwt.sign(jwtObj, process.env.JWT_REFRESH_TOKEN_KEY);
