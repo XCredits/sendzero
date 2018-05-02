@@ -1,3 +1,19 @@
+// This authentication controller is attempting to achieve best-in-class 
+// security and flexibility by:
+// 1) Using JWTs to allow for microservices to be authorised without having 
+//    access to a session database
+// 2) Using JWT Refresh Tokens to allow persistent sessions
+// 3) Storing JWT Refresh Tokens such that the refresher can be revoked, meaning
+//    compromised tokens will only remaing for a short while after revoking
+// 4) Storing JWTs on the client side in HTTP-only, Secure cookies, so 
+//    client-side JavaScript can't leak JWTs to some third party, which is 
+//    useful if using unverified third-party JavaScript on your site
+// 5) Using Cross-site request forgery tokens to ensure that the API routes
+//    cannot be exploited by loading URLs on other sites, e.g. 
+//    <img src="https://yoursite.com/api/delete-account">
+// Read more:
+// https://stormpath.com/blog/where-to-store-your-jwts-cookies-vs-html5-web-storage
+
 var User = require('../models/user.model.js');
 var Session = require('../models/session.model.js');
 var jwt = require('jsonwebtoken');
