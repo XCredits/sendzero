@@ -1,5 +1,5 @@
 $drawerWidth: 300px;
-$navDrawerImage: 'https://images.pexels.com/photos/1562/italian-landscape-mountains-nature.jpg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260';
+$navDrawerImage: '/assets/img/landscape-pexels.jpg';
 
 mat-drawer-container {
   display: flex;
@@ -66,3 +66,4 @@ mat-drawer mat-icon {
   }
   overflow: auto;
 }
+
