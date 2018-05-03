@@ -30,6 +30,9 @@ app.post('*', function(req, res) {
 });
 
 const server = http.createServer(app);
+const io = require('socket.io')(server);
+var signalServer = require('simple-signal-server')(io);
+
 
 server.listen(port, function () {
   console.log(`Running on localhost:${port}`);
