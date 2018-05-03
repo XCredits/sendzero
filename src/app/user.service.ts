@@ -7,9 +7,9 @@ import { Router } from '@angular/router';
 export class UserService {
 
   user: User;
-  jwtExp: Number;
-  jwtRefreshTokenExp: Number;
-  timeoutId: Number;
+  jwtExp: number;
+  jwtRefreshTokenExp: number;
+  timeoutId: any;
 
   nav = {
     router: Number,
