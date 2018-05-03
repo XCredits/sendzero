@@ -9,9 +9,16 @@ export class UserService {
   user: User;
   jwtExp: Number;
   jwtRefreshTokenExp: Number;
+  timeoutId: Number;
+
+  nav = {
+    router: Number,
+    data: Number
+  };
 
   constructor( private http: HttpClient,
       private router: Router ) {
+    this.refreshJwt();
     this.updateUserDetails();
   }
 
@@ -19,6 +26,16 @@ export class UserService {
     this.user = user;
     this.jwtExp = jwtExp;
     this.jwtRefreshTokenExp = jwtRefreshTokenExp;
+  }
+
+  refreshJwt() {
+    this.http.get<any>('/api/user/refresh-jwt')
+        .subscribe((response) => {
+          this.jwtExp = response.jwtExp;
+          const refreshTime = (this.jwtExp - 10) * 1000;
+          var refreshDuration = refreshTime - Date.now();
+          this.timeoutId = setTimeout(this.refreshJwt, refreshDuration);
+        });
   }
 
   updateUserDetails() {
@@ -36,7 +53,7 @@ export class UserService {
     }
   }
 
-  login(username, password, optional_nav) {
+  navigateOnSuccessfulAuthenticate(defaultNav) {
     // if (optional_nav) {
     //   router.navigateByUrl(optional_nav);
     // } else {
