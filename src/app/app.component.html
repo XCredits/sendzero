@@ -1,30 +1,57 @@
-<!--The content below is only a placeholder and can be replaced.-->
-<div style="text-align:center">
-  <h1>
-    Welcome to {{ title }}!
-  </h1>
-</div>
-<div>
-    <h2>Send files using WebRTC!</h2>
-</div>
-Your id is: {{sendZeroService.id}}
-<br>
-{{sendZeroService.prompt}}
-<div class="connectionBox">
-  <input type="text" name="peerId" id="peerId" [(ngModel)]="sendZeroService.peerId">
-  <button (click)="connectToPeer()" id="connectButton" name="connectButton"
-      class="connectButton" [disabled]="sendZeroService.disableConnectButton">
-    Connect
-  </button>
-</div>
-<div class="fileBox" id="fileBox" >
-    <label for="file">Choose File</label>
-    <input type="file"
-           id="file"
-           (change)="handleFileInput($event.target.files)">
-    <button id="sendFileButton" name="sendFileButton" (click)="sendFile()" [disabled]="sendZeroService.disableSendButton" class="sendFileButton">Send File</button>
-          </div>
-<div class="receiveBox" id="receiveBox">
-  <progress [value]="sendZeroService.receivedChunks" [max]="sendZeroService.maxFileChunks">Progress</progress>
-  <a target="_blank" [href]="sendZeroService.url" [download]="sendZeroService.fileName">Download file here</a>
-</div>
+<mat-drawer-container>
+  <!-- Side nav -->
+  <mat-drawer #sideNavDrawer mode="push" opened="false" class="lwa-dark-theme">
+    <mat-toolbar class="logo-toolbar">
+      <!-- Below line was added to prevent the mat-drawer form highlighting the logo with an orange box -->
+      <a routerLink="/" (click)="hideSideNavAfterClick()"></a>
+      <a routerLink="/" (click)="hideSideNavAfterClick()">
+        <img class="logo-long" src="/assets/img/logo-long-white.png" />
+      </a>
+    </mat-toolbar>
+    <mat-nav-list>
+      <a *ngFor="let navLink of primaryNavLinks" mat-list-item routerLink="{{navLink.routerLink}}" (click)="hideSideNavAfterClick()">
+        <mat-icon>{{navLink.icon}}</mat-icon>
+        {{navLink.text}}
+      </a>
+      <a *ngFor="let navLink of secondaryNavLinks" mat-list-item routerLink="{{navLink.routerLink}}" (click)="hideSideNavAfterClick()">
+        <mat-icon>{{navLink.icon}}</mat-icon>
+        {{navLink.text}}
+      </a>
+    </mat-nav-list>
+  </mat-drawer>
+  <!-- Top nav -->
+  <mat-drawer-content>
+    <mat-toolbar color="primary" class="top-navbar" role="header">
+      <div class="mobile-visible" >
+        <button mat-icon-button (click)="toggleSideNavDrawer()">
+          <mat-icon>
+            menu
+          </mat-icon>
+        </button>
+      </div>
+      <img class="logo-square mobile-visible" src="/assets/img/logo-square-white.png" />
+      <span>
+        {{title}}
+      </span>
+      <span class="navbar-spacer"></span>
+      <button mat-icon-button routerLink="/login">
+        <mat-icon>person</mat-icon>
+      </button>
+    </mat-toolbar>
+    <!-- Route content -->
+    <div class="content">
+      <router-outlet></router-outlet>
+    </div>
+    <!-- Bottom mobile nav -->
+    <div class="mobile-visible">
+      <!-- Below mat-toolbar if for lazy spacing -->
+      <mat-toolbar style="visibility:hidden"></mat-toolbar>
+      <mat-toolbar color="primary" class="bottom-mobile-nav">
+        <button *ngFor="let navLink of primaryNavLinks" mat-icon-button routerLink="{{navLink.routerLink}}" >
+          <mat-icon>{{navLink.icon}}</mat-icon>
+        </button>
+      </mat-toolbar>
+    </div>
+  </mat-drawer-content>
+</mat-drawer-container>
+

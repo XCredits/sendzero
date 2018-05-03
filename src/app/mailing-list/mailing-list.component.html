@@ -1,0 +1,30 @@
+<div class="container">
+  <div class="row">
+    <div class="col-lg-8 offset-lg-3">
+      <p>
+        Enter your details to join the mailing list.
+      </p>
+      <form [formGroup]="joinStringForm" (ngSubmit)="joinStringSubmit(joinStringForm.value)">
+        <div class="form-group">
+          <mat-form-field>
+            <input matInput placeholder="Given name" name="givenName" formControlName="givenName">
+          </mat-form-field>
+          <mat-form-field>
+            <input matInput placeholder="Family name" name="familyName" formControlName="familyName">
+          </mat-form-field>
+          <mat-form-field>
+            <input matInput placeholder="Email" name="email" formControlName="email">
+          </mat-form-field>
+          <button color="primary" mat-raised-button type="submit" value="submit">Submit</button>
+        </div>
+      </form>
+      <p>
+        The result from the express server is: {{joinListMessage}}
+      </p>
+
+      <!-- https://scotch.io/tutorials/using-angular-2s-model-driven-forms-with-formgroup-and-formcontrol -->
+      <!-- https://plnkr.co/edit/fYxjHY5xALoLuqaQze6u?p=preview -->
+
+    </div>
+  </div>
+</div>

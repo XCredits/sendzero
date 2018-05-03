@@ -1,0 +1,30 @@
+<!--The content below is only a placeholder and can be replaced.-->
+<div style="text-align:center">
+  <h1>
+    Welcome to {{ title }}!
+  </h1>
+</div>
+<div>
+    <h2>Send files using WebRTC!</h2>
+</div>
+Your id is: {{sendZeroService.id}}
+<br>
+{{sendZeroService.prompt}}
+<div class="connectionBox">
+  <input type="text" name="peerId" id="peerId" [(ngModel)]="sendZeroService.peerId">
+  <button (click)="connectToPeer()" id="connectButton" name="connectButton"
+      class="connectButton" [disabled]="sendZeroService.disableConnectButton">
+    Connect
+  </button>
+</div>
+<div class="fileBox" id="fileBox" >
+    <label for="file">Choose File</label>
+    <input type="file"
+           id="file"
+           (change)="handleFileInput($event.target.files)">
+    <button id="sendFileButton" name="sendFileButton" (click)="sendFile()" [disabled]="sendZeroService.disableSendButton" class="sendFileButton">Send File</button>
+          </div>
+<div class="receiveBox" id="receiveBox">
+  <progress [value]="sendZeroService.receivedChunks" [max]="sendZeroService.maxFileChunks">Progress</progress>
+  <a target="_blank" [href]="sendZeroService.url" [download]="sendZeroService.fileName">Download file here</a>
+</div>

@@ -1,6 +1,6 @@
 import { AppPage } from './app.po';
 
-describe('simplest-angular-nodejs-server App', () => {
+describe('lazy-web-app App', () => {
   let page: AppPage;
 
   beforeEach(() => {
