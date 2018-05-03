@@ -54,22 +54,6 @@ export class UserService {
     // Remove cookie
     // navigate to home page '/'
   }
-
-  requestInterceptor() {
-    // Determine if JWT is expired
-        // if expired, get new JWT
-    // Attach JWT to request authorisation field
-    // return 
-    // https://www.youtube.com/watch?v=qnRrqH-BzJE
-  }
-
-  jwtAuthHeader() {
-    return { headers: { Authorization: `Bearer ${this.jwt}` }}
-    // usage:
-    // import {jwtAuthHeader} from '../user.service'
-    // this.http.post('/api/routename', body, jwtAuthHeader);
-    // this.http.get('/api/routename', jwtAuthHeader);
-  }
 }
 
 interface User {
