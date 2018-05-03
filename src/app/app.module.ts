@@ -62,6 +62,10 @@ import { LoginComponent } from './login/login.component';
 import { RegisterComponent } from './register/register.component';
 import { MailingListComponent } from './mailing-list/mailing-list.component';
 
+// Services
+import { SendZeroService } from './send-zero.service';
+
+
 @NgModule({
   declarations: [
     AppComponent,
@@ -176,7 +180,9 @@ import { MailingListComponent } from './mailing-list/mailing-list.component';
     ServiceWorkerModule.register('/ngsw-worker.js', 
         {enabled: environment.production})
   ],
-  providers: [],
+  providers: [
+    SendZeroService,
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

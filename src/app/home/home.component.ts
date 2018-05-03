@@ -1,4 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { DomSanitizer } from '@angular/platform-browser';
+import { SendZeroService } from '../send-zero.service'
 
 @Component({
   selector: 'app-home',
@@ -7,9 +9,37 @@ import { Component, OnInit } from '@angular/core';
 })
 export class HomeComponent implements OnInit {
 
-  constructor() { }
+  // Typed defintions
+  title: string;
+  prompt: string;
+  id: string;
+  peerId: string;
+  file: File;
+  fileProgress: number = 0;
+  maxFileChunks: number = 0;
+  
+  constructor(private ref: ChangeDetectorRef,
+              private sanitizer: DomSanitizer,
+              public sendZeroService: SendZeroService) {
+    this.title = 'SendZero Alpha';
+    var self = this;
+  }
 
-  ngOnInit() {
+  handleFileInput(files: FileList): void {
+    this.file = files.item(0);
+  }
+
+  sendFile(): void {
+    if (!this.file) return;
+    this.sendZeroService.sendFile(this.file);
+  }
+
+  ngOnInit(): void {
+    this.sendZeroService.init();
+  }
+
+  connectToPeer(): void {
+    this.sendZeroService.connectToPeer();
   }
 
 }
