@@ -1,38 +1,32 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Router } from "@angular/router";
+import { Router } from '@angular/router';
 
 
 @Injectable()
 export class UserService {
 
   user: User;
-  jwt; // To be implemented later to allow APIs to be called quickly without having to hit up the 
 
-  constructor( private http: HttpClient, 
+  constructor( private http: HttpClient,
       private router: Router ) {
-    this.getUserDetails();
+    this.updateUserDetails();
     if (!this.user) {
 
     }
   }
 
-  createUser(email, password){
-    this.http.post<User>('/api/user/create', {email, password})
-        .subscribe((data) => {
-          // set the user
-          this.user = data;
-          // navigate to first page
-          this.router.navigateByUrl('/');
-          return data;
-        });
+  storeUser(userDetails) {
+    // set the user
+    this.user = userDetails;
+    // navigate to first page
+    this.router.navigateByUrl('/');
   }
 
-  getUserDetails() {
-    this.http.get<Details>('/api/user/details')
-        .subscribe((details) => {
-          this.user = details.user;
-          this.jwt = details.jwt;
+  updateUserDetails() {
+    this.http.get<User>('/api/user/details')
+        .subscribe((userDetails) => {
+          this.user = userDetails;
         });
   }
 
@@ -50,37 +44,16 @@ export class UserService {
 
   logOut() {
     // Send message to server
-    // Delete JWT
-    // Remove cookie
     // navigate to home page '/'
-  }
-
-  requestInterceptor() {
-    // Determine if JWT is expired
-        // if expired, get new JWT
-    // Attach JWT to request authorisation field
-    // return 
-    // https://www.youtube.com/watch?v=qnRrqH-BzJE
-  }
-
-  jwtAuthHeader() {
-    return { headers: { Authorization: `Bearer ${this.jwt}` }}
-    // usage:
-    // import {jwtAuthHeader} from '../user.service'
-    // this.http.post('/api/routename', body, jwtAuthHeader);
-    // this.http.get('/api/routename', jwtAuthHeader);
   }
 }
 
 interface User {
   id: string;
   username: string;
-  name: string;
+  givenName: string;
+  familyName: string;
   email: string;
   isLoggedIn: boolean;
-}
-
-interface Details {
-  user: User;
-  jwt: any;
+  isAdmin: boolean;
 }
