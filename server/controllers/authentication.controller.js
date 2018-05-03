@@ -77,7 +77,10 @@ function refreshJwt(req, res) {
     username: req.jwtRefreshToken.username,
   };
   const token = setJwtCookie(user, req.jwtRefreshToken.xsrf, res)
-  res.send({exp: token.jwtObj.exp, message:"JWT successfully refreshed."});
+  res.send({
+      jwtExp: token.jwtObj.exp,
+      message:"JWT successfully refreshed."
+  });
 }
 
 function changePassword(req, res) {
@@ -129,7 +132,11 @@ function createAndSendRefreshAndSessionJwt(user, req, res) {
   session.lastObserved = Date.now();
   session.save()
       .then(()=>{
-        res.json({user: user.frontendData(), exp: token.jwtObj.exp});
+        res.json({
+            user: user.frontendData(), 
+            jwtExp: token.jwtObj.exp, 
+            jwtRefreshTokenExp: token.jwtObj.exp,
+        });
       })
       .catch(()=>{
         res.status(500).json({message:"Error saving session."})
@@ -145,7 +152,7 @@ function setJwtCookie(user, xsrf, res) {
     jti: jwtId,
     username: user.username,
     xsrf: xsrf,
-    exp: parseInt(expiry.getTime() / 1000),
+    exp: parseInt(expiry.getTime() / 1000, 10),
   };
   var jwtString = jwt.sign(jwtObj, process.env.JWT_KEY);
   // Set the cookie
@@ -166,7 +173,7 @@ function setJwtRefreshTokenCookie(user, xsrf, res) {
     jti: jwtId,
     username: user.username,
     xsrf: xsrf,
-    exp: parseInt(expiry.getTime() / 1000),
+    exp: parseInt(expiry.getTime() / 1000, 10),
   };
   var jwtString = jwt.sign(jwtObj, process.env.JWT_REFRESH_TOKEN_KEY);
   // Set the cookie
