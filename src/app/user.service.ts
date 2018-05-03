@@ -32,10 +32,15 @@ export class UserService {
     this.http.get<any>('/api/user/refresh-jwt')
         .subscribe((response) => {
           this.jwtExp = response.jwtExp;
-          const refreshTime = (this.jwtExp - 10) * 1000;
+          // Call a refresh token 15 seconds before 
+          const refreshTime = (this.jwtExp - 15) * 1000;
           var refreshDuration = refreshTime - Date.now();
           this.timeoutId = setTimeout(this.refreshJwt, refreshDuration);
         });
+        // On failure (unauthenticated), directs to /login page
+        // On failure (timeout), tries again in 10 seconds
+            // gives up after 1 minute
+            // directs to /login page
   }
 
   updateUserDetails() {
