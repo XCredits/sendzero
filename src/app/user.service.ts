@@ -1,15 +1,14 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Router } from "@angular/router";
+import { Router } from '@angular/router';
 
 
 @Injectable()
 export class UserService {
 
   user: User;
-  jwt; // To be implemented later to allow APIs to be called quickly without having to hit up the 
 
-  constructor( private http: HttpClient, 
+  constructor( private http: HttpClient,
       private router: Router ) {
     this.updateUserDetails();
     if (!this.user) {
@@ -17,7 +16,7 @@ export class UserService {
     }
   }
 
-  storeUser(userDetails){
+  storeUser(userDetails) {
     // set the user
     this.user = userDetails;
     // navigate to first page
