@@ -103,6 +103,11 @@ function forgotPassword(req, res) {
   // 
 }
 
+function forgotUsername(req, res) {
+  // find all users by email
+  // send all user names to email
+}
+
 function logout(req, res) {
   // get the session from the cookie
   // delete it from the DB
