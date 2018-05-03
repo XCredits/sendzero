@@ -6,7 +6,7 @@
     "ng": "ng",
     "start": "node server.js",
     "dev": "concurrently --kill-others \"npm run dev-server\" \"npm run dev-angular\"",
-    "dev-server": "nodemon server.js --watch server",
+    "dev-server": "nodemon server.js",
     "dev-angular": "ng serve --proxy-config proxy.config.json",
     "build": "ng build --prod",
     "test": "ng test",
