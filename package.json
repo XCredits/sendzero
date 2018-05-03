@@ -6,7 +6,7 @@
     "ng": "ng",
     "start": "node server.js",
     "dev": "concurrently --kill-others \"npm run dev-server\" \"npm run dev-angular\"",
-    "dev-server": "nodemon server.js --watch server",
+    "dev-server": "nodemon server.js",
     "dev-angular": "ng serve --proxy-config proxy.config.json",
     "build": "ng build --prod",
     "test": "ng test",
@@ -31,6 +31,7 @@
     "@angular/service-worker": "^5.2.9",
     "@ng-bootstrap/ng-bootstrap": "^1.1.2",
     "@types/lodash": "^4.14.106",
+    "@types/text-encoding": "0.0.32",
     "angular-font-awesome": "^3.1.2",
     "bcrypt": "^2.0.1",
     "bluebird": "^3.5.1",
@@ -49,6 +50,10 @@
     "passport": "^0.4.0",
     "passport-local": "^1.0.0",
     "rxjs": "^5.5.6",
+    "simple-peer": "^9.1.1",
+    "simple-signal-client": "^1.3.2",
+    "simple-signal-server": "^1.5.1",
+    "socket.io": "^2.1.0",
     "zone.js": "^0.8.19"
   },
   "devDependencies": {
