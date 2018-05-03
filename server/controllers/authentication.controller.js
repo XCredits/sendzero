@@ -76,8 +76,8 @@ function refreshJwt(req, res) {
     _id: req.jwtRefreshToken.sub,
     username: req.jwtRefreshToken.username,
   };
-  setJwtCookie(user, req.jwtRefreshToken.xsrf, res)
-  res.send({message:"JWT successfully refreshed."});
+  const token = setJwtCookie(user, req.jwtRefreshToken.xsrf, res)
+  res.send({exp: token.jwtObj.exp, message:"JWT successfully refreshed."});
 }
 
 function changePassword(req, res) {
@@ -115,8 +115,8 @@ function createAndSendRefreshAndSessionJwt(user, req, res) {
   // Read more: https://stormpath.com/blog/angular-xsrf
   res.cookie('XSRF-TOKEN', xsrf, {secure: !process.env.IS_LOCAL});
 
-  setJwtCookie(user, xsrf, res);
-  var refreshToken = setJwtRefreshTokenCookie(user, xsrf, res);
+  const token = setJwtCookie(user, xsrf, res);
+  const refreshToken = setJwtRefreshTokenCookie(user, xsrf, res);
 
   var userAgent = req.header('User-Agent');
   userAgent = userAgent.substring(0, 512);
@@ -129,7 +129,7 @@ function createAndSendRefreshAndSessionJwt(user, req, res) {
   session.lastObserved = Date.now();
   session.save()
       .then(()=>{
-        res.json(user.frontendData());
+        res.json({user: user.frontendData(), exp: token.jwtObj.exp});
       })
       .catch(()=>{
         res.status(500).json({message:"Error saving session."})
