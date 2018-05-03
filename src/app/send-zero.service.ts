@@ -6,7 +6,7 @@ import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 let io = require('socket.io-client');
 let Peer = require('simple-peer');
 let SimpleSignalClient = require('simple-signal-client');
-// Simple peer splits files greater that 64k, so we make our lives easier
+// Simple peer splits files greater than ~64k, so we make our lives easier
 // by splitting up files ino 60k chunks
 let CHUNK_SIZE = 60000
 let SERVER_URL;
