@@ -11,28 +11,23 @@ export class UserService {
 
   constructor( private http: HttpClient, 
       private router: Router ) {
-    this.getUserDetails();
+    this.updateUserDetails();
     if (!this.user) {
 
     }
   }
 
-  createUser(email, password){
-    this.http.post<User>('/api/user/create', {email, password})
-        .subscribe((data) => {
-          // set the user
-          this.user = data;
-          // navigate to first page
-          this.router.navigateByUrl('/');
-          return data;
-        });
+  storeUser(userDetails){
+    // set the user
+    this.user = userDetails;
+    // navigate to first page
+    this.router.navigateByUrl('/');
   }
 
-  getUserDetails() {
-    this.http.get<Details>('/api/user/details')
-        .subscribe((details) => {
-          this.user = details.user;
-          this.jwt = details.jwt;
+  updateUserDetails() {
+    this.http.get<User>('/api/user/details')
+        .subscribe((userDetails) => {
+          this.user = userDetails;
         });
   }
 
@@ -50,8 +45,6 @@ export class UserService {
 
   logOut() {
     // Send message to server
-    // Delete JWT
-    // Remove cookie
     // navigate to home page '/'
   }
 }
@@ -59,12 +52,9 @@ export class UserService {
 interface User {
   id: string;
   username: string;
-  name: string;
+  givenName: string;
+  familyName: string;
   email: string;
   isLoggedIn: boolean;
-}
-
-interface Details {
-  user: User;
-  jwt: any;
+  isAdmin: boolean;
 }
