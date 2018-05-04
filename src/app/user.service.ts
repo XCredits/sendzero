@@ -9,12 +9,9 @@ export class UserService {
   user: User;
   jwtExp: number;
   jwtRefreshTokenExp: number;
-  timeoutId: any;
+  refreshTimeoutId: any;
 
-  nav = {
-    router: Number,
-    data: Number
-  };
+  nav: navObj;
 
   constructor( private http: HttpClient,
       private router: Router ) {
@@ -35,7 +32,7 @@ export class UserService {
           // Call a refresh token 15 seconds before 
           const refreshTime = (this.jwtExp - 15) * 1000;
           var refreshDuration = refreshTime - Date.now();
-          this.timeoutId = setTimeout(this.refreshJwt, refreshDuration);
+          this.refreshTimeoutId = setTimeout(this.refreshJwt, refreshDuration);
         });
         // On failure (unauthenticated), directs to /login page
         // On failure (timeout), tries again in 10 seconds
@@ -69,6 +66,10 @@ export class UserService {
   logOut() {
     // Send message to server
     // navigate to home page '/'
+    // Delete this.user
+    // Delete this.jwtExp
+    // Delete this.jwtRefreshTokenExp
+    // clear this.refreshTimeoutId
     this.router.navigateByUrl('/');
   }
 }
@@ -81,4 +82,9 @@ interface User {
   email: string;
   isLoggedIn: boolean;
   isAdmin: boolean;
+}
+
+interface navObj {
+  route?: string,
+  data: any
 }
