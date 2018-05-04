@@ -241,6 +241,11 @@ export class SendZeroService {
     return this.id;
   }
 
+  // In case we get id from URL
+  public setPeerId(id: string): void {
+    this.peerId = id;
+  }
+
   public getPeerId(): string {
     return this.peerId.trim();
   }
