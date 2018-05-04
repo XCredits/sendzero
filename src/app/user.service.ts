@@ -11,7 +11,7 @@ export class UserService {
   jwtRefreshTokenExp: number;
   refreshTimeoutId: any;
 
-  nav: navObj;
+  nav: NavObj;
 
   constructor( private http: HttpClient,
       private router: Router ) {
@@ -29,9 +29,9 @@ export class UserService {
     this.http.get<any>('/api/user/refresh-jwt')
         .subscribe((response) => {
           this.jwtExp = response.jwtExp;
-          // Call a refresh token 15 seconds before 
+          // Call a refresh token 15 seconds before
           const refreshTime = (this.jwtExp - 15) * 1000;
-          var refreshDuration = refreshTime - Date.now();
+          const refreshDuration = refreshTime - Date.now();
           this.refreshTimeoutId = setTimeout(this.refreshJwt, refreshDuration);
         });
         // On failure (unauthenticated), directs to /login page
@@ -86,7 +86,7 @@ interface User {
   isAdmin: boolean;
 }
 
-interface navObj {
-  route: string,
-  data?: any
+interface NavObj {
+  route: string;
+  data?: any;
 }
