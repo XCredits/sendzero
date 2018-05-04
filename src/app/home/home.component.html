@@ -5,25 +5,37 @@
   <div>
       <h2>Send files using WebRTC!</h2>
   </div>
-  Your id is: {{sendZeroService.id}}
+  Your id is: 
+  <mat-form-field class="id">
+    <input matInput disabled type="text" name="id" id="id" [(ngModel)]="sendZeroService.id">
+  </mat-form-field>
+  <br>
+  {{sendZeroService.connectionPrompt}}
   <br>
   {{sendZeroService.prompt}}
+  <br>
   <div class="connectionBox">
-    <input type="text" name="peerId" id="peerId" [(ngModel)]="sendZeroService.peerId">
-    <button (click)="connectToPeer()" id="connectButton" name="connectButton"
-        class="connectButton" [disabled]="sendZeroService.disableConnectButton">
+    <mat-form-field>
+      <input matInput placeholder="Peer ID" type="text" name="peerId" id="peerId" [(ngModel)]="sendZeroService.peerId">
+    </mat-form-field>
+    <button mat-raised-button required color="primary" (click)="connectToPeer()" id="connectButton" name="connectButton" class="connectButton" [disabled]="sendZeroService.disableConnectButton || sendZeroService.peerId === '' ">
       Connect
     </button>
   </div>
   <div class="fileBox" id="fileBox" >
-    <label for="file">Choose File</label>
-    <input type="file"
-          id="file"
-          (change)="handleFileInput($event.target.files)">
-    <button id="sendFileButton" name="sendFileButton" (click)="sendFile()" [disabled]="sendZeroService.disableSendButton" class="sendFileButton">Send File</button>
+    <form [formGroup]="fileForm">    
+      <mat-form-field>
+        <ngx-mat-file-input formControlName="selectFile" placeholder="Select File" valuePlaceholder="No file selected" value="file">
+        </ngx-mat-file-input>
+        <mat-icon matSuffix>folder</mat-icon>
+      </mat-form-field>
+      <button mat-raised-button id="sendFileButton" name="sendFileButton" (click)="sendFile()" [disabled]="sendZeroService.disableSendButton" class="sendFileButton">Send File</button>
+    </form>
   </div>
-  <div class="receiveBox" id="receiveBox">
-    <progress [value]="sendZeroService.receivedChunks" [max]="sendZeroService.maxFileChunks">Progress</progress>
-    <a target="_blank" [href]="sendZeroService.url" [download]="sendZeroService.fileName">Download file here</a>
+  <div class="receiveBox" id="receiveBox" *ngIf="sendZeroService.maxFileChunks !== 0">
+    <mat-progress-bar mode="determinate" [value]="sendZeroService.receivedChunks*100/sendZeroService.maxFileChunks">Progress</mat-progress-bar>
+    <div *ngIf="sendZeroService.fileReadyForDownload">
+      <a target="_blank" [href]="sendZeroService.url" [download]="sendZeroService.fileName">Click here to download file {{sendZeroService.fileName}}</a>
+    </div>
   </div>
 </div>

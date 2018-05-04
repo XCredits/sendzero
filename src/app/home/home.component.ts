@@ -3,6 +3,7 @@ import { DomSanitizer } from '@angular/platform-browser';
 import { Router, ActivatedRoute } from '@angular/router';
 import { Observable, Subscription } from 'rxjs';
 import { SendZeroService } from '../send-zero.service';
+import { FormGroup, FormControl } from '@angular/forms';
 
 @Component({
   selector: 'app-home',
@@ -13,12 +14,9 @@ export class HomeComponent implements OnInit {
 
   // Typed defintions
   title: string;
-  prompt: string;
   id: string;
   peerId: string;
-  file: File;
-  fileProgress: number = 0;
-  maxFileChunks: number = 0;
+  fileForm: FormGroup;
   sub: Subscription;
 
   constructor(private ref: ChangeDetectorRef,
@@ -27,16 +25,16 @@ export class HomeComponent implements OnInit {
               private route: ActivatedRoute,
               private router: Router,) {
     this.title = 'SendZero Alpha';
+    this.fileForm = new FormGroup({
+      selectFile: new FormControl(),
+    })
     var self = this;
   }
 
-  handleFileInput(files: FileList): void {
-    this.file = files.item(0);
-  }
-
   sendFile(): void {
-    if (!this.file) return;
-    this.sendZeroService.sendFile(this.file);
+    let fileInput = this.fileForm.get('selectFile').value;
+    if (!fileInput.files[0]) return;
+    this.sendZeroService.sendFile(fileInput.files[0]);
   }
 
   ngOnInit(): void {
@@ -45,7 +43,6 @@ export class HomeComponent implements OnInit {
         this.peerId = params['id'] || "";
         if (this.peerId.length > 0) {
           this.sendZeroService.setPeerId(this.peerId);
-          this.sendZeroService.connectToPeer();
         }
     });
   }
@@ -55,6 +52,7 @@ export class HomeComponent implements OnInit {
   }
 
   connectToPeer(): void {
+    this.peerId = this.sendZeroService.peerId;
     this.sendZeroService.connectToPeer();
   }
 

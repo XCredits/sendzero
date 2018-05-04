@@ -2,6 +2,8 @@ declare var require: any
 import { Injectable } from '@angular/core';
 import { OnInit, ApplicationRef } from '@angular/core';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
+import {MatDialog, MatDialogRef, MAT_DIALOG_DATA} from '@angular/material';
+
 
 let io = require('socket.io-client');
 let Peer = require('simple-peer');
@@ -22,9 +24,12 @@ export class SendZeroService {
   public id: string;
   public peerId: string; 
   public prompt: string;
+  public connectionPrompt: string;
   public url: SafeResourceUrl;
+  private unsafeUrl: string;
   public disableConnectButton: boolean; 
   public disableSendButton: boolean;
+  public fileReadyForDownload: boolean;
   public fileName: string;
   // For progress element
   public maxFileChunks: number = 0;
@@ -46,12 +51,15 @@ export class SendZeroService {
   private signalClient: any;
   private peer: any;
 
-  constructor(private ref: ApplicationRef, private sanitizer: DomSanitizer) {
-    this.id = null;
-    this.peerId = null;
+  constructor(private ref: ApplicationRef,
+              private sanitizer: DomSanitizer,
+              public dialog: MatDialog) {
+    this.id = "";
+    this.peerId = "";
     this.prompt = "Please wait..."; 
     this.disableConnectButton = true; 
     this.disableSendButton = true; 
+    this.fileReadyForDownload = false;
    }
 
   public init(): void {
@@ -75,10 +83,11 @@ export class SendZeroService {
   }
 
   private handleSignalClientReadyState(): void {
-    this.prompt = "Ready to connect! Enter peer's id below!";
+    this.prompt = "Ready to connect!";
+    this.id = this.signalClient.id;
+    this.connectionPrompt = "Users can connect to you by following this link: " + window.location.origin + '/home?id=' + this.id;
     this.ref.tick(); 
     this.disableConnectButton = false; 
-    this.id = this.signalClient.id;
   }
 
   // Maybe add more logic here - esp for some domains/IPs
@@ -97,6 +106,7 @@ export class SendZeroService {
 
   private handlePeerConnect(): void {
     this.prompt = 'Now connected to peer! Select a file to send!';
+    this.peerId = this.peer.id;
     this.ref.tick();
     this.disableSendButton = false;
   }
@@ -108,6 +118,10 @@ export class SendZeroService {
     // If this doesn't work, then we assume that we've received a file.
     try {
       this.prompt = "Now receiving a file!"
+      if (this.fileReadyForDownload) {
+        window.URL.revokeObjectURL(this.unsafeUrl);
+      }
+      this.fileReadyForDownload = false;
       this.ref.tick(); 
       // @ts-ignore
       let metadataString = new TextDecoder('utf-8').decode(data);
@@ -149,10 +163,11 @@ export class SendZeroService {
     let blob = new Blob([this.fileArray],
         {type: this.receivedFileMetadata.fileType});
     let url = window.URL.createObjectURL(blob);
+    this.unsafeUrl = url;
     let safeUrl = this.sanitizer.bypassSecurityTrustResourceUrl(url);
     // Set up download prompt
     this.url = safeUrl;
-    // TODO: Revoke URL
+    this.fileReadyForDownload = true;
     this.prompt = "File is ready for download!";
     this.ref.tick();
     this.resetReceiveVariables();
@@ -255,6 +270,5 @@ export class SendZeroService {
     this.file = file;
     this.fileReader.readAsArrayBuffer(file);
   }
-
 
 }

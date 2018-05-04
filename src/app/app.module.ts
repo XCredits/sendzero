@@ -45,6 +45,8 @@ import {
   MatToolbarModule,
   MatTooltipModule,
 } from '@angular/material';
+import { MaterialFileInputModule } from 'ngx-material-file-input';
+
 
 // Below is for Progressive Web App (PWA) functionality
 import { environment } from '../environments/environment';
@@ -175,6 +177,7 @@ import { SendZeroService } from './send-zero.service';
     MatTabsModule,
     MatToolbarModule,
     MatTooltipModule,
+    MaterialFileInputModule,
 
     // Below is for Progressive Web App (PWA) functionality
     ServiceWorkerModule.register('/ngsw-worker.js', 
