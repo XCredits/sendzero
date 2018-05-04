@@ -55,12 +55,14 @@ export class UserService {
     }
   }
 
-  navigateOnSuccessfulAuthenticate(defaultNav) {
-    // if (optional_nav) {
-    //   router.navigateByUrl(optional_nav);
-    // } else {
-    //   this.router.navigateByUrl('/');
-    // }
+  successNavigate(defaultNav) {
+    if (this.nav) {
+      this.router.navigateByUrl(this.nav.route);
+    } else if (defaultNav) {
+      this.router.navigateByUrl(defaultNav);
+    } else {
+      this.router.navigateByUrl('/');
+    }
   }
 
   logOut() {
@@ -85,6 +87,6 @@ interface User {
 }
 
 interface navObj {
-  route?: string,
-  data: any
+  route: string,
+  data?: any
 }

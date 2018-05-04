@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
+import {UserService} from '../user.service'
 
 @Component({
   selector: 'app-register',
@@ -12,7 +13,8 @@ export class RegisterComponent implements OnInit {
   emailPattern = '^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$'; // This is not a good regex http://emailregex.com/
 
 
-  constructor( private http: HttpClient ) {}
+  constructor( private http: HttpClient, 
+      private userService: UserService) {}
 
   ngOnInit() {
     this.registerForm = new FormGroup ({
@@ -37,8 +39,10 @@ export class RegisterComponent implements OnInit {
         'password': formData.password,
         })
         .subscribe(data => {
-          console.log('received message');
-          // redirect to intended location
+          console.log('register returned');
+          console.log(data);
+          this.userService.storeUser(data);
+          this.userService.successNavigate();
         });
   };
 }
