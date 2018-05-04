@@ -36,6 +36,7 @@ module.exports = function (app) {
   app.post('/api/user/refresh-jwt', auth.jwtRefreshToken, refreshJwt);
   app.post('/api/user/change-password', auth.jwtRefreshToken, changePassword);
   app.post('/api/user/reset-password', resetPassword);
+  app.post('/api/user/forgot-username', forgotUsername);
   app.post('/api/user/logout', auth.jwtRefreshToken, logout);
 }
 
@@ -95,9 +96,6 @@ function resetPassword(req, res) {
   // user.createPasswordHash(req.body.password);
   // user.save()
   // res.send()
-}
-
-function forgotPassword(req, res) {
   // https://www.owasp.org/index.php/Forgot_Password_Cheat_Sheet#Step_4.29_Allow_user_to_change_password_in_the_existing_session
   // create JWT that establishes an authetication session ONLY for reset password routes
   // 
