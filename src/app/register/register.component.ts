@@ -12,7 +12,7 @@ export class RegisterComponent implements OnInit {
   registerForm: FormGroup;
 
   constructor( private http: HttpClient, 
-      // private userService: UserService
+      private userService: UserService
     ) {}
 
   ngOnInit() {
@@ -39,8 +39,8 @@ export class RegisterComponent implements OnInit {
         .subscribe(data => {
           console.log('register returned');
           console.log(data);
-          // this.userService.storeUser(data);
-          // this.userService.successNavigate();
+          this.userService.storeUser(data);
+          this.userService.successNavigate();
         });
   };
 }

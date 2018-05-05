@@ -43,7 +43,7 @@ module.exports = function (app) {
   app.use(passport.initialize());
   app.post('/api/user/register', register);
   app.post('/api/user/login', login);
-  app.post('/api/user/refresh-jwt', auth.jwtRefreshToken, refreshJwt);
+  app.get('/api/user/refresh-jwt', auth.jwtRefreshToken, refreshJwt);
   app.post('/api/user/change-password', auth.jwtRefreshToken, changePassword);
   app.post('/api/user/reset-password', resetPassword);
   app.post('/api/user/forgot-username', forgotUsername);

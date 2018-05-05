@@ -4,6 +4,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { HttpClientModule} from '@angular/common/http'; // Deprecation https://angular.io/api/http/HttpModule
 import { RouterModule } from '@angular/router';
 import { AppComponent } from './app.component';
+import { UserService } from './user.service';
 
 // 
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
@@ -176,7 +177,7 @@ import { MailingListComponent } from './mailing-list/mailing-list.component';
     ServiceWorkerModule.register('/ngsw-worker.js', 
         {enabled: environment.production})
   ],
-  providers: [],
+  providers: [UserService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
