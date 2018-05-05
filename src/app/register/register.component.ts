@@ -10,20 +10,18 @@ import {UserService} from '../user.service';
 })
 export class RegisterComponent implements OnInit {
   registerForm: FormGroup;
-  emailPattern = '^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$'; // This is not a good regex http://emailregex.com/
-
 
   constructor( private http: HttpClient, 
-      private userService: UserService) {}
+      // private userService: UserService
+    ) {}
 
   ngOnInit() {
     this.registerForm = new FormGroup ({
-      givenName: new FormControl('', [<any>Validators.required]),
-      familyName: new FormControl('', [<any>Validators.required]),
-      email: new FormControl('',
-        [<any>Validators.required, <any>Validators.pattern(this.emailPattern)]),
-      username: new FormControl('', [<any>Validators.required]),
-      password: new FormControl('', [<any>Validators.required]),
+      givenName: new FormControl('', [Validators.required]),
+      familyName: new FormControl('', [Validators.required]),
+      email: new FormControl('', [Validators.required, , Validators.email]),
+      username: new FormControl('', [Validators.required]),
+      password: new FormControl('', [Validators.required]),
     });
   }
 
@@ -41,8 +39,8 @@ export class RegisterComponent implements OnInit {
         .subscribe(data => {
           console.log('register returned');
           console.log(data);
-          this.userService.storeUser(data);
-          this.userService.successNavigate();
+          // this.userService.storeUser(data);
+          // this.userService.successNavigate();
         });
   };
 }
