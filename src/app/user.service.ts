@@ -2,6 +2,9 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 
+// https://scotch.io/tutorials/protecting-angular-v2-routes-with-canactivatecanactivatechild-guards#toc-authentication-guard
+// https://www.youtube.com/watch?v=WveRq-tlb6I
+// https://www.youtube.com/watch?v=wswK6AzgvTE
 
 @Injectable()
 export class UserService {
