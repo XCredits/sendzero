@@ -44,6 +44,7 @@ module.exports = function (app) {
   app.post('/api/user/register', register);
   app.post('/api/user/login', login);
   app.get('/api/user/refresh-jwt', auth.jwtRefreshToken, refreshJwt);
+  app.post('/api/user/details', auth.jwt, userDetails);
   app.post('/api/user/change-password', auth.jwtRefreshToken, changePassword);
   app.post('/api/user/reset-password', resetPassword);
   app.post('/api/user/forgot-username', forgotUsername);
@@ -92,6 +93,13 @@ function refreshJwt(req, res) {
       jwtExp: token.jwtObj.exp,
       message:"JWT successfully refreshed."
   });
+}
+
+function userDetails(req, res) {
+  User.findOne({_id:req.userId})
+      .then(user => {
+        res.send(user.frontendData());
+      });
 }
 
 function changePassword(req, res) {
