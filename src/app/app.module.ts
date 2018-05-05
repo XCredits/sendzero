@@ -4,6 +4,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { HttpClientModule} from '@angular/common/http'; // Deprecation https://angular.io/api/http/HttpModule
 import { RouterModule } from '@angular/router';
 import { AppComponent } from './app.component';
+import { UserService } from './user.service';
 
 // 
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
@@ -61,6 +62,7 @@ import { AboutComponent } from './about/about.component';
 import { LoginComponent } from './login/login.component';
 import { RegisterComponent } from './register/register.component';
 import { MailingListComponent } from './mailing-list/mailing-list.component';
+import { ProfileComponent } from './profile/profile.component';
 
 @NgModule({
   declarations: [
@@ -75,6 +77,7 @@ import { MailingListComponent } from './mailing-list/mailing-list.component';
     LoginComponent,
     RegisterComponent,
     MailingListComponent,
+    ProfileComponent,
   ],
   imports: [
     BrowserModule, 
@@ -101,6 +104,11 @@ import { MailingListComponent } from './mailing-list/mailing-list.component';
         path: 'help',
         component: HelpComponent,
         data: { title: 'Help' },
+      },
+      {
+        path: 'profile',
+        component: ProfileComponent,
+        data: { title: 'Profile' },
       },
       {
         path: 'settings',
@@ -176,7 +184,7 @@ import { MailingListComponent } from './mailing-list/mailing-list.component';
     ServiceWorkerModule.register('/ngsw-worker.js', 
         {enabled: environment.production})
   ],
-  providers: [],
+  providers: [UserService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

@@ -1,0 +1,22 @@
+
+<div class="container">
+  <mat-card>
+    <mat-card-content>
+      <h2 class="example-h2">Profile</h2>
+
+      <section>
+        Given name: {{user?.givenName}} 
+        <!-- Safe navigation operator https://angular.io/guide/template-syntax#safe-navigation-operator -->
+      </section>
+      <section>
+        Family name: {{user?.familyName}}
+      </section>
+      <section>
+        Username: {{user?.username}}
+      </section>
+      <section>
+        Email: {{user?.email}}
+      </section>
+    </mat-card-content>
+  </mat-card>
+</div>

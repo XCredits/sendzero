@@ -21,6 +21,24 @@
 // Read more:
 // https://stormpath.com/blog/where-to-store-your-jwts-cookies-vs-html5-web-storage
 
+// Important notes:
+
+// When blocking routes using the authentication controller, the rejection is
+// always a 401, which, in the application front-end, forces the app to go to a 
+// login form. 
+// When a user is logged in, but their privileges do not allow them to access 
+// the content, the rejection should always be a 403. This does not result in 
+// the user being redirected, instead they are informed that they cannot access
+// the content specifed. In some cases, it may be necessary to prevent the user
+// from knowing that a resource exists at all. In those cases, it is best to 
+// return a 404. 
+
+// It is VERY important, for security reasons, to ensure that GET and HEAD 
+// events are not mutating in ANY way (including logging/analytics). The reason 
+// for this is that the Angular HTTPClient service does not automatically 
+// attach the XSRF Token to the request header that the server has set in the 
+// cookie. This means that ALL get requests could potentially be called from any
+
 const User = require('../models/user.model.js');
 const Session = require('../models/session.model.js');
 const jwt = require('jsonwebtoken');
@@ -33,9 +51,11 @@ module.exports = function (app) {
   app.use(passport.initialize());
   app.post('/api/user/register', register);
   app.post('/api/user/login', login);
-  app.post('/api/user/refresh-jwt', auth.jwtRefreshToken, refreshJwt);
+  app.get('/api/user/refresh-jwt', auth.jwtRefreshToken, refreshJwt);
+  app.get('/api/user/details', auth.jwt, userDetails);
   app.post('/api/user/change-password', auth.jwtRefreshToken, changePassword);
   app.post('/api/user/reset-password', resetPassword);
+  app.post('/api/user/forgot-username', forgotUsername);
   app.post('/api/user/logout', auth.jwtRefreshToken, logout);
 }
 
@@ -76,8 +96,18 @@ function refreshJwt(req, res) {
     _id: req.jwtRefreshToken.sub,
     username: req.jwtRefreshToken.username,
   };
-  setJwtCookie(user, req.jwtRefreshToken.xsrf, res)
-  res.send({message:"JWT successfully refreshed."});
+  const token = setJwtCookie(user, req.jwtRefreshToken.xsrf, res)
+  res.send({
+      jwtExp: token.jwtObj.exp,
+      message:"JWT successfully refreshed."
+  });
+}
+
+function userDetails(req, res) {
+  User.findOne({_id:req.userId})
+      .then(user => {
+        res.send(user.frontendData());
+      });
 }
 
 function changePassword(req, res) {
@@ -92,12 +122,14 @@ function resetPassword(req, res) {
   // user.createPasswordHash(req.body.password);
   // user.save()
   // res.send()
-}
-
-function forgotPassword(req, res) {
   // https://www.owasp.org/index.php/Forgot_Password_Cheat_Sheet#Step_4.29_Allow_user_to_change_password_in_the_existing_session
   // create JWT that establishes an authetication session ONLY for reset password routes
   // 
+}
+
+function forgotUsername(req, res) {
+  // find all users by email
+  // send all user names to email
 }
 
 function logout(req, res) {
@@ -115,8 +147,8 @@ function createAndSendRefreshAndSessionJwt(user, req, res) {
   // Read more: https://stormpath.com/blog/angular-xsrf
   res.cookie('XSRF-TOKEN', xsrf, {secure: !process.env.IS_LOCAL});
 
-  setJwtCookie(user, xsrf, res);
-  var refreshToken = setJwtRefreshTokenCookie(user, xsrf, res);
+  const token = setJwtCookie(user, xsrf, res);
+  const refreshToken = setJwtRefreshTokenCookie(user, xsrf, res);
 
   var userAgent = req.header('User-Agent');
   userAgent = userAgent.substring(0, 512);
@@ -129,7 +161,11 @@ function createAndSendRefreshAndSessionJwt(user, req, res) {
   session.lastObserved = Date.now();
   session.save()
       .then(()=>{
-        res.json(user.frontendData());
+        res.json({
+            user: user.frontendData(), 
+            jwtExp: token.jwtObj.exp, 
+            jwtRefreshTokenExp: token.jwtObj.exp,
+        });
       })
       .catch(()=>{
         res.status(500).json({message:"Error saving session."})
@@ -145,7 +181,7 @@ function setJwtCookie(user, xsrf, res) {
     jti: jwtId,
     username: user.username,
     xsrf: xsrf,
-    exp: parseInt(expiry.getTime() / 1000),
+    exp: parseInt(expiry.getTime() / 1000, 10),
   };
   var jwtString = jwt.sign(jwtObj, process.env.JWT_KEY);
   // Set the cookie
@@ -166,7 +202,7 @@ function setJwtRefreshTokenCookie(user, xsrf, res) {
     jti: jwtId,
     username: user.username,
     xsrf: xsrf,
-    exp: parseInt(expiry.getTime() / 1000),
+    exp: parseInt(expiry.getTime() / 1000, 10),
   };
   var jwtString = jwt.sign(jwtObj, process.env.JWT_REFRESH_TOKEN_KEY);
   // Set the cookie

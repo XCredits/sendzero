@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
+import { UserService } from '../user.service';
 
 @Component({
   selector: 'app-login',
@@ -10,7 +11,8 @@ import { FormGroup, FormControl, Validators } from '@angular/forms';
 export class LoginComponent implements OnInit {
   loginForm: FormGroup;
 
-  constructor( private http: HttpClient ) { }
+  constructor( private http: HttpClient, 
+    private userService: UserService ) { }
 
   ngOnInit() {
     this.loginForm = new FormGroup ({
@@ -28,8 +30,9 @@ export class LoginComponent implements OnInit {
         'password': formData.password,
         })
         .subscribe(data => {
-          console.log('received message');
-          // redirect to intended location
+          console.log('login returned');
+          this.userService.storeUser(data);
+          this.userService.successNavigate();
         });
   };
 }

@@ -2,25 +2,45 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 
+// https://scotch.io/tutorials/protecting-angular-v2-routes-with-canactivatecanactivatechild-guards#toc-authentication-guard
+// https://www.youtube.com/watch?v=WveRq-tlb6I
+// https://www.youtube.com/watch?v=wswK6AzgvTE
 
 @Injectable()
 export class UserService {
 
   user: User;
+  jwtExp: number;
+  jwtRefreshTokenExp: number;
+  refreshTimeoutId: any;
+
+  nav: NavObj;
 
   constructor( private http: HttpClient,
       private router: Router ) {
+    this.refreshJwt();
     this.updateUserDetails();
-    if (!this.user) {
-
-    }
   }
 
-  storeUser(userDetails) {
-    // set the user
-    this.user = userDetails;
-    // navigate to first page
-    this.router.navigateByUrl('/');
+  storeUser({user, jwtExp, jwtRefreshTokenExp}) {
+    this.user = user;
+    this.jwtExp = jwtExp;
+    this.jwtRefreshTokenExp = jwtRefreshTokenExp;
+  }
+
+  refreshJwt() {
+    this.http.get<any>('/api/user/refresh-jwt')
+        .subscribe((response) => {
+          this.jwtExp = response.jwtExp;
+          // Call a refresh token 15 seconds before
+          const refreshTime = (this.jwtExp - 15) * 1000;
+          const refreshDuration = refreshTime - Date.now();
+          this.refreshTimeoutId = setTimeout(this.refreshJwt, refreshDuration);
+        });
+        // On failure (unauthenticated), directs to /login page
+        // On failure (timeout), tries again in 10 seconds
+            // gives up after 1 minute
+            // directs to /login page
   }
 
   updateUserDetails() {
@@ -31,20 +51,31 @@ export class UserService {
   }
 
   isLoggedIn() {
-    return true;
+    if (this.user && this.jwtExp < Math.round(Date.now() / 1000)) {
+      return true;
+    } else {
+      return false;
+    }
   }
 
-  login(username, password, optional_nav) {
-    // if (optional_nav) {
-    //   router.navigateByUrl(optional_nav);
-    // } else {
-    //   router.navigateByUrl('/');
-    // }
+  successNavigate(defaultNav) {
+    if (this.nav) {
+      this.router.navigateByUrl(this.nav.route);
+    } else if (defaultNav) {
+      this.router.navigateByUrl(defaultNav);
+    } else {
+      this.router.navigateByUrl('/');
+    }
   }
 
   logOut() {
     // Send message to server
     // navigate to home page '/'
+    // Delete this.user
+    // Delete this.jwtExp
+    // Delete this.jwtRefreshTokenExp
+    // clear this.refreshTimeoutId
+    this.router.navigateByUrl('/');
   }
 }
 
@@ -56,4 +87,9 @@ interface User {
   email: string;
   isLoggedIn: boolean;
   isAdmin: boolean;
+}
+
+interface NavObj {
+  route: string;
+  data?: any;
 }
