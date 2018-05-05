@@ -21,6 +21,8 @@
 // Read more:
 // https://stormpath.com/blog/where-to-store-your-jwts-cookies-vs-html5-web-storage
 
+// Important notes:
+
 // When blocking routes using the authentication controller, the rejection is
 // always a 401, which, in the application front-end, forces the app to go to a 
 // login form. 
@@ -30,6 +32,12 @@
 // the content specifed. In some cases, it may be necessary to prevent the user
 // from knowing that a resource exists at all. In those cases, it is best to 
 // return a 404. 
+
+// It is VERY important, for security reasons, to ensure that GET and HEAD 
+// events are not mutating in ANY way (including logging/analytics). The reason 
+// for this is that the Angular HTTPClient service does not automatically 
+// attach the XSRF Token to the request header that the server has set in the 
+// cookie. This means that ALL get requests could potentially be called from any
 
 const User = require('../models/user.model.js');
 const Session = require('../models/session.model.js');
