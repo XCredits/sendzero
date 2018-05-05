@@ -21,6 +21,16 @@
 // Read more:
 // https://stormpath.com/blog/where-to-store-your-jwts-cookies-vs-html5-web-storage
 
+// When blocking routes using the authentication controller, the rejection is
+// always a 401, which, in the application front-end, forces the app to go to a 
+// login form. 
+// When a user is logged in, but their privileges do not allow them to access 
+// the content, the rejection should always be a 403. This does not result in 
+// the user being redirected, instead they are informed that they cannot access
+// the content specifed. In some cases, it may be necessary to prevent the user
+// from knowing that a resource exists at all. In those cases, it is best to 
+// return a 404. 
+
 const User = require('../models/user.model.js');
 const Session = require('../models/session.model.js');
 const jwt = require('jsonwebtoken');
