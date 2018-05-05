@@ -44,6 +44,7 @@
 // Observables: https://www.youtube.com/watch?v=Tux1nhBPl_w
 // https://angular-2-training-book.rangle.io/handout/observables/using_observables.html
 // https://github.com/ReactiveX/rxjs
+// Use behaviour subject, then call "next" on user return https://stackoverflow.com/questions/43659462/how-to-emit-a-change-in-rxjs-based-on-a-value
 
 const User = require('../models/user.model.js');
 const Session = require('../models/session.model.js');
