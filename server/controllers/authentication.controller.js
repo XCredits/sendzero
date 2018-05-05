@@ -39,6 +39,12 @@
 // attach the XSRF Token to the request header that the server has set in the 
 // cookie. This means that ALL get requests could potentially be called from any
 
+
+// Next steps
+// Observables: https://www.youtube.com/watch?v=Tux1nhBPl_w
+// https://angular-2-training-book.rangle.io/handout/observables/using_observables.html
+// https://github.com/ReactiveX/rxjs
+
 const User = require('../models/user.model.js');
 const Session = require('../models/session.model.js');
 const jwt = require('jsonwebtoken');

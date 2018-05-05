@@ -1,3 +1,6 @@
+// Use card
+// Position:fixed, to the right below the menu bar
+
 import { Component, OnInit } from '@angular/core';
 
 @Component({
