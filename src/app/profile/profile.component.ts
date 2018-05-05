@@ -13,7 +13,7 @@ export class ProfileComponent implements OnInit {
 
   ngOnInit() {
     console.log("Doing");
-    this.http.post<User>('/api/user/details',{})
+    this.http.get<User>('/api/user/details',{})
         .subscribe((user) =>  {
           console.log("Enter user details");
           this.user = user;
