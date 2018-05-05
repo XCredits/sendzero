@@ -11,11 +11,11 @@
     <mat-nav-list>
       <a *ngFor="let navLink of primaryNavLinks" mat-list-item routerLink="{{navLink.routerLink}}" (click)="hideSideNavAfterClick()">
         <mat-icon>{{navLink.icon}}</mat-icon>
-        {{navLink.text}}
+        {{navLink.title}}
       </a>
       <a *ngFor="let navLink of secondaryNavLinks" mat-list-item routerLink="{{navLink.routerLink}}" (click)="hideSideNavAfterClick()">
         <mat-icon>{{navLink.icon}}</mat-icon>
-        {{navLink.text}}
+        {{navLink.title}}
       </a>
     </mat-nav-list>
   </mat-drawer>

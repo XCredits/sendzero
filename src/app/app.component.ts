@@ -15,39 +15,39 @@ export class AppComponent {
   title: string;
   // Edit the area below to create main nav links
   // There should be 
-  primaryNavLinks: { routerLink: string, icon: string, text: string }[] = [
+  primaryNavLinks: { routerLink: string, icon: string, title: string }[] = [
     {
       routerLink: '/home',
       icon: 'home',
-      text: 'Home',
+      title: 'Home',
     },
     {
       routerLink: '/feed',
       icon: 'chat',
-      text: 'Feed',
+      title: 'Feed',
     },
     {
       routerLink: '/contacts',
       icon: 'person',
-      text: 'Contacts',
+      title: 'Contacts',
     },
     {
       routerLink: '/about',
       icon: 'view_carousel',
-      text: 'About',
+      title: 'About',
     },
   ];
 
-  secondaryNavLinks: { routerLink: string, icon: string, text: string }[] = [
+  secondaryNavLinks: { routerLink: string, icon: string, title: string }[] = [
     {
       routerLink: '/help',
       icon: 'help',
-      text: 'Help',
+      title: 'Help',
     },
     {
       routerLink: '/settings',
       icon: 'settings',
-      text: 'Settings',
+      title: 'Settings',
     },
   ];
 
