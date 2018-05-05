@@ -40,6 +40,11 @@ export class AppComponent {
 
   secondaryNavLinks: { routerLink: string, icon: string, title: string }[] = [
     {
+      routerLink: '/profile',
+      icon: 'person',
+      title: 'Profile',
+    },
+    {
       routerLink: '/help',
       icon: 'help',
       title: 'Help',

@@ -62,6 +62,7 @@ import { AboutComponent } from './about/about.component';
 import { LoginComponent } from './login/login.component';
 import { RegisterComponent } from './register/register.component';
 import { MailingListComponent } from './mailing-list/mailing-list.component';
+import { ProfileComponent } from './profile/profile.component';
 
 @NgModule({
   declarations: [
@@ -76,6 +77,7 @@ import { MailingListComponent } from './mailing-list/mailing-list.component';
     LoginComponent,
     RegisterComponent,
     MailingListComponent,
+    ProfileComponent,
   ],
   imports: [
     BrowserModule, 
@@ -102,6 +104,11 @@ import { MailingListComponent } from './mailing-list/mailing-list.component';
         path: 'help',
         component: HelpComponent,
         data: { title: 'Help' },
+      },
+      {
+        path: 'profile',
+        component: ProfileComponent,
+        data: { title: 'Profile' },
       },
       {
         path: 'settings',
