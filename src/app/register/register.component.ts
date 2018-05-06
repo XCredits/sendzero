@@ -11,7 +11,7 @@ import { UserService } from '../user.service';
 export class RegisterComponent implements OnInit {
   registerForm: FormGroup;
 
-  constructor( private http: HttpClient, 
+  constructor( private http: HttpClient,
       private userService: UserService
     ) {}
 
