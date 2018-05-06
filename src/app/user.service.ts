@@ -80,7 +80,7 @@ export class UserService {
     console.log("this.jwtExp");
     console.log(this.jwtExp);
     
-    if (this.user && this.jwtExp < Math.round(Date.now() / 1000)) {
+    if (this.user && this.jwtExp > Math.round(Date.now() / 1000)) {
       return true;
     } else {
       return false;
