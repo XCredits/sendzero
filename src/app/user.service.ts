@@ -57,7 +57,9 @@ export class UserService {
           // Call a refresh token 15 seconds before
           const refreshTime = (this.jwtExp - 15) * 1000;
           const refreshDuration = refreshTime - Date.now();
-          this.refreshTimeoutId = setTimeout(this.refreshJwt, refreshDuration);
+          const self = this;
+          this.refreshTimeoutId =
+              setTimeout(function() { self.refreshJwt(); }, refreshDuration);
         });
         // On failure (unauthenticated), directs to /login page
         // On failure (timeout), tries again in 10 seconds
