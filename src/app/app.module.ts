@@ -6,13 +6,12 @@ import { RouterModule } from '@angular/router';
 import { AppComponent } from './app.component';
 import { UserService } from './user.service';
 
-// 
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 // import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
 import { AngularFontAwesomeModule } from 'angular-font-awesome';
 
-// Material modules 
-import { 
+// Material modules
+import {
   MatAutocompleteModule,
   MatButtonModule,
   MatButtonToggleModule,
@@ -82,9 +81,9 @@ import { UserDropdownComponent } from './user-dropdown/user-dropdown.component';
     UserDropdownComponent,
   ],
   imports: [
-    BrowserModule, 
+    BrowserModule,
     FormsModule,
-    ReactiveFormsModule ,
+    ReactiveFormsModule,
     HttpClientModule,
     RouterModule.forRoot([
       {
@@ -133,12 +132,12 @@ import { UserDropdownComponent } from './user-dropdown/user-dropdown.component';
         data: { title: 'Register' },
       },
       { // Default route
-        path: '', 
-        redirectTo: '/home', 
+        path: '',
+        redirectTo: '/home',
         pathMatch: 'full',
       },
-      { 
-        path: '**', 
+      {
+        path: '**',
         component: PageNotFoundComponent,
         data: { title: 'Page Not Found' },
       },
@@ -147,8 +146,8 @@ import { UserDropdownComponent } from './user-dropdown/user-dropdown.component';
     BrowserAnimationsModule,
     // NgbModule,
     AngularFontAwesomeModule,
-    
-    // Material modules 
+
+    // Material modules
     MatAutocompleteModule,
     MatButtonModule,
     MatButtonToggleModule,
@@ -183,7 +182,7 @@ import { UserDropdownComponent } from './user-dropdown/user-dropdown.component';
     MatTooltipModule,
 
     // Below is for Progressive Web App (PWA) functionality
-    ServiceWorkerModule.register('/ngsw-worker.js', 
+    ServiceWorkerModule.register('/ngsw-worker.js',
         {enabled: environment.production})
   ],
   providers: [UserService],
