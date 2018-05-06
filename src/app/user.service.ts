@@ -1,6 +1,8 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
+import { BehaviorSubject } from 'rxjs/BehaviorSubject';
+import { isEqual } from 'lodash';
 
 // https://scotch.io/tutorials/protecting-angular-v2-routes-with-canactivatecanactivatechild-guards#toc-authentication-guard
 // https://www.youtube.com/watch?v=WveRq-tlb6I
@@ -9,28 +11,48 @@ import { Router } from '@angular/router';
 @Injectable()
 export class UserService {
 
-  user: User;
-  jwtExp: number;
-  jwtRefreshTokenExp: number;
-  refreshTimeoutId: any;
+  private user: User;
+  private jwtExp: number;
+  private jwtRefreshTokenExp: number;
+  private refreshTimeoutId: any;
+  userObservable: BehaviorSubject<User> = new BehaviorSubject<User>(this.user);
 
   nav: NavObj;
 
   constructor( private http: HttpClient,
       private router: Router ) {
+    console.log("running constructor");
     this.refreshJwt();
     this.updateUserDetails();
   }
 
+  /**
+  * Extrenal facing method for authentication routes to use
+  */
   storeUser({user, jwtExp, jwtRefreshTokenExp}) {
-    this.user = user;
     this.jwtExp = jwtExp;
     this.jwtRefreshTokenExp = jwtRefreshTokenExp;
+    this._setUser(user);
+  }
+
+  /**
+  * Internal method that checks if the user being set is different to the one
+  * currently set. Sends a subscription event if the user has changed.
+  */
+  private _setUser(user) {
+    if (!isEqual(this.user, user)) {
+      this.user = user;
+      this.userObservable.next(this.user);
+    }
   }
 
   refreshJwt() {
+    console.log("Refreshing");
+    console.log(this);
     this.http.get<any>('/api/user/refresh-jwt')
         .subscribe((response) => {
+          console.log("Now: " + Math.round(Date.now() / 1000));
+          console.log("jwt: " + response.jwtExp);
           this.jwtExp = response.jwtExp;
           // Call a refresh token 15 seconds before
           const refreshTime = (this.jwtExp - 15) * 1000;
@@ -45,12 +67,17 @@ export class UserService {
 
   updateUserDetails() {
     this.http.get<User>('/api/user/details')
-        .subscribe((userDetails) => {
-          this.user = userDetails;
+        .subscribe((user) => {
+          this._setUser(user);
         });
   }
 
   isLoggedIn() {
+    console.log("this.user");
+    console.log(this.user);
+    console.log("this.jwtExp");
+    console.log(this.jwtExp);
+    
     if (this.user && this.jwtExp < Math.round(Date.now() / 1000)) {
       return true;
     } else {

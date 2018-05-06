@@ -1,3 +1,8 @@
-<p>
-  user-dropdown works!
-</p>
+<button *ngIf="!isLoggedIn" mat-button routerLink="/login"
+    style="min-width:50px">
+  Login
+</button>
+<button *ngIf="isLoggedIn" mat-button routerLink="/profile"
+    style="min-width:50px">
+  {{user?.givenName}} {{user?.familyName[0]}} 
+</button>
