@@ -158,14 +158,11 @@ function createAndSendRefreshAndSessionJwt(user, req, res) {
   const token = setJwtCookie(user, xsrf, res);
   const refreshToken = setJwtRefreshTokenCookie(user, xsrf, res);
 
-  var userAgent = req.header('User-Agent');
-  userAgent = userAgent.substring(0, 512);
-
   var session = new Session();
   session.userId = refreshToken.jwtObj.sub;
   session.sessionId = refreshToken.jwtObj.jti;
   session.exp = refreshToken.jwtObj.exp;
-  session.userAgent = userAgent;
+  session.userAgent = req.header('User-Agent').substring(0, 512);;
   session.lastObserved = Date.now();
   session.save()
       .then(()=>{
@@ -176,6 +173,7 @@ function createAndSendRefreshAndSessionJwt(user, req, res) {
         });
       })
       .catch(()=>{
+        auth.clearTokens();
         res.status(500).json({message:"Error saving session."})
       });
 }
