@@ -12,7 +12,8 @@ var UserSchema = new Schema({
     emailConfirmed: {type: Boolean, default: false},
     timeRegistered: {type: Date, default: Date.now},
     passwordHash: String,
-    saltRounds: Number // stored in case we increase the salt rounds in the future
+    saltRounds: Number, // stored in case we increase the salt rounds in the future
+    isAdmin: {type: Boolean, default: false},
   }
 );
 
@@ -46,6 +47,7 @@ UserSchema.methods.frontendData = function() {
     email: this.email,
     emailConfirmed: this.emailConfirmed,
     timeRegistered: this.timeRegistered,
+    isAdmin: this.isAdmin,
   };
 };
 

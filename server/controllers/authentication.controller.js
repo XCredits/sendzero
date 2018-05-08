@@ -187,6 +187,7 @@ function setJwtCookie(user, xsrf, res) {
     sub: user._id,
     jti: jwtId,
     username: user.username,
+    isAdmin: user.isAdmin,
     xsrf: xsrf,
     exp: parseInt(expiry.getTime() / 1000, 10),
   };
@@ -208,6 +209,7 @@ function setJwtRefreshTokenCookie(user, xsrf, res) {
     sub: user._id,
     jti: jwtId,
     username: user.username,
+    isAdmin: user.isAdmin,
     xsrf: xsrf,
     exp: parseInt(expiry.getTime() / 1000, 10),
   };

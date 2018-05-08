@@ -36,6 +36,18 @@ module.exports = {
     next();
   },
 
+  isAdmin: function (req, res, next) {
+    if (!req.jwt) {
+      return res.status(500)
+          .json({message: 'Access to auth.admin used, but auth.jwt not called prior to auth.admin'});
+    }
+    if (!req.jwt.isAdmin) {
+      return res.status(403)
+          .json({message: 'You do not have the admin privileges needed to access this content.'});;
+    }
+    next();
+  },
+
   jwtRefreshToken: function (req, res, next) {
     if(!req.cookies.JWT_REFRESH_TOKEN){
       return res.status(401)
