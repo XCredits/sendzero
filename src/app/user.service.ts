@@ -21,7 +21,6 @@ export class UserService {
 
   constructor( private http: HttpClient,
       private router: Router ) {
-    console.log("running constructor");
     this.refreshJwt();
     this.updateUserDetails();
   }
@@ -47,12 +46,8 @@ export class UserService {
   }
 
   refreshJwt() {
-    console.log("Refreshing");
-    console.log(this);
     this.http.get<any>('/api/user/refresh-jwt')
         .subscribe((response) => {
-          console.log("Now: " + Math.round(Date.now() / 1000));
-          console.log("jwt: " + response.jwtExp);
           this.jwtExp = response.jwtExp;
           // Call a refresh token 15 seconds before
           const refreshTime = (this.jwtExp - 15) * 1000;
@@ -75,11 +70,6 @@ export class UserService {
   }
 
   isLoggedIn() {
-    console.log("this.user");
-    console.log(this.user);
-    console.log("this.jwtExp");
-    console.log(this.jwtExp);
-    
     if (this.user && this.jwtExp > Math.round(Date.now() / 1000)) {
       return true;
     } else {

@@ -19,6 +19,7 @@ module.exports = {
     try {
       var payload = jwt.verify(req.cookies.JWT, process.env.JWT_KEY);
     } catch (err) {
+      this.clearTokens(res);
       return res.status(401)
         .json({message:"JWT authenthication error: JWT is not verified"});
     }
@@ -36,6 +37,18 @@ module.exports = {
     next();
   },
 
+  isAdmin: function (req, res, next) {
+    if (!req.jwt) {
+      return res.status(500)
+          .json({message: 'Access to auth.admin used, but auth.jwt not called prior to auth.admin'});
+    }
+    if (!req.jwt.isAdmin) {
+      return res.status(403)
+          .json({message: 'You do not have the admin privileges needed to access this content.'});;
+    }
+    next();
+  },
+
   jwtRefreshToken: function (req, res, next) {
     if(!req.cookies.JWT_REFRESH_TOKEN){
       return res.status(401)
@@ -45,6 +58,7 @@ module.exports = {
       var payload = jwt.verify(req.cookies.JWT_REFRESH_TOKEN, 
           process.env.JWT_REFRESH_TOKEN_KEY);
     } catch (err) {
+      this.clearTokens(res);
       return res.status(401)
         .json({message:"JWT Refresh Token authenthication error: JWT Refresh Token is not verified"});
     }
@@ -56,7 +70,7 @@ module.exports = {
           .json({message:"JWT Refresh Token authenthication error: XSRF does not match"});
       }
     }
-    Session.findOne({sessionId: payload.jti})
+    Session.findOne({_id: payload.jti})
         .then(session=>{
           if (!session) {
             return res.status(401)
@@ -72,8 +86,10 @@ module.exports = {
           return res.status(401)
               .json({message:"JWT Refresh Token authenthication error: Problem getting session from DB"});
         });
-
-    
   },
 
+  clearTokens: function(res) {
+    res.clearCookie('JWT');
+    res.clearCookie('JWT_REFRESH_TOKEN');
+  }, 
 };
