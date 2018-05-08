@@ -90,6 +90,7 @@ function login(req, res) {
       return res.status(500).json(err);
     }
     if (!user) {
+      auth.clearTokens();
       return res.status(401)
           .send({message:"Error in finding user: " + info.message});
     }

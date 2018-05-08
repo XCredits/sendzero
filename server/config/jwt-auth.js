@@ -19,6 +19,7 @@ module.exports = {
     try {
       var payload = jwt.verify(req.cookies.JWT, process.env.JWT_KEY);
     } catch (err) {
+      this.clearTokens();
       return res.status(401)
         .json({message:"JWT authenthication error: JWT is not verified"});
     }
@@ -57,6 +58,7 @@ module.exports = {
       var payload = jwt.verify(req.cookies.JWT_REFRESH_TOKEN, 
           process.env.JWT_REFRESH_TOKEN_KEY);
     } catch (err) {
+      this.clearTokens();
       return res.status(401)
         .json({message:"JWT Refresh Token authenthication error: JWT Refresh Token is not verified"});
     }
@@ -86,4 +88,8 @@ module.exports = {
         });
   },
 
+  clearTokens: function() {
+    res.clearCookie('JWT');
+    res.clearCookie('JWT_REFRESH_TOKEN');
+  }, 
 };
