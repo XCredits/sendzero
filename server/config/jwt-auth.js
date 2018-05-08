@@ -72,8 +72,6 @@ module.exports = {
           return res.status(401)
               .json({message:"JWT Refresh Token authenthication error: Problem getting session from DB"});
         });
-
-    
   },
 
 };
