@@ -11,9 +11,10 @@ var UserSchema = new Schema({
     email: {type: String},
     emailConfirmed: {type: Boolean, default: false},
     timeRegistered: {type: Date, default: Date.now},
-    passwordHash: String,
+    passwordHash: {type: String, required: true},
     saltRounds: Number, // stored in case we increase the salt rounds in the future
     isAdmin: {type: Boolean, default: false},
+    profileImage: {type: String}
   }
 );
 
@@ -48,6 +49,7 @@ UserSchema.methods.frontendData = function() {
     emailConfirmed: this.emailConfirmed,
     timeRegistered: this.timeRegistered,
     isAdmin: this.isAdmin,
+    profileImage: this.profileImage,
   };
 };
 
