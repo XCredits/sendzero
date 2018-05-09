@@ -135,10 +135,19 @@ function userDetails(req, res) {
 }
 
 function changePassword(req, res) {
-  // look up user
-  // user.createPasswordHash(req.body.password);
-  // user.save()
-  // res.send()
+  // Attach the user name to the body
+  req.body.username = req.jwt.username;
+  // Check password
+  passport.authenticate('local', function(err, user, info){
+    // Create new password hash
+    user.createPasswordHash(req.body.newPassword);
+    user.save(()=>{
+          return res.send({message:'Password successfully changed'});
+        })
+        .catch(()=>{
+          return res.status(500).send({message:'Password change failed'});
+        });
+  }) (req, res);
 }
 
 function resetPassword(req, res) {
