@@ -10,6 +10,7 @@ import { UserService } from '../user.service';
 })
 export class RegisterComponent implements OnInit {
   registerForm: FormGroup;
+  formErrorMessage: string;
 
   constructor( private http: HttpClient,
       private userService: UserService
@@ -36,11 +37,16 @@ export class RegisterComponent implements OnInit {
         'username': formData.username,
         'password': formData.password,
         })
-        .subscribe(data => {
-          console.log('register returned');
-          console.log(data);
-          this.userService.storeUser(data);
-          this.userService.successNavigate();
-        });
+        .subscribe(
+            data => {
+              this.userService.storeUser(data);
+              this.userService.successNavigate();
+            },
+            errorResponse => {
+              if (errorResponse.status === 409) {
+                this.formErrorMessage = errorResponse.error.message;
+                this.registerForm.controls['username'].setErrors({'incorrect': true});
+              }
+            });
   };
 }

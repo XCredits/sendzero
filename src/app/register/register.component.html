@@ -26,7 +26,10 @@
             <input matInput type="password" placeholder="Password" name="password" formControlName="password">
           </mat-form-field>
           <br>
-          <button class="simple-form-button" color="primary" mat-raised-button type="submit" value="submit">Submit</button>
+          <section>
+            <button class="simple-form-button" color="primary" mat-raised-button type="submit" value="submit">Submit</button>
+            <span *ngIf='formErrorMessage' class="text-error-color">{{formErrorMessage}}</span>
+          </section>
         </div>
         </form>
     </mat-card-content>

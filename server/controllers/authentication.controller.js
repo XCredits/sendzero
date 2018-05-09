@@ -63,19 +63,34 @@ module.exports = function (app) {
 
 function register(req, res) {
   // validate
-  var user = new User();
-  user.givenName = req.body.givenName;
-  user.familyName = req.body.familyName;
-  user.username = req.body.username;
-  user.email = req.body.email;
-  user.createPasswordHash(req.body.password);
-  user.save()
-      .then(() => {
-        createAndSendRefreshAndSessionJwt(user, req, res);
+
+  // check that there is not an existing user with this username
+  User.findOne({username: req.body.username})
+      .then(existingUser => {
+        if (existingUser){
+          return res.status(409).send({message: 'Username already taken.'})
+        }
+        var user = new User();
+        user.givenName = req.body.givenName;
+        user.familyName = req.body.familyName;
+        user.username = req.body.username;
+        user.email = req.body.email;
+        user.createPasswordHash(req.body.password);
+        return user.save()
+            .then(() => {
+              return createAndSendRefreshAndSessionJwt(user, req, res);
+            })
+            .catch(dbError => {
+              if (!process.env.IS_PROD) {
+                // DO NOT console.log or return Mongoose catch errors to the front-end in production, especially for user objects. They contain secret information. e.g. if you try to create a user with a username that already exists, it will return the operation that you are trying to do, which includes the password hash.
+                const err = dbError;
+              }
+              return res.status(500).send({
+                  message: 'Error in creating user during registration: ' + err});
+            });
       })
-      .catch(err => {
-        res.status(500).send({
-            message: "Error in creating user during registration: " + err});
+      .catch(()=>{
+        res.status(500).send({message:'Error accessing database while checking for existing users'});
       });
 }
 
@@ -89,7 +104,7 @@ function login(req, res) {
       return res.status(401)
           .send({message:"Error in finding user: " + info.message});
     }
-    createAndSendRefreshAndSessionJwt(user, req, res);
+    return createAndSendRefreshAndSessionJwt(user, req, res);
   }) (req, res);
 }
 
@@ -171,7 +186,7 @@ function createAndSendRefreshAndSessionJwt(user, req, res) {
         const token = setJwtCookie({res, user, xsrf, sessionId: session._id});
         const refreshToken = setJwtRefreshTokenCookie({res, user, xsrf,
             sessionId: session._id, exp: refreshTokenExpiry});
-        res.json({
+        return res.json({
             user: user.frontendData(), 
             jwtExp: token.jwtObj.exp, 
             jwtRefreshTokenExp: refreshToken.jwtObj.exp,
@@ -179,7 +194,7 @@ function createAndSendRefreshAndSessionJwt(user, req, res) {
       })
       .catch((err)=>{
         auth.clearTokens(res);
-        res.status(500).json({message:"Error saving session. " + err})
+        return res.status(500).json({message:"Error saving session. " + err});
       });
 }
 
