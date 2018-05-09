@@ -17,6 +17,14 @@ if (!process.env.IS_LOCAL &&
 }
 
 if (process.env.IS_LOCAL) {
+  process.env.URL_ORIGIN = process.env.URL_ORIGIN_LOCAL;
+} else if (process.env.IS_PROD) {
+  process.env.URL_ORIGIN = process.env.URL_ORIGIN_PROD;
+} else {
+  process.env.URL_ORIGIN = process.env.URL_ORIGIN_DEV;
+}
+
+if (process.env.IS_LOCAL) {
   process.env.MONGODB_URI = process.env.MONGODB_URI_LOCAL;
 } else if (process.env.IS_PROD) {
   process.env.MONGODB_URI = process.env.MONGODB_URI_PROD;

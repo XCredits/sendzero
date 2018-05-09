@@ -88,6 +88,30 @@ module.exports = {
         });
   },
 
+  jwtTemporaryLinkToken: function(req, res, next){
+    if(!req.cookies.JWT_TEMP_AUTH){
+      return res.status(401)
+        .json({message:"JWT_TEMP_AUTH authenthication error: JWT_TEMP_AUTH cookie not set"});
+    }
+    try {
+      var payload = jwt.verify(req.cookies.JWT_TEMP_AUTH, process.env.JWT_KEY);
+    } catch (err) {
+      clearTokens(res);
+      return res.status(401)
+        .json({message:"JWT authenthication error: JWT is not verified"});
+    }
+    // Get out XSRF header & compare to XSRF
+    // Don't block non-mutating requests
+    if (req.method !== "GET" && req.method !== "HEAD") {
+      if (req.header('X-XSRF-TOKEN') !== payload.xsrf) {
+        return res.status(401)
+          .json({message:"JWT_TEMP_AUTH authenthication error: XSRF does not match"});
+      }
+    }
+    req.userId = payload.sub;
+    next();
+  },
+
   clearTokens: clearTokens, 
 };
 

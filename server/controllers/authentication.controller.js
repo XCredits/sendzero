@@ -56,7 +56,8 @@ module.exports = function (app) {
   app.get('/api/user/refresh-jwt', auth.jwtRefreshToken, refreshJwt);
   app.get('/api/user/details', auth.jwt, userDetails);
   app.post('/api/user/change-password', auth.jwtRefreshToken, changePassword);
-  app.post('/api/user/reset-password', resetPassword);
+  app.post('/api/user/request-reset-password', requestResetPassword);
+  app.post('/api/user/reset-password', auth.jwtTemporaryLinkToken, resetPassword);
   app.post('/api/user/forgot-username', forgotUsername);
   app.post('/api/user/logout', auth.jwtRefreshToken, logout);
 }
@@ -150,14 +151,56 @@ function changePassword(req, res) {
   }) (req, res);
 }
 
+function requestResetPassword(req, res) {
+  User.findOne({username:req.body.username})
+      .then(user=>{
+        // Success object must be identical, to avoid people discovering emails in the system
+        const successObject = {message: 'Email sent if users found in database.'}
+        res.send(successObject); // Note that if errors in send in emails occur, the front end will not see them
+        if (!users) {
+          return;
+        }
+        var xsrf;
+        if (req.header('X-XSRF-TOKEN')){
+          xsrf = req.header('X-XSRF-TOKEN')
+        } else {
+          xsrf = crypto.randomBytes(8).toString('hex');
+          res.cookie('XSRF-TOKEN', xsrf, {secure: !process.env.IS_LOCAL});
+        }
+        const jwtObj = {
+          sub: user._id,
+          username: user.username,
+          isAdmin: user.isAdmin,
+          xsrf: xsrf,
+          exp: parseInt((Date.now() + 60*60*1000)/1000, 10),// 1 hour
+        };
+        const jwtString = jwt.sign(jwtObj, process.env.JWT_KEY);
+        const emailLink = process.env.URL_ORIGIN + 
+            '/password-reset?username=' + user.username // the username here is only display purposes on the front-end
+            '&auth=' + jwtString;
+        res.status(404).send({message: 'Email service not set up'});
+        // When the user clicks on the link, the app pulls the JWT from the link 
+        // and stores it in the JWT_TEMP_AUTH cookie
+      })
+      .catch(() => {
+        res.status(500).send({message:'Error accessing user database.'})
+      });
+}
+
 function resetPassword(req, res) {
+  // Other ideas: https://www.owasp.org/index.php/Forgot_Password_Cheat_Sheet#Step_4.29_Allow_user_to_change_password_in_the_existing_session
   // look up user
-  // user.createPasswordHash(req.body.password);
-  // user.save()
-  // res.send()
-  // https://www.owasp.org/index.php/Forgot_Password_Cheat_Sheet#Step_4.29_Allow_user_to_change_password_in_the_existing_session
-  // create JWT that establishes an authetication session ONLY for reset password routes
-  // 
+  User.findOne({_id: req.userId}) // req.userId is set in auth.temporaryLinkAuth
+      .then(user => {
+        user.createPasswordHash(req.body.password);
+        return user.save()
+            .then(()=>{
+              res.send({message:'Password reset successful'});
+            });
+      })
+      .catch(() => {
+        res.status(500).send({message:'Error accessing user database.'})
+      });
 }
 
 function forgotUsername(req, res) {
@@ -165,7 +208,7 @@ function forgotUsername(req, res) {
   User.find({email: req.body.email}).select('username')
       .then(users => {
           // Success object must be identical, to avoid people discovering emails in the system
-          const successObject = {message: 'Emails sent if users found in database.'}
+          const successObject = {message: 'Email sent if users found in database.'}
           res.send(successObject); // Note that if errors in send in emails occur, the front end will not see them
           if (!users) {
             return;
