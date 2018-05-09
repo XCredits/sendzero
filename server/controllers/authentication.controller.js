@@ -109,12 +109,18 @@ function login(req, res) {
 }
 
 function refreshJwt(req, res) {
-  // Pull the user data from the JWT
-  var user = {
-    _id: req.jwtRefreshToken.sub,
+  // The refresh token is verfied by auth.jwtRefreshToken
+  // Pull the user data from the refresh JWT
+  console.log('Getting into refresher');
+  const token = setJwtCookie({
+    res,
+    userId: req.jwtRefreshToken.sub, 
     username: req.jwtRefreshToken.username,
-  };
-  const token = setJwtCookie(user, req.jwtRefreshToken.xsrf, res)
+    isAdmin: req.jwtRefreshToken.isAdmin,
+    xsrf: req.jwtRefreshToken.xsrf, 
+    sessionId: req.jwtRefreshToken.jwt,
+  });
+
   res.send({
       jwtExp: token.jwtObj.exp,
       message:"JWT successfully refreshed."
@@ -157,7 +163,7 @@ function forgotUsername(req, res) {
           }
           const usernames = users.map(user => user.username);
           res.status(404).send({message: 'Email service not set up'});
-  // send all user names to email
+          // send all user names to email
           // return emailService.send({emailAddress: req.body.email, data: usernames})
           //     .catch(() => {
           //     });
@@ -201,9 +207,21 @@ function createAndSendRefreshAndSessionJwt(user, req, res) {
   return session.save()
       .then((session)=>{
         console.log('saved session');
-        const token = setJwtCookie({res, user, xsrf, sessionId: session._id});
-        const refreshToken = setJwtRefreshTokenCookie({res, user, xsrf,
-            sessionId: session._id, exp: refreshTokenExpiry});
+        const token = setJwtCookie({
+            res,
+            userId: user._id, 
+            username: user.username,
+            isAdmin: user.isAdmin,
+            xsrf, 
+            sessionId: session._id});
+        const refreshToken = setJwtRefreshTokenCookie({
+            res,
+            userId: user._id, 
+            username: user.username,
+            isAdmin: user.isAdmin,
+            xsrf,
+            sessionId: session._id,
+            exp: refreshTokenExpiry});
         return res.json({
             user: user.frontendData(), 
             jwtExp: token.jwtObj.exp, 
@@ -216,17 +234,17 @@ function createAndSendRefreshAndSessionJwt(user, req, res) {
       });
 }
 
-function setJwtCookie({res, user, xsrf, sessionId}) {
+function setJwtCookie({res, userId, username, isAdmin, xsrf, sessionId}) {
   console.log("setJwtCookie");
   var expiry = new Date(Date.now());
   expiry.setMinutes(expiry.getMinutes() + process.env.JWT_EXPIRY_MINS);
   var jwtObj = {
-    sub: user._id,
+    sub: userId,
     // Note this id is set using the refresh token session id so that we can
     // easily determine which session is responisble for an action
     jti: sessionId,
-    username: user.username,
-    isAdmin: user.isAdmin,
+    username: username,
+    isAdmin: isAdmin,
     xsrf: xsrf,
     exp: parseInt(expiry.getTime() / 1000, 10),
   };
@@ -239,13 +257,13 @@ function setJwtCookie({res, user, xsrf, sessionId}) {
   return {jwtString, jwtObj};
 }
 
-function setJwtRefreshTokenCookie({res, user, xsrf, sessionId, exp}) {
+function setJwtRefreshTokenCookie({res, userId, username, isAdmin, xsrf, sessionId, exp}) {
   console.log("setJwtRefreshTokenCookie");
   var jwtObj = {
-    sub: user._id,
+    sub: userId,
     jti: sessionId,
-    username: user.username,
-    isAdmin: user.isAdmin,
+    username: username,
+    isAdmin: isAdmin,
     xsrf: xsrf,
     exp: exp,
   };
