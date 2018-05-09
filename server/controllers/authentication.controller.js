@@ -191,12 +191,8 @@ function createAndSendRefreshAndSessionJwt(user, req, res) {
   console.log('pre save cookie');
   res.cookie('XSRF-TOKEN', xsrf, {secure: !process.env.IS_LOCAL});
 
-  console.log('save cookie');
-  var refreshTokenExpiryDate = new Date(Date.now());
-  refreshTokenExpiryDate.setDay(refreshTokenExpiryDate.getDay() + 
-      process.env.JWT_REFRESH_TOKEN_EXPIRY_DAYS);
   const refreshTokenExpiry = 
-      parseInt(refreshTokenExpiryDate.getTime() / 1000, 10);
+      parseInt((Date.now() + process.env.JWT_REFRESH_TOKEN_EXPIRY)/1000, 10);
 
   console.log(refreshTokenExpiry);
   var session = new Session();
@@ -236,8 +232,6 @@ function createAndSendRefreshAndSessionJwt(user, req, res) {
 
 function setJwtCookie({res, userId, username, isAdmin, xsrf, sessionId}) {
   console.log("setJwtCookie");
-  var expiry = new Date(Date.now());
-  expiry.setMinutes(expiry.getMinutes() + process.env.JWT_EXPIRY_MINS);
   var jwtObj = {
     sub: userId,
     // Note this id is set using the refresh token session id so that we can
@@ -246,7 +240,7 @@ function setJwtCookie({res, userId, username, isAdmin, xsrf, sessionId}) {
     username: username,
     isAdmin: isAdmin,
     xsrf: xsrf,
-    exp: parseInt(expiry.getTime() / 1000, 10),
+    exp: parseInt((Date.now() + process.env.JWT_EXPIRY)/1000, 10),
   };
   var jwtString = jwt.sign(jwtObj, process.env.JWT_KEY);
   // Set the cookie

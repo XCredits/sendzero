@@ -1,7 +1,7 @@
 'use strict';
 
-process.env.JWT_EXPIRY_MINS = 10;
-process.env.JWT_REFRESH_TOKEN_EXPIRY_DAYS = 365;
+process.env.JWT_EXPIRY = 10*60*1000; // Expiry in ms (10 mins)
+process.env.JWT_REFRESH_TOKEN_EXPIRY = 365*24*60*60*1000; // Expiry in ms (1 year)
 
 if (process.env.GOOGLE_CLOUD_PROJECT) {
   process.env.IS_LOCAL = false;
