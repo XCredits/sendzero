@@ -147,7 +147,25 @@ function resetPassword(req, res) {
 
 function forgotUsername(req, res) {
   // find all users by email
+  User.find({email: req.body.email}).select('username')
+      .then(users => {
+          // Success object must be identical, to avoid people discovering emails in the system
+          const successObject = {message: 'Emails sent if users found in database.'}
+          res.send(successObject); // Note that if errors in send in emails occur, the front end will not see them
+          if (!users) {
+            return;
+          }
+          const usernames = users.map(user => user.username);
+          res.status(404).send({message: 'Email service not set up'});
   // send all user names to email
+          // return emailService.send({emailAddress: req.body.email, data: usernames})
+          //     .catch(() => {
+          //     });
+      })
+      .catch(() => {
+        res.status(500).send({message:'Error accessing user database.'})
+      });
+  
 }
 
 function logout(req, res) {
