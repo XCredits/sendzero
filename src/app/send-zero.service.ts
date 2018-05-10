@@ -46,6 +46,8 @@ export class SendZeroService {
   private fileArrayOffset: number = 0;
   private fileReader: FileReader;
   private file: File;
+  // For file sending
+  private fileChunks: Array<Uint8Array>;
   
   // Untyped definitions
   private socket: any;
@@ -113,35 +115,50 @@ export class SendZeroService {
   private handlePeerConnect(): void {
     this.prompt = 'Now connected to peer! Select a file to send!';
     this.peerId = this.peer.id;
-    this.ref.tick();
     this.disableSendButton = false;
+    this.ref.tick();
   }
 
   // Data always comes in as Uint8Array of size CHUNK_SIZE
   private handlePeerReceiveData(data: Uint8Array): void {
-    // We first try to convert data to JSON as metadata of the file is always
-    // received as JSON.
+    // We first try to convert data to String/JSON as metadata of the file
+    // always received as JSON and messages as strings.
     // If this doesn't work, then we assume that we've received a file.
     try {
       // @ts-ignore
-      let metadataString = new TextDecoder('utf-8').decode(data);
-      let fileMetadata = JSON.parse(metadataString);
-      this.openReceiveFileDialog(fileMetadata);
-      this.prompt = "Now receiving a file!"
-      if (this.fileReadyForDownload) {
-        this.resetReceiveVariables();
-        window.URL.revokeObjectURL(this.unsafeUrl);
+      let messageOrMetadataString = new TextDecoder('utf-8').decode(data);
+      // Various cases
+      // 1. We receive a message saying we can continue sending file (after 
+      // we've sent file metadata through)
+      if (messageOrMetadataString === "File Accepted") {
+        // We can now continue sending our file.
+        this.sendChunkedFile();
       }
-      this.fileReadyForDownload = false;
-      this.ref.tick(); 
-      // @ts-ignore
-      this.receivedFileMetadata = JSON.parse(metadataString);
-      this.fileName = this.receivedFileMetadata.fileName;
-      // Set up maxFileChunks for expected file - we do this for the progress
-      // element
-      this.maxFileChunks = this.receivedFileMetadata.numberOfChunks;
-      // Initialize a Uint8Array
-      this.fileArray = new Uint8Array(this.receivedFileMetadata.fileByteSize); 
+      // 2. We receive a message saying we cannot send the file (after we've 
+      // sent file metadata through)
+      else if (messageOrMetadataString === "File Declined") {
+        // We should now clear all file related variables in our state.
+        this.prompt = "Peer did not accept the file! Please try again.";
+        this.ref.tick();
+        this.fileChunks = null;
+      } 
+      // 3. We're receiving an actual metadata object and we have to ask the
+      // user if they want to accept the file by opening the dialog
+      else {
+        let fileMetadata = JSON.parse(messageOrMetadataString);
+        if (this.fileReadyForDownload) {
+          this.resetReceiveVariables();
+          window.URL.revokeObjectURL(this.unsafeUrl);
+        }
+        // this.fileReadyForDownload = false;
+        // Reassign (deep copy) rather than fileMetadata = receivedFileMetaData
+        this.receivedFileMetadata = JSON.parse(messageOrMetadataString);
+        this.fileName = this.receivedFileMetadata.fileName;
+        // Initialize a Uint8Array
+        this.fileArray = new Uint8Array(this.receivedFileMetadata.fileByteSize);
+        this.ref.tick();
+        this.openReceiveFileDialog(fileMetadata);
+      }
     } catch(e) {
       // We've (hopefully) received part of a file (a chunk).
       // If it's the first data array, set the fileArray with it
@@ -204,17 +221,19 @@ export class SendZeroService {
 
   // TODO: Check if return behaviour is correct
   private finishReadingFile(): void {
-    this.prompt = 'Finished processing file, now sending!';
+    this.prompt = 'Finished processing file. Waiting for confirmation from peer!';
     this.ref.tick();
     // Make sure the file has actually been read
     if (this.fileReader.readyState !== 2) {
-      this.prompt = 'Something went wrong!';
+      this.prompt = 'Something went wrong! Please try again.';
       return;
     }
-    this.chunkAndSendFile();
+    this.chunkFileAndSendMetadata();
   }
 
-  private chunkAndSendFile(): void {
+  private chunkFileAndSendMetadata(): void {
+    // Clear fileChunk arrray since it's a new file
+    this.fileChunks = null;
     // Make the file into a typed array to send it as the WebRTC API doesn't
     // support sending blobs at this point.
     let fileView = new Uint8Array(this.fileReader.result);
@@ -250,13 +269,22 @@ export class SendZeroService {
       return;
     }
     this.peer.send(jsonString);
-    
+
+    // Save chunked file
+    this.fileChunks = chunks;
+  }
+
+  private sendChunkedFile(): void {
+    this.prompt = "Received confirmation, now sending file!"
+    this.ref.tick();
     // Send chunks
     // We use write instead of send as send closes the connection on big files.
-    chunks.forEach(element => {
-      this.peer.write(element)
+    this.fileChunks.forEach(element => {
+      this.peer.send(element)
     });
 
+    this.prompt = "Finished sending file!"
+    this.ref.tick();
   }
 
   public connectToPeer(): void {
@@ -300,12 +328,24 @@ export class SendZeroService {
 
   private openReceiveFileDialog(metadata: any): void {
     metadata.id = this.peerId;
+    this.ref.tick();
     const dialogRef = this.dialog.open(ReceiveFileDialog, {
       data: metadata,
     });
 
     dialogRef.afterClosed().subscribe(result => {
-      console.log(result);
+      if (result === true) {
+        this.peer.send('File Accepted');
+        this.fileReadyForDownload = false;
+        // Set up maxFileChunks for expected file - we do this for the progress
+        // element
+        this.maxFileChunks = metadata.numberOfChunks;
+        this.ref.tick();
+      } else {
+        this.peer.send('File Declined');
+        // Clear state variables
+        this.resetReceiveVariables();
+      }
     })
   }
 
