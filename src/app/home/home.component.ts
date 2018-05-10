@@ -23,7 +23,7 @@ export class HomeComponent implements OnInit {
               private sanitizer: DomSanitizer,
               public sendZeroService: SendZeroService,
               private route: ActivatedRoute,
-              private router: Router,) {
+              private router: Router) {
     this.title = 'SendZero Alpha';
     this.fileForm = new FormGroup({
       selectFile: new FormControl(),
