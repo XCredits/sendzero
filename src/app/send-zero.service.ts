@@ -123,14 +123,18 @@ export class SendZeroService {
     // received as JSON.
     // If this doesn't work, then we assume that we've received a file.
     try {
+      // @ts-ignore
+      let metadataString = new TextDecoder('utf-8').decode(data);
+      let fileMetadata = JSON.parse(metadataString);
+      this.openReceiveFileDialog(fileMetadata);
       this.prompt = "Now receiving a file!"
       if (this.fileReadyForDownload) {
+        this.resetReceiveVariables();
         window.URL.revokeObjectURL(this.unsafeUrl);
       }
       this.fileReadyForDownload = false;
       this.ref.tick(); 
       // @ts-ignore
-      let metadataString = new TextDecoder('utf-8').decode(data);
       this.receivedFileMetadata = JSON.parse(metadataString);
       this.fileName = this.receivedFileMetadata.fileName;
       // Set up maxFileChunks for expected file - we do this for the progress
@@ -176,18 +180,19 @@ export class SendZeroService {
     this.fileReadyForDownload = true;
     this.prompt = "File is ready for download!";
     this.ref.tick();
-    this.resetReceiveVariables();
+    // Resetting the variables is now done when another file is received
+    // This is to prevent file info from getting erased immadietaly after it
+    // arrives.
+    //this.resetReceiveVariables();
     this.ref.tick();
   }
 
   private resetReceiveVariables(): void {
     this.fileArray = null;
     this.fileArrayOffset = 0;
-    // We don't do filename so that user doesn't have to immediately download it
-    // It will get overwritten with the next file anyway.
-    //this.fileName = null;
+    this.fileName = null;
     this.receivedChunks = 0;
-    this.maxFileChunks = null;
+    this.maxFileChunks = 0;
     this.receivedFileMetadata = null;
   }
 
@@ -279,7 +284,7 @@ export class SendZeroService {
     this.fileReader.readAsArrayBuffer(file);
   }
 
-  private openConnectionDialog(request: any) :void {
+  private openConnectionDialog(request: any) : void {
     const dialogRef = this.dialog.open(ConnectionDialog, {
       data: {id: request.id},
     });
@@ -293,12 +298,23 @@ export class SendZeroService {
     });
   }
 
+  private openReceiveFileDialog(metadata: any): void {
+    metadata.id = this.peerId;
+    const dialogRef = this.dialog.open(ReceiveFileDialog, {
+      data: metadata,
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      console.log(result);
+    })
+  }
+
 }
 
 // Connection dialog component
 // TODO: move to component
 @Component({
-  selector: 'dialog-content-example-dialog',
+  selector: 'connection-dialog',
   template: `
     <h1 mat-dialog-title> User with id {{data.id}} wants to connect to your browser. Accept?</h1>
     <mat-dialog-actions>
@@ -307,5 +323,25 @@ export class SendZeroService {
     </mat-dialog-actions>`,
 })
 export class ConnectionDialog {
+  constructor(@Inject(MAT_DIALOG_DATA) public data: any) { }
+}
+
+@Component({
+  selector: 'receive-file-dialog',
+  template: `
+    <h1 mat-dialog-title> User with id {{data.id}} wants to send you a file. Accept?</h1>
+    <mat-dialog-content>
+      File Name: {{data.fileName}}
+      <br>
+      File Type: {{data.fileType}}
+      <br>
+      File Size: {{data.fileSize | byteFormat}}
+    </mat-dialog-content>
+    <mat-dialog-actions>
+    <button mat-raised-button [mat-dialog-close]="true" cdkFocusInitial color='primary'>Yes</button>
+    <button mat-raised-button [mat-dialog-close]="false" color='warn'>No</button>
+    </mat-dialog-actions>`,
+})
+export class ReceiveFileDialog {
   constructor(@Inject(MAT_DIALOG_DATA) public data: any) { }
 }

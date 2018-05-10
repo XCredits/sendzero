@@ -65,7 +65,7 @@ import { RegisterComponent } from './register/register.component';
 import { MailingListComponent } from './mailing-list/mailing-list.component';
 
 // Services
-import { SendZeroService, ConnectionDialog } from './send-zero.service';
+import { SendZeroService, ConnectionDialog, ReceiveFileDialog } from './send-zero.service';
 
 
 @NgModule({
@@ -81,7 +81,8 @@ import { SendZeroService, ConnectionDialog } from './send-zero.service';
     LoginComponent,
     RegisterComponent,
     MailingListComponent,
-    ConnectionDialog
+    ConnectionDialog,
+    ReceiveFileDialog
   ],
   imports: [
     BrowserModule, 
@@ -186,7 +187,8 @@ import { SendZeroService, ConnectionDialog } from './send-zero.service';
   ],
   // For dialogs
   entryComponents: [
-    ConnectionDialog
+    ConnectionDialog,
+    ReceiveFileDialog
   ],
   providers: [
     SendZeroService,
