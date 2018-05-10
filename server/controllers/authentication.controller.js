@@ -82,9 +82,10 @@ function register(req, res) {
               return createAndSendRefreshAndSessionJwt(user, req, res);
             })
             .catch(dbError => {
-              if (!process.env.IS_PROD) {
+              var err;
+              if (process.env.NODE_ENV !== 'production') {
                 // DO NOT console.log or return Mongoose catch errors to the front-end in production, especially for user objects. They contain secret information. e.g. if you try to create a user with a username that already exists, it will return the operation that you are trying to do, which includes the password hash.
-                const err = dbError;
+                err = dbError;
               }
               return res.status(500).send({
                   message: 'Error in creating user during registration: ' + err});
@@ -156,7 +157,7 @@ function requestResetPassword(req, res) {
       .then(user=>{
         // Success object must be identical, to avoid people discovering emails in the system
         const successObject = {message: 'Email sent if users found in database.'}
-        res.send(successObject); // Note that if errors in send in emails occur, the front end will not see them
+        res.send(successObject); // Note that if errors in sending emails occur, the front end will not see them
         if (!users) {
           return;
         }
@@ -172,7 +173,8 @@ function requestResetPassword(req, res) {
           username: user.username,
           isAdmin: user.isAdmin,
           xsrf: xsrf,
-          exp: parseInt((Date.now() + 60*60*1000)/1000, 10),// 1 hour
+          exp: Math.floor(
+              (Date.now() + Number(process.env.JWT_TEMPORARY_LINK_TOKEN_EXPIRY))/1000),// 1 hour
         };
         const jwtString = jwt.sign(jwtObj, process.env.JWT_KEY);
         const emailLink = process.env.URL_ORIGIN + 
@@ -253,15 +255,15 @@ function createAndSendRefreshAndSessionJwt(user, req, res) {
   console.log('pre save cookie');
   res.cookie('XSRF-TOKEN', xsrf, {secure: !process.env.IS_LOCAL});
 
-  const refreshTokenExpiry = 
-      parseInt((Date.now() + process.env.JWT_REFRESH_TOKEN_EXPIRY)/1000, 10);
-
+  const refreshTokenExpiry = Math.floor(
+      (Date.now() + Number(process.env.JWT_REFRESH_TOKEN_EXPIRY))/1000);
+  
   console.log(refreshTokenExpiry);
   var session = new Session();
   session.userId = user._id;
-  session.exp = refreshTokenExpiry;
+  session.exp = new Date(refreshTokenExpiry*1000);
   session.userAgent = req.header('User-Agent').substring(0, 512);;
-  session.lastObserved = Date.now();
+  session.lastObserved = new Date(Date.now());
   return session.save()
       .then((session)=>{
         console.log('saved session');
@@ -302,7 +304,7 @@ function setJwtCookie({res, userId, username, isAdmin, xsrf, sessionId}) {
     username: username,
     isAdmin: isAdmin,
     xsrf: xsrf,
-    exp: parseInt((Date.now() + process.env.JWT_EXPIRY)/1000, 10),
+    exp: Math.floor((Date.now() + Number(process.env.JWT_EXPIRY))/1000),
   };
   var jwtString = jwt.sign(jwtObj, process.env.JWT_KEY);
   // Set the cookie
