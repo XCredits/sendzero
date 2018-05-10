@@ -332,27 +332,46 @@ export class SendZeroService {
     const dialogRef = this.dialog.open(ReceiveFileDialog, {
       data: metadata,
     });
-
+    this.ref.tick();
+    dialogRef.beforeClose().subscribe(() => {
+      console.log('1');
+      this.ref.tick();
+    })
     dialogRef.afterClosed().subscribe(result => {
+      this.ref.tick();
+      console.log('2');
       if (result === true) {
-        this.peer.send('File Accepted');
+        console.log('3');
         this.fileReadyForDownload = false;
         // Set up maxFileChunks for expected file - we do this for the progress
         // element
         this.maxFileChunks = metadata.numberOfChunks;
+        console.log('4');
         this.ref.tick();
+        console.log('5');
+        this.peer.send('File Accepted');
+        console.log('6');
       } else {
-        this.peer.send('File Declined');
+        console.log('7');
         // Clear state variables
         this.resetReceiveVariables();
+        console.log('8');
+        this.peer.send('File Declined');
+        console.log('9');
       }
+      console.log('10');
+      this.ref.tick();
+      console.log('11');
     })
+    console.log('12');
+    this.ref.tick();
+    console.log('13');
   }
 
 }
 
 // Connection dialog component
-// TODO: move to component
+// TODO: move to home component
 @Component({
   selector: 'connection-dialog',
   template: `
@@ -385,3 +404,4 @@ export class ConnectionDialog {
 export class ReceiveFileDialog {
   constructor(@Inject(MAT_DIALOG_DATA) public data: any) { }
 }
+
