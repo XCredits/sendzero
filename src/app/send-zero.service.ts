@@ -237,7 +237,8 @@ export class SendZeroService {
     };
     let jsonString = JSON.stringify(metadata);
     // Dirty check to make sure metadata isn't too big.
-    // TODO: Make sure things can't be circular because JSON.* will break
+    // TODO: Make sure things can't be circular because JSON.Parse/stringify
+    // will break
     if (jsonString.length > CHUNK_SIZE) {
       this.prompt = 'File metadata too big, consider renaming.';
       this.ref.tick();
