@@ -66,7 +66,7 @@ function register(req, res) {
   // validate
 
   // check that there is not an existing user with this username
-  User.findOne({username: req.body.username})
+  return User.findOne({username: req.body.username})
       .then(existingUser => {
         if (existingUser){
           return res.status(409).send({message: 'Username already taken.'})
@@ -130,7 +130,7 @@ function refreshJwt(req, res) {
 }
 
 function userDetails(req, res) {
-  User.findOne({_id: req.userId})
+  return User.findOne({_id: req.userId})
       .then(user => {
         res.send(user.frontendData());
       });
@@ -153,7 +153,7 @@ function changePassword(req, res) {
 }
 
 function requestResetPassword(req, res) {
-  User.findOne({username:req.body.username})
+  return User.findOne({username:req.body.username})
       .then(user=>{
         // Success object must be identical, to avoid people discovering emails in the system
         const successObject = {message: 'Email sent if users found in database.'}
@@ -193,7 +193,7 @@ function requestResetPassword(req, res) {
 function resetPassword(req, res) {
   // Other ideas: https://www.owasp.org/index.php/Forgot_Password_Cheat_Sheet#Step_4.29_Allow_user_to_change_password_in_the_existing_session
   // look up user
-  User.findOne({_id: req.userId}) // req.userId is set in auth.temporaryLinkAuth
+  return User.findOne({_id: req.userId}) // req.userId is set in auth.temporaryLinkAuth
       .then(user => {
         user.createPasswordHash(req.body.password);
         return user.save()
@@ -208,7 +208,7 @@ function resetPassword(req, res) {
 
 function forgotUsername(req, res) {
   // find all users by email
-  User.find({email: req.body.email}).select('username')
+  return User.find({email: req.body.email}).select('username')
       .then(users => {
           // Success object must be identical, to avoid people discovering emails in the system
           const successObject = {message: 'Email sent if users found in database.'}
@@ -237,14 +237,15 @@ function logout(req, res) {
   console.log("\n\n\nNeed to check JTI is actually a string\n\n\n");
   
   // delete it from the DB
-  Session.remove({_id: req.jwtRefreshToken.jti})
+  return Session.remove({_id: req.jwtRefreshToken.jti})
       .then(()=>{
         // needs a .then to act like a promise for Mongoose Promise
+        return null;
       })
       .finally(() => {
         // delete the cookies (note this should not clear the browserId)
         auth.clearTokens(res);
-        res.send({message: 'Log out succesfful'});
+        return res.send({message: 'Log out succesfful'});
       });
 }
 
