@@ -238,6 +238,9 @@ function logout(req, res) {
   
   // delete it from the DB
   Session.remove({_id: req.jwtRefreshToken.jti})
+      .then(()=>{
+        // needs a .then to act like a promise for Mongoose Promise
+      })
       .finally(() => {
         // delete the cookies (note this should not clear the browserId)
         auth.clearTokens(res);

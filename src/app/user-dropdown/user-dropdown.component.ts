@@ -19,10 +19,13 @@ export class UserDropdownComponent implements OnInit {
     this.isLoggedIn = true;
     this.userService.userObservable
         .subscribe(user => {
-          console.log("Subscription fired");
           this.user = user;
           this.isLoggedIn = this.userService.isLoggedIn();
         });
+  }
+
+  logout() {
+    this.userService.logOut();
   }
 
 }

@@ -89,12 +89,18 @@ export class UserService {
 
   logOut() {
     // Send message to server
-    // navigate to home page '/'
-    // Delete this.user
-    // Delete this.jwtExp
-    // Delete this.jwtRefreshTokenExp
-    // clear this.refreshTimeoutId
-    this.router.navigateByUrl('/');
+    this.http.post('/api/user/logout', {})
+        .subscribe(() => {
+          // Clean up old data
+          this.user = undefined;
+          this.jwtExp = undefined;
+          this.jwtRefreshTokenExp = undefined;
+          clearTimeout(this.refreshTimeoutId);
+          // inform the rest of the app that a log out has occurred
+          this.userObservable.next(this.user);
+          // go to default location
+          this.router.navigateByUrl('/');
+        });
   }
 }
 
