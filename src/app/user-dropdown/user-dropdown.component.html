@@ -1,11 +1,32 @@
 <button *ngIf="!isLoggedIn" mat-button routerLink="/login"
     style="min-width:50px">
-    <mat-icon>person</mat-icon>Login
+  <mat-icon>person</mat-icon>Login
 </button>
-<button *ngIf="isLoggedIn" mat-button routerLink="/profile"
+<button *ngIf="isLoggedIn" mat-button [matMenuTriggerFor]="user-dropdown-menu"
     style="min-width:50px">
-    <mat-icon>person</mat-icon>{{user?.givenName}} {{user?.familyName[0]}} 
+  <mat-icon>person</mat-icon>{{user?.givenName}} {{user?.familyName[0]}} 
 </button>
-<mat-card class="user-dropdown-menu">
-    yo yo so ds onknjdkasj <br> ksjdhkasjd asd,jhas dk
-</mat-card>
+<!-- <mat-card class="user-dropdown-menu">
+  <mat-card-header>
+    <mat-card-title>A title within the header </mat-card-title>
+    <mat-card-subtitle>A subtitle within the header </mat-card-subtitle>
+    <img mat-card-avatar src="/assets/img/landscape-pexels.jpg">
+  </mat-card-header>
+  <mat-card-content>Primary card content. Intended for blocks of text</mat-card-content>
+  <mat-card-content>Primary card content. Intended for blocks of text</mat-card-content>
+</mat-card> -->
+
+<mat-menu #menu="matMenu">
+  <button mat-menu-item>
+    <mat-icon>dialpad</mat-icon>
+    <span>Redial</span>
+  </button>
+  <button mat-menu-item disabled>
+    <mat-icon>voicemail</mat-icon>
+    <span>Check voicemail</span>
+  </button>
+  <button mat-menu-item>
+    <mat-icon>notifications_off</mat-icon>
+    <span>Disable alerts</span>
+  </button>
+</mat-menu>
