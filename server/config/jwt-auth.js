@@ -70,7 +70,7 @@ module.exports = {
           .json({message:"JWT Refresh Token authenthication error: XSRF does not match"});
       }
     }
-    Session.findOne({_id: payload.jti})
+    return Session.findOne({_id: payload.jti})
         .then(session=>{
           if (!session) {
             return res.status(401)
@@ -80,7 +80,8 @@ module.exports = {
           req.jwtRefreshToken = payload;
           req.userId = payload.sub;
           req.username = payload.username;
-          next();
+          next(); 
+          return null;// should return null as may contain promises and there is a promise above
         })
         .catch(err=>{
           return res.status(401)
