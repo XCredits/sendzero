@@ -33,7 +33,7 @@ export class HomeComponent implements OnInit {
 
   sendFile(): void {
     let fileInput = this.fileForm.get('selectFile').value;
-    if (!fileInput.files[0]) return;
+    if (!fileInput || !fileInput.files[0]) return;
     this.sendZeroService.sendFile(fileInput.files[0]);
   }
 
