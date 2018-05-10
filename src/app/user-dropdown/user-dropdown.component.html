@@ -2,31 +2,18 @@
     style="min-width:50px">
   <mat-icon>person</mat-icon>Login
 </button>
-<button *ngIf="isLoggedIn" mat-button [matMenuTriggerFor]="user-dropdown-menu"
+<button *ngIf="isLoggedIn" mat-button [matMenuTriggerFor]="userDropdownMenu"
     style="min-width:50px">
   <mat-icon>person</mat-icon>{{user?.givenName}} {{user?.familyName[0]}} 
 </button>
-<!-- <mat-card class="user-dropdown-menu">
-  <mat-card-header>
-    <mat-card-title>A title within the header </mat-card-title>
-    <mat-card-subtitle>A subtitle within the header </mat-card-subtitle>
-    <img mat-card-avatar src="/assets/img/landscape-pexels.jpg">
-  </mat-card-header>
-  <mat-card-content>Primary card content. Intended for blocks of text</mat-card-content>
-  <mat-card-content>Primary card content. Intended for blocks of text</mat-card-content>
-</mat-card> -->
 
-<mat-menu #menu="matMenu">
-  <button mat-menu-item>
-    <mat-icon>dialpad</mat-icon>
-    <span>Redial</span>
+<mat-menu #userDropdownMenu="matMenu" overlapTrigger=false>
+  <button mat-menu-item routerLink="/profile">
+    <mat-icon>person</mat-icon>
+    <span>Profile</span>
   </button>
-  <button mat-menu-item disabled>
-    <mat-icon>voicemail</mat-icon>
-    <span>Check voicemail</span>
-  </button>
-  <button mat-menu-item>
-    <mat-icon>notifications_off</mat-icon>
-    <span>Disable alerts</span>
+  <button mat-menu-item routerLink="/profile">
+    <mat-icon>exit_to_app</mat-icon>
+    <span>Log out</span>
   </button>
 </mat-menu>
