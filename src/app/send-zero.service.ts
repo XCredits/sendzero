@@ -98,14 +98,12 @@ export class SendZeroService {
 
   // Maybe add more logic here - esp for some domains/IPs
   private handleSignalClientRequest(request: any): void {
-    this.openConnectionDialog(request.id);
-    //this.socket.emit('request declined', request);
-    // request.accept();
+    // This function will handle the acceptance of the offer
+    this.openConnectionDialog(request);
   }
 
   private handleSignalClientPeer(peer: any): void {
     this.peer = peer;
-    console.log('connected?');
     // Set up peer handling functions
     this.peer.on('connect', this.handlePeerConnect.bind(this));
     this.peer.on('data', this.handlePeerReceiveData.bind(this));
@@ -280,14 +278,17 @@ export class SendZeroService {
     this.fileReader.readAsArrayBuffer(file);
   }
 
-  private openConnectionDialog(id: string) :void {
+  private openConnectionDialog(request: any) :void {
     const dialogRef = this.dialog.open(ConnectionDialog, {
-      data: {id: id},
-      // heigh:
+      data: {id: request.id},
     });
 
     dialogRef.afterClosed().subscribe(result => {
-      console.log(`dialog result: ${result}`);
+      if (result === true) {
+        request.accept();
+      } else {
+        this.socket.emit('request declined', request);
+      }
     });
   }
 
