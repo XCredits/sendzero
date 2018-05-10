@@ -161,7 +161,7 @@ function requestResetPassword(req, res) {
           return;
         }
         var xsrf;
-        if (req.header('X-XSRF-TOKEN')){
+        if (req.header('X-XSRF-TOKEN')){ //Use existing XSRF if it exists
           xsrf = req.header('X-XSRF-TOKEN')
         } else {
           xsrf = crypto.randomBytes(8).toString('hex');
@@ -179,6 +179,7 @@ function requestResetPassword(req, res) {
             '/password-reset?username=' + user.username // the username here is only display purposes on the front-end
             '&auth=' + jwtString;
         res.status(404).send({message: 'Email service not set up'});
+        console.log(emailLink);
         // When the user clicks on the link, the app pulls the JWT from the link 
         // and stores it in the JWT_TEMP_AUTH cookie
       })
@@ -214,7 +215,9 @@ function forgotUsername(req, res) {
             return;
           }
           const usernames = users.map(user => user.username);
+
           res.status(404).send({message: 'Email service not set up'});
+          console.log(usernames);
           // send all user names to email
           // return emailService.send({emailAddress: req.body.email, data: usernames})
           //     .catch(() => {
@@ -228,9 +231,16 @@ function forgotUsername(req, res) {
 
 function logout(req, res) {
   // get the session from the cookie
+
+  console.log("\n\n\nNeed to check JTI is actually a string\n\n\n");
+  
   // delete it from the DB
-  // delete the cookie
-  // return a success message
+  Session.remove({_id: req.jwtRefreshToken.jti})
+      .finally(() => {
+        // delete the cookies (note this should not clear the browserId)
+        auth.clearTokens(res);
+        res.send({message: 'Log out succesfful'});
+      });
 }
 
 function createAndSendRefreshAndSessionJwt(user, req, res) {

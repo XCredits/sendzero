@@ -98,7 +98,7 @@ module.exports = {
     } catch (err) {
       clearTokens(res);
       return res.status(401)
-        .json({message:"JWT authenthication error: JWT is not verified"});
+        .json({message:"JWT_TEMP_AUTH authenthication error: JWT_TEMP_AUTH is not verified"});
     }
     // Get out XSRF header & compare to XSRF
     // Don't block non-mutating requests
@@ -118,4 +118,6 @@ module.exports = {
 function clearTokens(res) {
   res.clearCookie('JWT');
   res.clearCookie('JWT_REFRESH_TOKEN');
+  res.clearCookie('JWT_TEMP_AUTH');
+  res.clearCookie('XSRF-TOKEN');
 }
