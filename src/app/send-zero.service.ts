@@ -220,7 +220,7 @@ export class SendZeroService {
     let fileView = new Uint8Array(this.fileReader.result);
     let fileByteLength = fileView.byteLength;
     // Set number of chunks. We split each file into 60k chunks as simple-peer
-    // only supports sending ~64k chunks(?) at one time and does its own
+    // only supports sending ~64k(?) chunks at one time and does its own
     // splitting otherwise, which throttles the connection.
     let numberOfChunks = Math.ceil(fileByteLength/CHUNK_SIZE);
     // Push chunks into an array
