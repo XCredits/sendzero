@@ -34,6 +34,15 @@ const io = require('socket.io')(server);
 var signalServer = require('simple-signal-server')(io);
 
 
+io.on('connection', (socket) => { 
+  
+  socket.on('request declined', (request) => {
+    io.sockets.connected[request.id].emit('request declined', request);
+  });
+
+})
+
+
 server.listen(port, function () {
   console.log(`Running on localhost:${port}`);
 });

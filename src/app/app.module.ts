@@ -65,7 +65,7 @@ import { RegisterComponent } from './register/register.component';
 import { MailingListComponent } from './mailing-list/mailing-list.component';
 
 // Services
-import { SendZeroService } from './send-zero.service';
+import { SendZeroService, ConnectionDialog } from './send-zero.service';
 
 
 @NgModule({
@@ -81,6 +81,7 @@ import { SendZeroService } from './send-zero.service';
     LoginComponent,
     RegisterComponent,
     MailingListComponent,
+    ConnectionDialog
   ],
   imports: [
     BrowserModule, 
@@ -182,6 +183,10 @@ import { SendZeroService } from './send-zero.service';
     // Below is for Progressive Web App (PWA) functionality
     ServiceWorkerModule.register('/ngsw-worker.js', 
         {enabled: environment.production})
+  ],
+  // For dialogs
+  entryComponents: [
+    ConnectionDialog
   ],
   providers: [
     SendZeroService,

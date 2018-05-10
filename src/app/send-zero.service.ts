@@ -1,8 +1,9 @@
 declare var require: any
-import { Injectable } from '@angular/core';
+import { Injectable, Component, Inject } from '@angular/core';
 import { OnInit, ApplicationRef } from '@angular/core';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import {MatDialog, MatDialogRef, MAT_DIALOG_DATA} from '@angular/material';
+
 
 
 let io = require('socket.io-client');
@@ -67,6 +68,11 @@ export class SendZeroService {
     
     // Set up socket
     this.socket = io(SERVER_URL, {transports: ['websocket']});
+    this.socket.on('request declined', (request) => {
+      if (request.id === this.id) {
+        this.prompt = 'The user declined your request!';
+      }
+    })
 
     // Set up signal client
     this.signalClient = new SimpleSignalClient(this.socket);  
@@ -92,12 +98,14 @@ export class SendZeroService {
 
   // Maybe add more logic here - esp for some domains/IPs
   private handleSignalClientRequest(request: any): void {
-    request.accept();
+    this.openConnectionDialog(request.id);
+    //this.socket.emit('request declined', request);
+    // request.accept();
   }
 
   private handleSignalClientPeer(peer: any): void {
     this.peer = peer;
-
+    console.log('connected?');
     // Set up peer handling functions
     this.peer.on('connect', this.handlePeerConnect.bind(this));
     this.peer.on('data', this.handlePeerReceiveData.bind(this));
@@ -187,6 +195,7 @@ export class SendZeroService {
 
   // TODO: Error handling.
   private handlePeerError(err: any): void {
+    this.prompt = "Something went wrong! Please try connecting again."
     console.log(err);
   }
 
@@ -271,4 +280,30 @@ export class SendZeroService {
     this.fileReader.readAsArrayBuffer(file);
   }
 
+  private openConnectionDialog(id: string) :void {
+    const dialogRef = this.dialog.open(ConnectionDialog, {
+      data: {id: id},
+      // heigh:
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      console.log(`dialog result: ${result}`);
+    });
+  }
+
+}
+
+// Connection dialog component
+// TODO: move to component
+@Component({
+  selector: 'dialog-content-example-dialog',
+  template: `
+    <h1 mat-dialog-title> User with id {{data.id}} wants to connect to your browser. Accept?</h1>
+    <mat-dialog-actions>
+    <button mat-raised-button [mat-dialog-close]="true" cdkFocusInitial color='primary'>Yes</button>
+    <button mat-raised-button [mat-dialog-close]="false" color='warn'>No</button>
+    </mat-dialog-actions>`,
+})
+export class ConnectionDialog {
+  constructor(@Inject(MAT_DIALOG_DATA) public data: any) { }
 }
