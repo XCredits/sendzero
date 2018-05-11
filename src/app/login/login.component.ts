@@ -9,20 +9,20 @@ import { UserService } from '../user.service';
   styleUrls: ['./login.component.scss']
 })
 export class LoginComponent implements OnInit {
-  loginForm: FormGroup;
+  form: FormGroup;
 
   constructor( private http: HttpClient, 
     private userService: UserService ) { }
 
   ngOnInit() {
-    this.loginForm = new FormGroup ({
+    this.form = new FormGroup ({
       username: new FormControl('', [<any>Validators.required]),
       password: new FormControl('', [<any>Validators.required]),
     });
   }
 
-  loginSubmit = function (formData) {
-    if (this.loginForm.invalid) {
+  submit = function (formData) {
+    if (this.form.invalid) {
       return;
     }
     this.http.post('/api/user/login', {

@@ -9,7 +9,7 @@ import { UserService } from '../user.service';
   styleUrls: ['./register.component.scss']
 })
 export class RegisterComponent implements OnInit {
-  registerForm: FormGroup;
+  form: FormGroup;
   formErrorMessage: string;
 
   constructor( private http: HttpClient,
@@ -17,7 +17,7 @@ export class RegisterComponent implements OnInit {
     ) {}
 
   ngOnInit() {
-    this.registerForm = new FormGroup ({
+    this.form = new FormGroup ({
       givenName: new FormControl('', [Validators.required]),
       familyName: new FormControl('', [Validators.required]),
       email: new FormControl('', [Validators.required, , Validators.email]),
@@ -26,8 +26,8 @@ export class RegisterComponent implements OnInit {
     });
   }
 
-  registerSubmit = function (formData) {
-    if (this.registerForm.invalid) {
+  submit = function (formData) {
+    if (this.form.invalid) {
       return;
     }
     this.http.post('/api/user/register', {
@@ -45,7 +45,7 @@ export class RegisterComponent implements OnInit {
             errorResponse => {
               if (errorResponse.status === 409) {
                 this.formErrorMessage = errorResponse.error.message;
-                this.registerForm.controls['username'].setErrors({'incorrect': true});
+                this.form.controls['username'].setErrors({'incorrect': true});
               } else {
                 this.formErrorMessage = 'There was a problem submitting the form.';
               }
