@@ -180,12 +180,13 @@ function requestResetPassword(req, res) {
         const emailLink = process.env.URL_ORIGIN + 
             '/password-reset?username=' + user.username // the username here is only display purposes on the front-end
             '&auth=' + jwtString;
-        res.status(404).send({message: 'Email service not set up'});
         console.log(emailLink);
+        console.log('Email service not set up!!!!!!!!!!!!!!!!!!!!!!');
         // When the user clicks on the link, the app pulls the JWT from the link 
         // and stores it in the JWT_TEMP_AUTH cookie
       })
-      .catch(() => {
+      .catch((err) => {
+        console.log(err);
         res.status(500).send({message:'Error accessing user database.'})
       });
 }
@@ -218,9 +219,9 @@ function forgotUsername(req, res) {
           }
           const usernames = users.map(user => user.username);
 
-          res.status(404).send({message: 'Email service not set up'});
-          console.log(usernames);
-          // send all user names to email
+          console.log('Email service not set up!!!!!!!!!!!!!!!!!!!!!!');
+          // send all user names to email   
+          // process.env.URL_ORIGIN
           // return emailService.send({emailAddress: req.body.email, data: usernames})
           //     .catch(() => {
           //     });
