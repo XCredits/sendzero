@@ -27,7 +27,6 @@ export class ResetPasswordComponent implements OnInit {
     if (this.form.invalid) {
       return;
     }
-    console.log(this.form.get('username').value);
     // Clear state from previous submissions
     this.formErrorMessage = undefined;
 
