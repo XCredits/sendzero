@@ -3,6 +3,7 @@ import { Injectable, Component, Inject } from '@angular/core';
 import { OnInit, ApplicationRef } from '@angular/core';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import {MatDialog, MatDialogRef, MAT_DIALOG_DATA} from '@angular/material';
+import { THIS_EXPR } from '@angular/compiler/src/output/output_ast';
 
 
 
@@ -177,9 +178,8 @@ export class SendZeroService {
         this.ref.tick();
       } else {
         this.fileArray.set(data, this.fileArrayOffset);
+        this.receivedChunks++;
         this.ref.tick();
-        console.log(this.receivedChunks);
-        console.log(this.maxFileChunks);
         this.makeBlob();
       }
     }
