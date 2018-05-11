@@ -59,6 +59,7 @@ import { FeedComponent } from './feed/feed.component';
 import { ContactsComponent } from './contacts/contacts.component';
 import { AboutComponent } from './about/about.component';
 import { LoginComponent } from './login/login.component';
+import { ForgotPasswordComponent } from './forgot-password/forgot-password.component';
 import { RegisterComponent } from './register/register.component';
 import { MailingListComponent } from './mailing-list/mailing-list.component';
 import { ProfileComponent } from './profile/profile.component';
@@ -75,6 +76,7 @@ import { UserDropdownComponent } from './user-dropdown/user-dropdown.component';
     ContactsComponent,
     AboutComponent,
     LoginComponent,
+    ForgotPasswordComponent,
     RegisterComponent,
     MailingListComponent,
     ProfileComponent,
@@ -125,6 +127,11 @@ import { UserDropdownComponent } from './user-dropdown/user-dropdown.component';
         path: 'login',
         component: LoginComponent,
         data: { title: 'Login' },
+      },
+      {
+        path: 'forgot-password',
+        component: ForgotPasswordComponent,
+        data: { title: 'Forgot Password' },
       },
       {
         path: 'register',
