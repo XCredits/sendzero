@@ -2,7 +2,7 @@ import { Component, ViewChild } from '@angular/core';
 // Imports needed for router import for title
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import 'rxjs/add/operator/filter';
-import { AfterViewInit, OnInit } from '@angular/core/src/metadata/lifecycle_hooks';
+import { AfterViewInit, OnInit } from '@angular/core';
 
 @Component({
   selector: 'app-root',
