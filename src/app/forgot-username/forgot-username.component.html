@@ -1,17 +1,17 @@
 <div *ngIf="!submitSuccess" class="simple-form-aligner">
   <mat-card class="simple-form-card">
-    <mat-card-title>Forgot password </mat-card-title>
-    <mat-card-subtitle>Enter your username to have your password emailed to you. 
-      Forgot your username? 
-      <a routerLink="/forgot-username">
-        Email me my username.
+    <mat-card-title>Forgot username </mat-card-title>
+    <mat-card-subtitle>Enter your email to have your username emailed to you. 
+      Forgot your password? 
+      <a routerLink="/forgot-password">
+        Reset my password.
       </a>
     </mat-card-subtitle>
     <mat-card-content>
       <form [formGroup]="form" (ngSubmit)="submit(form.value)">
         <div class="form-group">
           <mat-form-field class="simple-form-field-100">
-            <input matInput placeholder="Username" name="username" formControlName="username">
+            <input matInput placeholder="Email" name="email" formControlName="email">
           </mat-form-field>
           <br>
           <button 
@@ -42,7 +42,9 @@
 </div>
 <div *ngIf="submitSuccess" class="simple-form-aligner">
   <mat-card class="simple-form-card">
-    <mat-card-title>Password reset sent</mat-card-title>
-    <mat-card-content>If we found your username, we will send a password reset link to your email.</mat-card-content>
+    <mat-card-title>Username reminder sent</mat-card-title>
+    <mat-card-content>
+      If we found your email, we will send your username to your email.
+    </mat-card-content>
   </mat-card>
 </div>

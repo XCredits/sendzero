@@ -19,7 +19,7 @@ export class ForgotUsernameComponent implements OnInit {
 
   ngOnInit() {
     this.form = new FormGroup ({
-      username: new FormControl('', [<any>Validators.required]),
+      email: new FormControl('', [Validators.required, Validators.email]),
     });
   }
 
@@ -27,18 +27,16 @@ export class ForgotUsernameComponent implements OnInit {
     if (this.form.invalid) {
       return;
     }
-    console.log(this.form.get('username').value);
     // Clear state from previous submissions
     this.formErrorMessage = undefined;
 
     this.waiting = true;
-    this.http.post('/api/user/request-reset-password', {
-          'username': formData.username,
+    this.http.post('/api/user/forgot-username', {
+          'email': formData.email,
         })
         .subscribe(data => {
           this.waiting = false;
           this.submitSuccess = true;
-          console.log('Forgot password success.');
         },
         errorResponse => {
           this.waiting = false;
