@@ -233,7 +233,6 @@ export class SendZeroService {
 
   private chunkFileAndSendMetadata(): void {
     // Clear fileChunk arrray since it's a new file
-    this.fileChunks = null;
     // Make the file into a typed array to send it as the WebRTC API doesn't
     // support sending blobs at this point.
     const fileView = new Uint8Array(this.fileReader.result);
@@ -242,14 +241,18 @@ export class SendZeroService {
     // only supports sending ~64k(?) chunks at one time and does its own
     // splitting otherwise, which throttles the connection.
     const numberOfChunks = Math.ceil(fileByteLength / CHUNK_SIZE);
-    // Push chunks into an array
+    // Pre allocate arrays as assigning chunks is faster than
+    // pushing chunks into an array
+    this.fileChunks = Array(numberOfChunks);
     const chunks = Array(numberOfChunks);
+    // Assign chunks
     for (let i = 0; i < numberOfChunks - 1; i++) {
       const chunk = fileView.slice(CHUNK_SIZE * i, CHUNK_SIZE * (i + 1));
-      chunks.push(chunk);
+      chunks[i] = chunk;
     }
-    // Push final chunk
-    chunks.push(fileView.slice(CHUNK_SIZE * (numberOfChunks - 1)));
+    // Assign final chunk
+    chunks[numberOfChunks - 1] =
+        (fileView.slice(CHUNK_SIZE * (numberOfChunks - 1)));
 
     // Set up and send metadata for the file
     const metadata = {
@@ -279,9 +282,15 @@ export class SendZeroService {
     this.ref.tick();
     // Send chunks
     // We use write instead of send as send closes the connection on big files.
-    this.fileChunks.forEach(element => {
-      this.peer.send(element);
-    });
+    let chunk;
+    while ((chunk = this.fileChunks.shift()) !== undefined) {
+      this.peer.write(chunk);
+    }
+    // console.log(this.fileChunks);
+    // this.fileChunks.forEach(element => {
+    //   console.log(element);
+    //   this.peer.write(element);
+    // });
 
     this.prompt = 'Finished sending file!';
     this.ref.tick();
