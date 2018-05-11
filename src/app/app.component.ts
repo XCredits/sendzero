@@ -1,44 +1,98 @@
-declare var require: any
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
-import { DomSanitizer } from '@angular/platform-browser';
-import { SendZeroService } from './send-zero.service'
+import { Component, ViewChild } from '@angular/core';
+// Imports needed for router import for title
+import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
+import 'rxjs/add/operator/filter';
+import { AfterViewInit, OnInit } from '@angular/core/src/metadata/lifecycle_hooks';
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
-  styleUrls: ['./app.component.css']
+  styleUrls: ['./app.component.scss']
 })
-export class AppComponent implements OnInit {
-  // Typed defintions
+export class AppComponent implements AfterViewInit {
+  @ViewChild('sideNavDrawer') sideNavDrawer;
+  screenWidth: number;
+  mobileWidth = false;
   title: string;
-  prompt: string;
-  id: string;
-  peerId: string;
-  file: File;
-  fileProgress: number = 0;
-  maxFileChunks: number = 0;
-  
-  constructor(private ref: ChangeDetectorRef,
-              private sanitizer: DomSanitizer,
-              public sendZeroService: SendZeroService) {
-    this.title = 'SendZero Alpha';
-    var self = this;
+  // Edit the area below to create main nav links
+  // There should be
+  primaryNavLinks: { routerLink: string, icon: string, text: string }[] = [
+    {
+      routerLink: '/home',
+      icon: 'home',
+      text: 'Home',
+    },
+    {
+      routerLink: '/feed',
+      icon: 'chat',
+      text: 'Feed',
+    },
+    {
+      routerLink: '/contacts',
+      icon: 'person',
+      text: 'Contacts',
+    },
+    {
+      routerLink: '/about',
+      icon: 'view_carousel',
+      text: 'About',
+    },
+  ];
+
+  secondaryNavLinks: { routerLink: string, icon: string, text: string }[] = [
+    {
+      routerLink: '/help',
+      icon: 'help',
+      text: 'Help',
+    },
+    {
+      routerLink: '/settings',
+      icon: 'settings',
+      text: 'Settings',
+    },
+  ];
+
+
+  toggleSideNavDrawer() {
+    this.sideNavDrawer.toggle();
   }
 
-  handleFileInput(files: FileList): void {
-    this.file = files.item(0);
+  hideSideNavAfterClick () {
+    if (this.mobileWidth) {
+      this.toggleSideNavDrawer();
+    }
   }
 
-  sendFile(): void {
-    if (!this.file) return;
-    this.sendZeroService.sendFile(this.file);
+  setSideBar() {
+    console.log(this.sideNavDrawer);
+    if (this.screenWidth < 768) {
+      this.sideNavDrawer.mode = 'push'; // push or over
+      this.sideNavDrawer.opened = false;
+      this.mobileWidth = true;
+    } else {
+      this.sideNavDrawer.mode = 'side';
+      this.sideNavDrawer.opened = true;
+      this.mobileWidth = false;
+    }
   }
 
-  ngOnInit(): void {
-    this.sendZeroService.init();
+  constructor(router: Router, route: ActivatedRoute) {
+    // Set side bar mode
+    this.screenWidth = window.innerWidth;
+    window.onresize = () => {
+      this.screenWidth = window.innerWidth;
+      this.setSideBar();
+    };
+
+    //
+    router.events
+      .filter(e => e instanceof NavigationEnd)
+      .forEach(e => {
+        this.title = route.root.firstChild.snapshot.data['title'];
+      });
   }
 
-  connectToPeer(): void {
-    this.sendZeroService.connectToPeer();
+  ngAfterViewInit() {
+    this.setSideBar();
   }
 }
