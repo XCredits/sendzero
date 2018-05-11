@@ -1,6 +1,5 @@
 var mongoose = require('mongoose');
-var Promise = require("bluebird");
-mongoose.Promise = global.Promise;
+mongoose.Promise = require("bluebird");
 var Schema = mongoose.Schema;
 
 var MailingListSchema = new Schema({

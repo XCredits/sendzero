@@ -6,13 +6,12 @@ import { RouterModule } from '@angular/router';
 import { AppComponent } from './app.component';
 import { UserService } from './user.service';
 
-// 
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 // import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
 import { AngularFontAwesomeModule } from 'angular-font-awesome';
 
-// Material modules 
-import { 
+// Material modules
+import {
   MatAutocompleteModule,
   MatButtonModule,
   MatButtonToggleModule,
@@ -60,9 +59,11 @@ import { FeedComponent } from './feed/feed.component';
 import { ContactsComponent } from './contacts/contacts.component';
 import { AboutComponent } from './about/about.component';
 import { LoginComponent } from './login/login.component';
+import { ForgotPasswordComponent } from './forgot-password/forgot-password.component';
 import { RegisterComponent } from './register/register.component';
 import { MailingListComponent } from './mailing-list/mailing-list.component';
 import { ProfileComponent } from './profile/profile.component';
+import { UserDropdownComponent } from './user-dropdown/user-dropdown.component';
 
 @NgModule({
   declarations: [
@@ -75,14 +76,16 @@ import { ProfileComponent } from './profile/profile.component';
     ContactsComponent,
     AboutComponent,
     LoginComponent,
+    ForgotPasswordComponent,
     RegisterComponent,
     MailingListComponent,
     ProfileComponent,
+    UserDropdownComponent,
   ],
   imports: [
-    BrowserModule, 
+    BrowserModule,
     FormsModule,
-    ReactiveFormsModule ,
+    ReactiveFormsModule,
     HttpClientModule,
     RouterModule.forRoot([
       {
@@ -126,17 +129,22 @@ import { ProfileComponent } from './profile/profile.component';
         data: { title: 'Login' },
       },
       {
+        path: 'forgot-password',
+        component: ForgotPasswordComponent,
+        data: { title: 'Forgot Password' },
+      },
+      {
         path: 'register',
         component: RegisterComponent,
         data: { title: 'Register' },
       },
       { // Default route
-        path: '', 
-        redirectTo: '/home', 
+        path: '',
+        redirectTo: '/home',
         pathMatch: 'full',
       },
-      { 
-        path: '**', 
+      {
+        path: '**',
         component: PageNotFoundComponent,
         data: { title: 'Page Not Found' },
       },
@@ -145,8 +153,8 @@ import { ProfileComponent } from './profile/profile.component';
     BrowserAnimationsModule,
     // NgbModule,
     AngularFontAwesomeModule,
-    
-    // Material modules 
+
+    // Material modules
     MatAutocompleteModule,
     MatButtonModule,
     MatButtonToggleModule,
@@ -181,7 +189,7 @@ import { ProfileComponent } from './profile/profile.component';
     MatTooltipModule,
 
     // Below is for Progressive Web App (PWA) functionality
-    ServiceWorkerModule.register('/ngsw-worker.js', 
+    ServiceWorkerModule.register('/ngsw-worker.js',
         {enabled: environment.production})
   ],
   providers: [UserService],

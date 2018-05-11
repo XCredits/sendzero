@@ -12,7 +12,7 @@ export class ProfileComponent implements OnInit {
   constructor(private http: HttpClient) { }
 
   ngOnInit() {
-    this.http.get<User>('/api/user/details',{})
+    this.http.get<User>('/api/user/details', {})
         .subscribe((user) =>  {
           this.user = user;
         });

@@ -1,6 +1,5 @@
 var mongoose = require('mongoose');
-var Promise = require("bluebird");
-mongoose.Promise = global.Promise;
+mongoose.Promise = require("bluebird");
 var Schema = mongoose.Schema;
 var bcrypt = require('bcrypt');
 
@@ -11,8 +10,10 @@ var UserSchema = new Schema({
     email: {type: String},
     emailConfirmed: {type: Boolean, default: false},
     timeRegistered: {type: Date, default: Date.now},
-    passwordHash: String,
-    saltRounds: Number // stored in case we increase the salt rounds in the future
+    passwordHash: {type: String, required: true},
+    saltRounds: Number, // stored in case we increase the salt rounds in the future
+    isAdmin: {type: Boolean, default: false},
+    profileImage: {type: String}
   }
 );
 
@@ -46,6 +47,8 @@ UserSchema.methods.frontendData = function() {
     email: this.email,
     emailConfirmed: this.emailConfirmed,
     timeRegistered: this.timeRegistered,
+    isAdmin: this.isAdmin,
+    profileImage: this.profileImage,
   };
 };
 

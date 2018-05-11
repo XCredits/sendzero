@@ -39,6 +39,8 @@
 // attach the XSRF Token to the request header that the server has set in the 
 // cookie. This means that ALL get requests could potentially be called from any
 
+
+
 const User = require('../models/user.model.js');
 const Session = require('../models/session.model.js');
 const jwt = require('jsonwebtoken');
@@ -54,26 +56,43 @@ module.exports = function (app) {
   app.get('/api/user/refresh-jwt', auth.jwtRefreshToken, refreshJwt);
   app.get('/api/user/details', auth.jwt, userDetails);
   app.post('/api/user/change-password', auth.jwtRefreshToken, changePassword);
-  app.post('/api/user/reset-password', resetPassword);
+  app.post('/api/user/request-reset-password', requestResetPassword);
+  app.post('/api/user/reset-password', auth.jwtTemporaryLinkToken, resetPassword);
   app.post('/api/user/forgot-username', forgotUsername);
   app.post('/api/user/logout', auth.jwtRefreshToken, logout);
 }
 
 function register(req, res) {
   // validate
-  var user = new User();
-  user.givenName = req.body.givenName;
-  user.familyName = req.body.familyName;
-  user.username = req.body.username;
-  user.email = req.body.email;
-  user.createPasswordHash(req.body.password);
-  user.save()
-      .then(() => {
-        createAndSendRefreshAndSessionJwt(user, req, res);
+
+  // check that there is not an existing user with this username
+  return User.findOne({username: req.body.username})
+      .then(existingUser => {
+        if (existingUser){
+          return res.status(409).send({message: 'Username already taken.'})
+        }
+        var user = new User();
+        user.givenName = req.body.givenName;
+        user.familyName = req.body.familyName;
+        user.username = req.body.username;
+        user.email = req.body.email;
+        user.createPasswordHash(req.body.password);
+        return user.save()
+            .then(() => {
+              return createAndSendRefreshAndSessionJwt(user, req, res);
+            })
+            .catch(dbError => {
+              var err;
+              if (process.env.NODE_ENV !== 'production') {
+                // DO NOT console.log or return Mongoose catch errors to the front-end in production, especially for user objects. They contain secret information. e.g. if you try to create a user with a username that already exists, it will return the operation that you are trying to do, which includes the password hash.
+                err = dbError;
+              }
+              return res.status(500).send({
+                  message: 'Error in creating user during registration: ' + err});
+            });
       })
-      .catch(err => {
-        res.status(500).send({
-            message: "Error in creating user during registration: " + err});
+      .catch(()=>{
+        res.status(500).send({message:'Error accessing database while checking for existing users'});
       });
 }
 
@@ -83,20 +102,27 @@ function login(req, res) {
       return res.status(500).json(err);
     }
     if (!user) {
+      auth.clearTokens(res);
       return res.status(401)
           .send({message:"Error in finding user: " + info.message});
     }
-    createAndSendRefreshAndSessionJwt(user, req, res);
+    return createAndSendRefreshAndSessionJwt(user, req, res);
   }) (req, res);
 }
 
 function refreshJwt(req, res) {
-  // Pull the user data from the JWT
-  var user = {
-    _id: req.jwtRefreshToken.sub,
+  // The refresh token is verfied by auth.jwtRefreshToken
+  // Pull the user data from the refresh JWT
+  console.log('Getting into refresher');
+  const token = setJwtCookie({
+    res,
+    userId: req.jwtRefreshToken.sub, 
     username: req.jwtRefreshToken.username,
-  };
-  const token = setJwtCookie(user, req.jwtRefreshToken.xsrf, res)
+    isAdmin: req.jwtRefreshToken.isAdmin,
+    xsrf: req.jwtRefreshToken.xsrf, 
+    sessionId: req.jwtRefreshToken.jwt,
+  });
+
   res.send({
       jwtExp: token.jwtObj.exp,
       message:"JWT successfully refreshed."
@@ -104,84 +130,185 @@ function refreshJwt(req, res) {
 }
 
 function userDetails(req, res) {
-  User.findOne({_id:req.userId})
+  return User.findOne({_id: req.userId})
       .then(user => {
         res.send(user.frontendData());
       });
 }
 
 function changePassword(req, res) {
-  // look up user
-  // user.createPasswordHash(req.body.password);
-  // user.save()
-  // res.send()
+  // Attach the user name to the body
+  req.body.username = req.jwt.username;
+  // Check password
+  passport.authenticate('local', function(err, user, info){
+    // Create new password hash
+    user.createPasswordHash(req.body.newPassword);
+    user.save(()=>{
+          return res.send({message:'Password successfully changed'});
+        })
+        .catch(()=>{
+          return res.status(500).send({message:'Password change failed'});
+        });
+  }) (req, res);
+}
+
+function requestResetPassword(req, res) {
+  return User.findOne({username:req.body.username})
+      .then(user=>{
+        // Success object must be identical, to avoid people discovering emails in the system
+        const successObject = {message: 'Email sent if users found in database.'}
+        res.send(successObject); // Note that if errors in sending emails occur, the front end will not see them
+        if (!users) {
+          return;
+        }
+        var xsrf;
+        if (req.header('X-XSRF-TOKEN')){ //Use existing XSRF if it exists
+          xsrf = req.header('X-XSRF-TOKEN')
+        } else {
+          xsrf = crypto.randomBytes(8).toString('hex');
+          res.cookie('XSRF-TOKEN', xsrf, {secure: !process.env.IS_LOCAL});
+        }
+        const jwtObj = {
+          sub: user._id,
+          username: user.username,
+          isAdmin: user.isAdmin,
+          xsrf: xsrf,
+          exp: Math.floor(
+              (Date.now() + Number(process.env.JWT_TEMPORARY_LINK_TOKEN_EXPIRY))/1000),// 1 hour
+        };
+        const jwtString = jwt.sign(jwtObj, process.env.JWT_KEY);
+        const emailLink = process.env.URL_ORIGIN + 
+            '/password-reset?username=' + user.username // the username here is only display purposes on the front-end
+            '&auth=' + jwtString;
+        res.status(404).send({message: 'Email service not set up'});
+        console.log(emailLink);
+        // When the user clicks on the link, the app pulls the JWT from the link 
+        // and stores it in the JWT_TEMP_AUTH cookie
+      })
+      .catch(() => {
+        res.status(500).send({message:'Error accessing user database.'})
+      });
 }
 
 function resetPassword(req, res) {
+  // Other ideas: https://www.owasp.org/index.php/Forgot_Password_Cheat_Sheet#Step_4.29_Allow_user_to_change_password_in_the_existing_session
   // look up user
-  // user.createPasswordHash(req.body.password);
-  // user.save()
-  // res.send()
-  // https://www.owasp.org/index.php/Forgot_Password_Cheat_Sheet#Step_4.29_Allow_user_to_change_password_in_the_existing_session
-  // create JWT that establishes an authetication session ONLY for reset password routes
-  // 
+  return User.findOne({_id: req.userId}) // req.userId is set in auth.temporaryLinkAuth
+      .then(user => {
+        user.createPasswordHash(req.body.password);
+        return user.save()
+            .then(()=>{
+              res.send({message:'Password reset successful'});
+            });
+      })
+      .catch(() => {
+        res.status(500).send({message:'Error accessing user database.'})
+      });
 }
 
 function forgotUsername(req, res) {
   // find all users by email
-  // send all user names to email
+  return User.find({email: req.body.email}).select('username')
+      .then(users => {
+          // Success object must be identical, to avoid people discovering emails in the system
+          const successObject = {message: 'Email sent if users found in database.'}
+          res.send(successObject); // Note that if errors in send in emails occur, the front end will not see them
+          if (!users) {
+            return;
+          }
+          const usernames = users.map(user => user.username);
+
+          res.status(404).send({message: 'Email service not set up'});
+          console.log(usernames);
+          // send all user names to email
+          // return emailService.send({emailAddress: req.body.email, data: usernames})
+          //     .catch(() => {
+          //     });
+      })
+      .catch(() => {
+        res.status(500).send({message:'Error accessing user database.'})
+      });
+  
 }
 
 function logout(req, res) {
   // get the session from the cookie
+
+  console.log("\n\n\nNeed to check JTI is actually a string\n\n\n");
+  
   // delete it from the DB
-  // delete the cookie
-  // return a success message
+  return Session.remove({_id: req.jwtRefreshToken.jti})
+      .then(()=>{
+        // needs a .then to act like a promise for Mongoose Promise
+        return null;
+      })
+      .finally(() => {
+        // delete the cookies (note this should not clear the browserId)
+        auth.clearTokens(res);
+        return res.send({message: 'Log out succesfful'});
+      });
 }
 
 function createAndSendRefreshAndSessionJwt(user, req, res) {
+  console.log("createAndSendRefreshAndSessionJwt");
   // Create cross-site request forgery token
   var xsrf = crypto.randomBytes(8).toString('hex');
   // Setting XSRF-TOKEN cookie means that Angular will automatically attach the 
   // XSRF token to the X-XSRF-TOKEN header. 
   // Read more: https://stormpath.com/blog/angular-xsrf
+  console.log('pre save cookie');
   res.cookie('XSRF-TOKEN', xsrf, {secure: !process.env.IS_LOCAL});
 
-  const token = setJwtCookie(user, xsrf, res);
-  const refreshToken = setJwtRefreshTokenCookie(user, xsrf, res);
-
-  var userAgent = req.header('User-Agent');
-  userAgent = userAgent.substring(0, 512);
-
+  const refreshTokenExpiry = Math.floor(
+      (Date.now() + Number(process.env.JWT_REFRESH_TOKEN_EXPIRY))/1000);
+  
+  console.log(refreshTokenExpiry);
   var session = new Session();
-  session.userId = refreshToken.jwtObj.sub;
-  session.sessionId = refreshToken.jwtObj.jti;
-  session.exp = refreshToken.jwtObj.exp;
-  session.userAgent = userAgent;
-  session.lastObserved = Date.now();
-  session.save()
-      .then(()=>{
-        res.json({
+  session.userId = user._id;
+  session.exp = new Date(refreshTokenExpiry*1000);
+  session.userAgent = req.header('User-Agent').substring(0, 512);;
+  session.lastObserved = new Date(Date.now());
+  return session.save()
+      .then((session)=>{
+        console.log('saved session');
+        const token = setJwtCookie({
+            res,
+            userId: user._id, 
+            username: user.username,
+            isAdmin: user.isAdmin,
+            xsrf, 
+            sessionId: session._id});
+        const refreshToken = setJwtRefreshTokenCookie({
+            res,
+            userId: user._id, 
+            username: user.username,
+            isAdmin: user.isAdmin,
+            xsrf,
+            sessionId: session._id,
+            exp: refreshTokenExpiry});
+        return res.json({
             user: user.frontendData(), 
             jwtExp: token.jwtObj.exp, 
-            jwtRefreshTokenExp: token.jwtObj.exp,
+            jwtRefreshTokenExp: refreshToken.jwtObj.exp,
         });
       })
-      .catch(()=>{
-        res.status(500).json({message:"Error saving session."})
+      .catch((err)=>{
+        auth.clearTokens(res);
+        return res.status(500).json({message:"Error saving session. " + err});
       });
 }
 
-function setJwtCookie(user, xsrf, res) {
-  var expiry = new Date();
-  expiry.setMinutes(expiry.getMinutes() + process.env.JWT_EXPIRY_MINS);
-  var jwtId = crypto.randomBytes(8).toString('hex');
+function setJwtCookie({res, userId, username, isAdmin, xsrf, sessionId}) {
+  console.log("setJwtCookie");
   var jwtObj = {
-    sub: user._id,
-    jti: jwtId,
-    username: user.username,
+    sub: userId,
+    // Note this id is set using the refresh token session id so that we can
+    // easily determine which session is responisble for an action
+    jti: sessionId,
+    username: username,
+    isAdmin: isAdmin,
     xsrf: xsrf,
-    exp: parseInt(expiry.getTime() / 1000, 10),
+    exp: Math.floor((Date.now() + Number(process.env.JWT_EXPIRY))/1000),
   };
   var jwtString = jwt.sign(jwtObj, process.env.JWT_KEY);
   // Set the cookie
@@ -192,17 +319,15 @@ function setJwtCookie(user, xsrf, res) {
   return {jwtString, jwtObj};
 }
 
-function setJwtRefreshTokenCookie(user, xsrf, res) {
-  var expiry = new Date();
-  expiry.setMinutes(expiry.getDay() + 
-      process.env.JWT_REFRESH_TOKEN_EXPIRY_DAYS);
-  var jwtId = crypto.randomBytes(8).toString('hex');
+function setJwtRefreshTokenCookie({res, userId, username, isAdmin, xsrf, sessionId, exp}) {
+  console.log("setJwtRefreshTokenCookie");
   var jwtObj = {
-    sub: user._id,
-    jti: jwtId,
-    username: user.username,
+    sub: userId,
+    jti: sessionId,
+    username: username,
+    isAdmin: isAdmin,
     xsrf: xsrf,
-    exp: parseInt(expiry.getTime() / 1000, 10),
+    exp: exp,
   };
   var jwtString = jwt.sign(jwtObj, process.env.JWT_REFRESH_TOKEN_KEY);
   // Set the cookie

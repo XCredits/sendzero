@@ -1,6 +1,8 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
+import { BehaviorSubject } from 'rxjs/BehaviorSubject';
+import { isEqual } from 'lodash';
 
 // https://scotch.io/tutorials/protecting-angular-v2-routes-with-canactivatecanactivatechild-guards#toc-authentication-guard
 // https://www.youtube.com/watch?v=WveRq-tlb6I
@@ -9,10 +11,11 @@ import { Router } from '@angular/router';
 @Injectable()
 export class UserService {
 
-  user: User;
-  jwtExp: number;
-  jwtRefreshTokenExp: number;
-  refreshTimeoutId: any;
+  private user: User;
+  private jwtExp: number;
+  private jwtRefreshTokenExp: number;
+  private refreshTimeoutId: any;
+  userObservable: BehaviorSubject<User> = new BehaviorSubject<User>(this.user);
 
   nav: NavObj;
 
@@ -22,10 +25,24 @@ export class UserService {
     this.updateUserDetails();
   }
 
+  /**
+  * Extrenal facing method for authentication routes to use
+  */
   storeUser({user, jwtExp, jwtRefreshTokenExp}) {
-    this.user = user;
     this.jwtExp = jwtExp;
     this.jwtRefreshTokenExp = jwtRefreshTokenExp;
+    this._setUser(user);
+  }
+
+  /**
+  * Internal method that checks if the user being set is different to the one
+  * currently set. Sends a subscription event if the user has changed.
+  */
+  private _setUser(user) {
+    if (!isEqual(this.user, user)) {
+      this.user = user;
+      this.userObservable.next(this.user);
+    }
   }
 
   refreshJwt() {
@@ -35,7 +52,9 @@ export class UserService {
           // Call a refresh token 15 seconds before
           const refreshTime = (this.jwtExp - 15) * 1000;
           const refreshDuration = refreshTime - Date.now();
-          this.refreshTimeoutId = setTimeout(this.refreshJwt, refreshDuration);
+          const self = this;
+          this.refreshTimeoutId =
+              setTimeout(function() { self.refreshJwt(); }, refreshDuration);
         });
         // On failure (unauthenticated), directs to /login page
         // On failure (timeout), tries again in 10 seconds
@@ -45,13 +64,13 @@ export class UserService {
 
   updateUserDetails() {
     this.http.get<User>('/api/user/details')
-        .subscribe((userDetails) => {
-          this.user = userDetails;
+        .subscribe((user) => {
+          this._setUser(user);
         });
   }
 
   isLoggedIn() {
-    if (this.user && this.jwtExp < Math.round(Date.now() / 1000)) {
+    if (this.user && this.jwtExp > Math.round(Date.now() / 1000)) {
       return true;
     } else {
       return false;
@@ -70,12 +89,18 @@ export class UserService {
 
   logOut() {
     // Send message to server
-    // navigate to home page '/'
-    // Delete this.user
-    // Delete this.jwtExp
-    // Delete this.jwtRefreshTokenExp
-    // clear this.refreshTimeoutId
-    this.router.navigateByUrl('/');
+    this.http.post('/api/user/logout', {})
+        .subscribe(() => {
+          // Clean up old data
+          this.user = undefined;
+          this.jwtExp = undefined;
+          this.jwtRefreshTokenExp = undefined;
+          clearTimeout(this.refreshTimeoutId);
+          // inform the rest of the app that a log out has occurred
+          this.userObservable.next(this.user);
+          // go to default location
+          this.router.navigateByUrl('/');
+        });
   }
 }
 

@@ -1,0 +1,19 @@
+<button *ngIf="!isLoggedIn" mat-button routerLink="/login"
+    style="min-width:50px">
+  <mat-icon>person</mat-icon>Login
+</button>
+<button *ngIf="isLoggedIn" mat-button [matMenuTriggerFor]="userDropdownMenu"
+    style="min-width:50px">
+  <mat-icon>person</mat-icon>{{user?.givenName}} {{user?.familyName[0]}} 
+</button>
+
+<mat-menu #userDropdownMenu="matMenu" overlapTrigger=false>
+  <button mat-menu-item routerLink="/profile">
+    <mat-icon>person</mat-icon>
+    <span>Profile</span>
+  </button>
+  <button mat-menu-item (click)="logout()">
+    <mat-icon>exit_to_app</mat-icon>
+    <span>Log out</span>
+  </button>
+</mat-menu>
