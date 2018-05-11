@@ -219,7 +219,8 @@ function forgotUsername(req, res) {
             return;
           }
           const usernames = users.map(user => user.username);
-
+          
+          console.log(usernames);
           console.log('Email service not set up!!!!!!!!!!!!!!!!!!!!!!');
           // send all user names to email   
           // process.env.URL_ORIGIN
