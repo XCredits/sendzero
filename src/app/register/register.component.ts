@@ -46,6 +46,8 @@ export class RegisterComponent implements OnInit {
               if (errorResponse.status === 409) {
                 this.formErrorMessage = errorResponse.error.message;
                 this.registerForm.controls['username'].setErrors({'incorrect': true});
+              } else {
+                this.formErrorMessage = 'There was a problem submitting the form.';
               }
             });
   };
