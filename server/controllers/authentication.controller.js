@@ -158,7 +158,7 @@ function requestResetPassword(req, res) {
         // Success object must be identical, to avoid people discovering emails in the system
         const successObject = {message: 'Email sent if users found in database.'}
         res.send(successObject); // Note that if errors in sending emails occur, the front end will not see them
-        if (!users) {
+        if (!user) {
           return;
         }
         var xsrf;
@@ -166,7 +166,6 @@ function requestResetPassword(req, res) {
           xsrf = req.header('X-XSRF-TOKEN')
         } else {
           xsrf = crypto.randomBytes(8).toString('hex');
-          res.cookie('XSRF-TOKEN', xsrf, {secure: !process.env.IS_LOCAL});
         }
         const jwtObj = {
           sub: user._id,
@@ -177,15 +176,18 @@ function requestResetPassword(req, res) {
               (Date.now() + Number(process.env.JWT_TEMPORARY_LINK_TOKEN_EXPIRY))/1000),// 1 hour
         };
         const jwtString = jwt.sign(jwtObj, process.env.JWT_KEY);
+        
+        console.log(jwtString);
         const emailLink = process.env.URL_ORIGIN + 
-            '/password-reset?username=' + user.username // the username here is only display purposes on the front-end
+            '/password-reset?username=' + user.username + // the username here is only display purposes on the front-end
             '&auth=' + jwtString;
-        res.status(404).send({message: 'Email service not set up'});
         console.log(emailLink);
+        console.log('Email service not set up!!!!!!!!!!!!!!!!!!!!!!');
         // When the user clicks on the link, the app pulls the JWT from the link 
         // and stores it in the JWT_TEMP_AUTH cookie
       })
-      .catch(() => {
+      .catch((err) => {
+        console.log(err);
         res.status(500).send({message:'Error accessing user database.'})
       });
 }
@@ -217,10 +219,11 @@ function forgotUsername(req, res) {
             return;
           }
           const usernames = users.map(user => user.username);
-
-          res.status(404).send({message: 'Email service not set up'});
+          
           console.log(usernames);
-          // send all user names to email
+          console.log('Email service not set up!!!!!!!!!!!!!!!!!!!!!!');
+          // send all user names to email   
+          // process.env.URL_ORIGIN
           // return emailService.send({emailAddress: req.body.email, data: usernames})
           //     .catch(() => {
           //     });
