@@ -333,41 +333,20 @@ export class SendZeroService {
       data: metadata,
     });
     this.ref.tick();
-    dialogRef.beforeClose().subscribe(() => {
-      console.log('1');
-      this.ref.tick();
-    })
     dialogRef.afterClosed().subscribe(result => {
-      this.ref.tick();
-      console.log('2');
       if (result === true) {
-        console.log('3');
+        this.peer.send('File Accepted');
         this.fileReadyForDownload = false;
         // Set up maxFileChunks for expected file - we do this for the progress
         // element
         this.maxFileChunks = metadata.numberOfChunks;
-        console.log('4');
-        this.ref.tick();
-        console.log('5');
-        this.peer.send('File Accepted');
-        console.log('6');
       } else {
-        console.log('7');
+        this.peer.send('File Declined');
         // Clear state variables
         this.resetReceiveVariables();
-        console.log('8');
-        this.peer.send('File Declined');
-        console.log('9');
       }
-      console.log('10');
-      this.ref.tick();
-      console.log('11');
     })
-    console.log('12');
-    this.ref.tick();
-    console.log('13');
   }
-
 }
 
 // Connection dialog component
@@ -397,11 +376,19 @@ export class ConnectionDialog {
       File Size: {{data.fileSize | byteFormat}}
     </mat-dialog-content>
     <mat-dialog-actions>
-    <button mat-raised-button [mat-dialog-close]="true" cdkFocusInitial color='primary'>Yes</button>
-    <button mat-raised-button [mat-dialog-close]="false" color='warn'>No</button>
+    <button mat-raised-button (click)="closeDialog(true)" cdkFocusInitial color='primary'>Yes</button>
+    <button mat-raised-button (click)="closeDialog(false)" color='warn'>No</button>
     </mat-dialog-actions>`,
 })
 export class ReceiveFileDialog {
-  constructor(@Inject(MAT_DIALOG_DATA) public data: any) { }
+  constructor(private dialogRef: MatDialogRef<ReceiveFileDialog>,
+              private ref: ApplicationRef, 
+              @Inject(MAT_DIALOG_DATA) public data: any) { 
+  }
+  
+  public closeDialog(result: boolean): void {
+    this.dialogRef.close(result);
+    this.ref.tick();
+  }
 }
 
