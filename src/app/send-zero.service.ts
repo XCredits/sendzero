@@ -309,6 +309,7 @@ export class SendZeroService {
   // In case we get id from URL
   public setPeerId(id: string): void {
     this.peerId = id;
+    this.ref.tick();
   }
 
   public getPeerId(): string {
