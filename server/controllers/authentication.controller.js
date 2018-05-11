@@ -158,7 +158,7 @@ function requestResetPassword(req, res) {
         // Success object must be identical, to avoid people discovering emails in the system
         const successObject = {message: 'Email sent if users found in database.'}
         res.send(successObject); // Note that if errors in sending emails occur, the front end will not see them
-        if (!users) {
+        if (!user) {
           return;
         }
         var xsrf;
