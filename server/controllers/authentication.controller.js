@@ -166,7 +166,6 @@ function requestResetPassword(req, res) {
           xsrf = req.header('X-XSRF-TOKEN')
         } else {
           xsrf = crypto.randomBytes(8).toString('hex');
-          res.cookie('XSRF-TOKEN', xsrf, {secure: !process.env.IS_LOCAL});
         }
         const jwtObj = {
           sub: user._id,
@@ -177,8 +176,10 @@ function requestResetPassword(req, res) {
               (Date.now() + Number(process.env.JWT_TEMPORARY_LINK_TOKEN_EXPIRY))/1000),// 1 hour
         };
         const jwtString = jwt.sign(jwtObj, process.env.JWT_KEY);
+        
+        console.log(jwtString);
         const emailLink = process.env.URL_ORIGIN + 
-            '/password-reset?username=' + user.username // the username here is only display purposes on the front-end
+            '/password-reset?username=' + user.username + // the username here is only display purposes on the front-end
             '&auth=' + jwtString;
         console.log(emailLink);
         console.log('Email service not set up!!!!!!!!!!!!!!!!!!!!!!');
