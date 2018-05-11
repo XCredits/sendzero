@@ -10,6 +10,9 @@ import { UserService } from '../user.service';
 })
 export class LoginComponent implements OnInit {
   form: FormGroup;
+  submitSuccess = false;
+  waiting = false;
+  formErrorMessage: string;
 
   constructor( private http: HttpClient,
     private userService: UserService ) { }
@@ -25,14 +28,22 @@ export class LoginComponent implements OnInit {
     if (this.form.invalid) {
       return;
     }
+    // Clear state from previous submissions
+    this.formErrorMessage = undefined;
+
+    this.waiting = true;
     this.http.post('/api/user/login', {
         'username': formData.username,
         'password': formData.password,
         })
         .subscribe(data => {
-          console.log('login returned');
+          this.waiting = false;
           this.userService.storeUser(data);
           this.userService.successNavigate();
+        },
+        errorResponse => {
+          this.waiting = false;
+          this.formErrorMessage = 'There was a problem submitting the form.';
         });
   };
 }

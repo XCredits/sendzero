@@ -10,6 +10,8 @@ import { UserService } from '../user.service';
 })
 export class RegisterComponent implements OnInit {
   form: FormGroup;
+  submitSuccess = false;
+  waiting = false;
   formErrorMessage: string;
 
   constructor( private http: HttpClient,
@@ -30,6 +32,10 @@ export class RegisterComponent implements OnInit {
     if (this.form.invalid) {
       return;
     }
+    // Clear state from previous submissions
+    this.formErrorMessage = undefined;
+
+    this.waiting = true;
     this.http.post('/api/user/register', {
         'givenName': formData.givenName,
         'familyName': formData.familyName,
@@ -39,10 +45,12 @@ export class RegisterComponent implements OnInit {
         })
         .subscribe(
             data => {
+              this.waiting = false;
               this.userService.storeUser(data);
               this.userService.successNavigate();
             },
             errorResponse => {
+              this.waiting = false;
               if (errorResponse.status === 409) {
                 this.formErrorMessage = errorResponse.error.message;
                 this.form.controls['username'].setErrors({'incorrect': true});
