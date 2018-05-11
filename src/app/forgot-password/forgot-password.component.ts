@@ -22,15 +22,15 @@ export class ForgotPasswordComponent implements OnInit {
   }
 
   submit(formData) {
-    this.submitSuccess = true;
     if (this.form.invalid) {
       return;
     }
     console.log(this.form.get('username').value);
-    this.http.post('/api/user/forgot-password', {
+    this.http.post('/api/user/request-reset-password', {
           'username': formData.username,
         })
         .subscribe(data => {
+          this.submitSuccess = true;
           console.log('Forgot password success.');
         });
   }
