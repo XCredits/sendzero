@@ -4,11 +4,11 @@ import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { UserService } from '../user.service';
 
 @Component({
-  selector: 'app-login',
-  templateUrl: './login.component.html',
-  styleUrls: ['./login.component.scss']
+  selector: 'app-forgot-username',
+  templateUrl: './forgot-username.component.html',
+  styleUrls: ['./forgot-username.component.scss']
 })
-export class LoginComponent implements OnInit {
+export class ForgotUsernameComponent implements OnInit {
   form: FormGroup;
   submitSuccess = false;
   waiting = false;
@@ -19,12 +19,11 @@ export class LoginComponent implements OnInit {
 
   ngOnInit() {
     this.form = new FormGroup ({
-      username: new FormControl('', [<any>Validators.required]),
-      password: new FormControl('', [<any>Validators.required]),
+      email: new FormControl('', [Validators.required, Validators.email]),
     });
   }
 
-  submit = function (formData) {
+  submit(formData) {
     if (this.form.invalid) {
       return;
     }
@@ -32,18 +31,16 @@ export class LoginComponent implements OnInit {
     this.formErrorMessage = undefined;
 
     this.waiting = true;
-    this.http.post('/api/user/login', {
-        'username': formData.username,
-        'password': formData.password,
+    this.http.post('/api/user/forgot-username', {
+          'email': formData.email,
         })
         .subscribe(data => {
           this.waiting = false;
-          this.userService.storeUser(data);
-          this.userService.successNavigate();
+          this.submitSuccess = true;
         },
         errorResponse => {
           this.waiting = false;
           this.formErrorMessage = 'There was a problem submitting the form.';
         });
-  };
+  }
 }

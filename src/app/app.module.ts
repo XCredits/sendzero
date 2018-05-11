@@ -60,6 +60,7 @@ import { ContactsComponent } from './contacts/contacts.component';
 import { AboutComponent } from './about/about.component';
 import { LoginComponent } from './login/login.component';
 import { ForgotPasswordComponent } from './forgot-password/forgot-password.component';
+import { ForgotUsernameComponent } from './forgot-username/forgot-username.component';
 import { RegisterComponent } from './register/register.component';
 import { MailingListComponent } from './mailing-list/mailing-list.component';
 import { ProfileComponent } from './profile/profile.component';
@@ -77,6 +78,7 @@ import { UserDropdownComponent } from './user-dropdown/user-dropdown.component';
     AboutComponent,
     LoginComponent,
     ForgotPasswordComponent,
+    ForgotUsernameComponent,
     RegisterComponent,
     MailingListComponent,
     ProfileComponent,
@@ -132,6 +134,11 @@ import { UserDropdownComponent } from './user-dropdown/user-dropdown.component';
         path: 'forgot-password',
         component: ForgotPasswordComponent,
         data: { title: 'Forgot Password' },
+      },
+      {
+        path: 'forgot-username',
+        component: ForgotUsernameComponent,
+        data: { title: 'Forgot Username' },
       },
       {
         path: 'register',
