@@ -11,7 +11,7 @@ import { UserService } from '../user.service';
 export class LoginComponent implements OnInit {
   form: FormGroup;
 
-  constructor( private http: HttpClient, 
+  constructor( private http: HttpClient,
     private userService: UserService ) { }
 
   ngOnInit() {

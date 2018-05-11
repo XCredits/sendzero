@@ -27,8 +27,19 @@
           </mat-form-field>
           <br>
           <section>
-            <button class="simple-form-button" color="primary" mat-raised-button type="submit" value="submit">Submit</button>
-            <span *ngIf='formErrorMessage' class="text-error-color">{{formErrorMessage}}</span>
+            <button
+                class="simple-form-button"
+                color="primary"
+                mat-raised-button
+                type="submit"
+                value="submit">
+              Submit
+            </button>
+            <span 
+                *ngIf='formErrorMessage'
+                class="text-error-color">
+              {{formErrorMessage}}
+            </span>
           </section>
         </div>
         </form>
