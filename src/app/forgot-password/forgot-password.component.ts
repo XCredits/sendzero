@@ -10,6 +10,7 @@ import { UserService } from '../user.service';
 })
 export class ForgotPasswordComponent implements OnInit {
   form: FormGroup;
+  submitSuccess = false;
 
   constructor( private http: HttpClient,
     private userService: UserService ) { }
@@ -20,15 +21,17 @@ export class ForgotPasswordComponent implements OnInit {
     });
   }
 
-  submit = function (formData) {
+  submit(formData) {
+    this.submitSuccess = true;
     if (this.form.invalid) {
       return;
     }
+    console.log(this.form.get('username').value);
     this.http.post('/api/user/forgot-password', {
           'username': formData.username,
         })
         .subscribe(data => {
           console.log('Forgot password success.');
         });
-  };
+  }
 }
