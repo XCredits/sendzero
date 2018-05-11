@@ -1,16 +1,18 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { DomSanitizer } from '@angular/platform-browser';
 import { Router, ActivatedRoute } from '@angular/router';
-import { Observable, Subscription } from 'rxjs';
+import { Observable } from 'rxjs/Observable';
+import { Subscription } from 'rxjs/Subscription';
 import { SendZeroService } from '../send-zero.service';
 import { FormGroup, FormControl } from '@angular/forms';
+import { OnDestroy } from '@angular/core/src/metadata/lifecycle_hooks';
 
 @Component({
   selector: 'app-home',
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.scss']
 })
-export class HomeComponent implements OnInit {
+export class HomeComponent implements OnInit, OnDestroy {
 
   // Typed defintions
   title: string;
@@ -27,20 +29,22 @@ export class HomeComponent implements OnInit {
     this.title = 'SendZero Alpha';
     this.fileForm = new FormGroup({
       selectFile: new FormControl(),
-    })
-    var self = this;
+    });
+    const self = this;
   }
 
   sendFile(): void {
-    let fileInput = this.fileForm.get('selectFile').value;
-    if (!fileInput || !fileInput.files[0]) return;
+    const fileInput = this.fileForm.get('selectFile').value;
+    if (!fileInput || !fileInput.files[0]) {
+     return;
+    }
     this.sendZeroService.sendFile(fileInput.files[0]);
   }
 
   ngOnInit(): void {
     this.sendZeroService.init();
     this.sub = this.route.queryParams.subscribe(params => {
-        this.peerId = params['id'] || "";
+        this.peerId = params['id'] || '';
         if (this.peerId.length > 0) {
           this.sendZeroService.setPeerId(this.peerId);
         }

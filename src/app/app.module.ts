@@ -5,13 +5,13 @@ import { HttpClientModule} from '@angular/common/http'; // Deprecation https://a
 import { RouterModule } from '@angular/router';
 import { AppComponent } from './app.component';
 
-// 
+//
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 // import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
 import { AngularFontAwesomeModule } from 'angular-font-awesome';
 
-// Material modules 
-import { 
+// Material modules
+import {
   MatAutocompleteModule,
   MatButtonModule,
   MatButtonToggleModule,
@@ -65,7 +65,7 @@ import { RegisterComponent } from './register/register.component';
 import { MailingListComponent } from './mailing-list/mailing-list.component';
 
 // Services
-import { SendZeroService, ConnectionDialog, ReceiveFileDialog } from './send-zero.service';
+import { SendZeroService, ConnectionDialogComponent, ReceiveFileDialogComponent } from './send-zero.service';
 
 
 @NgModule({
@@ -81,11 +81,11 @@ import { SendZeroService, ConnectionDialog, ReceiveFileDialog } from './send-zer
     LoginComponent,
     RegisterComponent,
     MailingListComponent,
-    ConnectionDialog,
-    ReceiveFileDialog
+    ConnectionDialogComponent,
+    ReceiveFileDialogComponent
   ],
   imports: [
-    BrowserModule, 
+    BrowserModule,
     FormsModule,
     ReactiveFormsModule ,
     HttpClientModule,
@@ -131,12 +131,12 @@ import { SendZeroService, ConnectionDialog, ReceiveFileDialog } from './send-zer
         data: { title: 'Register' },
       },
       { // Default route
-        path: '', 
-        redirectTo: '/home', 
+        path: '',
+        redirectTo: '/home',
         pathMatch: 'full',
       },
-      { 
-        path: '**', 
+      {
+        path: '**',
         component: PageNotFoundComponent,
         data: { title: 'Page Not Found' },
       },
@@ -145,8 +145,8 @@ import { SendZeroService, ConnectionDialog, ReceiveFileDialog } from './send-zer
     BrowserAnimationsModule,
     // NgbModule,
     AngularFontAwesomeModule,
-    
-    // Material modules 
+
+    // Material modules
     MatAutocompleteModule,
     MatButtonModule,
     MatButtonToggleModule,
@@ -182,13 +182,13 @@ import { SendZeroService, ConnectionDialog, ReceiveFileDialog } from './send-zer
     MaterialFileInputModule,
 
     // Below is for Progressive Web App (PWA) functionality
-    ServiceWorkerModule.register('/ngsw-worker.js', 
+    ServiceWorkerModule.register('/ngsw-worker.js',
         {enabled: environment.production})
   ],
   // For dialogs
   entryComponents: [
-    ConnectionDialog,
-    ReceiveFileDialog
+    ConnectionDialogComponent,
+    ReceiveFileDialogComponent
   ],
   providers: [
     SendZeroService,
