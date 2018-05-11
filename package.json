@@ -30,6 +30,7 @@
     "@angular/router": "^5.2.0",
     "@angular/service-worker": "^5.2.9",
     "@ng-bootstrap/ng-bootstrap": "^1.1.2",
+    "@types/jwt-decode": "^2.2.1",
     "@types/lodash": "^4.14.106",
     "angular-font-awesome": "^3.1.2",
     "bcrypt": "^2.0.1",

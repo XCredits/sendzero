@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { UserService } from '../user.service';
+import * as jwtDecode from 'jwt-decode';
 
 @Component({
   selector: 'app-reset-password',
@@ -21,6 +22,8 @@ export class ResetPasswordComponent implements OnInit {
     this.form = new FormGroup ({
       username: new FormControl('', [<any>Validators.required]),
     });
+    console.log('Attempting decode');
+    console.log(jwtDecode('eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI1YWVkNTM3NGQwMzQ1ZDJiZDZjN2M5NTkiLCJqdGkiOiJkZTZmNDUwOWEzODliZTQ2IiwidXNlcm5hbWUiOiJhMSIsInhzcmYiOiIzMTBmMzNmZDhhOTA0YWYxIiwiZXhwIjoxNTI1NzgyNjE2LCJpYXQiOjE1MjU1MDI4MzZ9.uQ_IIfkNISFuc4-EU9g4Zdu1Fp3luh50TVPNu3dy1gE'));
   }
 
   submit(formData) {
