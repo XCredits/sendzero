@@ -12,6 +12,7 @@ export class ForgotPasswordComponent implements OnInit {
   form: FormGroup;
   submitSuccess = false;
   waiting = false;
+  formErrorMessage: string;
 
   constructor( private http: HttpClient,
     private userService: UserService ) { }
@@ -28,6 +29,7 @@ export class ForgotPasswordComponent implements OnInit {
     }
     console.log(this.form.get('username').value);
     // Clear state from previous submissions
+    this.formErrorMessage = undefined;
 
     this.waiting = true;
     this.http.post('/api/user/request-reset-password', {
@@ -37,6 +39,10 @@ export class ForgotPasswordComponent implements OnInit {
           this.waiting = false;
           this.submitSuccess = true;
           console.log('Forgot password success.');
+        },
+        errorResponse => {
+          this.waiting = false;
+          this.formErrorMessage = 'There was a problem submitting the form.';
         });
   }
 }
