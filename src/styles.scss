@@ -37,3 +37,28 @@ body {
     display: none;
   }
 }
+
+// Simple form styles
+.simple-form-aligner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+}
+
+.simple-form-card {
+  width:400px;
+  max-width: 100%;
+}
+
+.simple-form-button {
+  align-self: flex-end;
+}
+
+.simple-form-field-100 {
+  width: 100%;
+}
+
+.simple-form-field-50 {
+  width: 49%;
+}
