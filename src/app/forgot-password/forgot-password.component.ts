@@ -11,6 +11,7 @@ import { UserService } from '../user.service';
 export class ForgotPasswordComponent implements OnInit {
   form: FormGroup;
   submitSuccess = false;
+  waiting = false;
 
   constructor( private http: HttpClient,
     private userService: UserService ) { }
@@ -26,10 +27,14 @@ export class ForgotPasswordComponent implements OnInit {
       return;
     }
     console.log(this.form.get('username').value);
+    // Clear state from previous submissions
+
+    this.waiting = true;
     this.http.post('/api/user/request-reset-password', {
           'username': formData.username,
         })
         .subscribe(data => {
+          this.waiting = false;
           this.submitSuccess = true;
           console.log('Forgot password success.');
         });
