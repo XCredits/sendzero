@@ -16,18 +16,20 @@ export class ResetPasswordComponent implements OnInit {
   waiting = false;
   formErrorMessage: string;
   username: string;
-  jwt: any;
+  jwt: string;
+  jwtDecoded: any;
 
   constructor( private http: HttpClient,
     private userService: UserService,
     private activatedRoute: ActivatedRoute) {
       activatedRoute.queryParamMap
           .subscribe(paramMap => {
-            this.username = paramMap.params.username;
+            this.username = paramMap.get('username');
+            this.jwt = paramMap.get('jwt');
             try {
-              this.jwt = jwtDecode(paramMap.params.auth);
+              this.jwtDecoded = jwtDecode(this.jwt);
             } catch {
-              this.formErrorMessage = 'Link does not work (authorisation string not valid).';
+              return this.formErrorMessage = 'Link does not work (authorisation string not valid).';
             }
           });
   }
@@ -36,10 +38,6 @@ export class ResetPasswordComponent implements OnInit {
     this.form = new FormGroup ({
       password: new FormControl('', [<any>Validators.required]),
     });
-    // get queryParamMap: Observable<ParamMap>
-    // https://angular.io/api/router/ActivatedRoute
-    console.log('Attempting decode');
-    console.log(jwtDecode('eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI1YWVkNTM3NGQwMzQ1ZDJiZDZjN2M5NTkiLCJqdGkiOiJkZTZmNDUwOWEzODliZTQ2IiwidXNlcm5hbWUiOiJhMSIsInhzcmYiOiIzMTBmMzNmZDhhOTA0YWYxIiwiZXhwIjoxNTI1NzgyNjE2LCJpYXQiOjE1MjU1MDI4MzZ9.uQ_IIfkNISFuc4-EU9g4Zdu1Fp3luh50TVPNu3dy1gE'));
   }
 
   submit(formData) {
@@ -52,6 +50,7 @@ export class ResetPasswordComponent implements OnInit {
     this.waiting = true;
     this.http.post('/api/user/reset-password', {
           'password': formData.password,
+          'jwt': this.jwt,
         })
         .subscribe(data => {
           this.waiting = false;
