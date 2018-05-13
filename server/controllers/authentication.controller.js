@@ -49,6 +49,8 @@ const passport = require('passport');
 const crypto = require('crypto');
 require('../config/passport.js');
 
+// const emailController = 
+
 module.exports = function (app) {
   app.use(passport.initialize());
   app.post('/api/user/register', register);
@@ -161,30 +163,22 @@ function requestResetPassword(req, res) {
         if (!user) {
           return;
         }
-        var xsrf;
-        if (req.header('X-XSRF-TOKEN')){ //Use existing XSRF if it exists
-          xsrf = req.header('X-XSRF-TOKEN')
-        } else {
-          xsrf = crypto.randomBytes(8).toString('hex');
-        }
+        // The JWT for request password will NOT be set in the cookie and hence does not require XSRF
         const jwtObj = {
           sub: user._id,
           username: user.username,
           isAdmin: user.isAdmin,
-          xsrf: xsrf,
           exp: Math.floor(
               (Date.now() + Number(process.env.JWT_TEMPORARY_LINK_TOKEN_EXPIRY))/1000),// 1 hour
         };
         const jwtString = jwt.sign(jwtObj, process.env.JWT_KEY);
-        
-        console.log(jwtString);
         const emailLink = process.env.URL_ORIGIN + 
             '/password-reset?username=' + user.username + // the username here is only display purposes on the front-end
             '&auth=' + jwtString;
         console.log(emailLink);
         console.log('Email service not set up!!!!!!!!!!!!!!!!!!!!!!');
-        // When the user clicks on the link, the app pulls the JWT from the link 
-        // and stores it in the JWT_TEMP_AUTH cookie
+        // When the user clicks on the link, the app pulls the JWT from the link
+        // and stores it in the component
       })
       .catch((err) => {
         console.log(err);
