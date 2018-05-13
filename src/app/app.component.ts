@@ -1,7 +1,9 @@
+
+import {filter} from 'rxjs/operators/filter';
 import { Component, ViewChild } from '@angular/core';
 // Imports needed for router import for title
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
-import 'rxjs/add/operator/filter';
+
 
 @Component({
   selector: 'app-root',
@@ -87,8 +89,8 @@ export class AppComponent {
     };
 
 
-    router.events
-      .filter(e => e instanceof NavigationEnd)
+    router.events.pipe(
+      filter(e => e instanceof NavigationEnd))
       .forEach(e => {
         this.title = route.root.firstChild.snapshot.data['title'];
       });
