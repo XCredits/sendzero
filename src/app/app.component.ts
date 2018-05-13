@@ -1,5 +1,5 @@
 
-import {filter} from 'rxjs/operators/filter';
+import {filter} from 'rxjs/operators';
 import { Component, ViewChild } from '@angular/core';
 // Imports needed for router import for title
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
