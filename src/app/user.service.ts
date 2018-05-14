@@ -111,6 +111,7 @@ export class UserService {
         this.userObservable.next(this.user);
       }
     }
+    clearTimeout(this.refreshUserTimeoutId);
     this.refreshUserTimeoutId =
         setTimeout(function() { self.userChecker(); }, 1000);
   }
@@ -124,6 +125,7 @@ export class UserService {
 
     // If another tab is checking, wait for a response
     if (isRefreshing) { // currently checking, come back soon, say 1 second
+      clearTimeout(this.refreshJwtTimeoutId);
       this.refreshJwtTimeoutId =
           setTimeout(function() { self.refreshJwt(); }, 1000);
       return;
