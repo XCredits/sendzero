@@ -19,7 +19,10 @@ export class UserDropdownComponent implements OnInit {
     this.userService.userObservable
         .subscribe(user => {
           this.user = user;
-          this.isLoggedIn = this.userService.isLoggedIn();
+          this.userService.isLoggedInObservable
+              .subscribe(isLoggedIn => {
+                this.isLoggedIn = isLoggedIn;
+              });
         });
   }
 
