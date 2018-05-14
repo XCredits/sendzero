@@ -72,8 +72,8 @@ export class UserService {
     this.jwtExp = jwtExp;
     this.jwtRefreshTokenExp = jwtRefreshTokenExp;
 
-    this.localStorageService.add('user-service-jwt-exp', this.jwtExp);
-    this.localStorageService.add('user-service-jwt-refresh-token-exp',
+    this.localStorageService.set('user-service-jwt-exp', this.jwtExp);
+    this.localStorageService.set('user-service-jwt-refresh-token-exp',
         this.jwtRefreshTokenExp);
 
     this.isLoggedInObservable.next(true);
@@ -90,8 +90,8 @@ export class UserService {
       this.user = user;
       this.userSetTime = Date.now();
       // Store user in local storage
-      this.localStorageService.add('user-service-user', this.user);
-      this.localStorageService.add('user-service-user-set-time', this.userSetTime);
+      this.localStorageService.set('user-service-user', this.user);
+      this.localStorageService.set('user-service-user-set-time', this.userSetTime);
 
       this.userObservable.next(this.user);
     }
@@ -144,13 +144,13 @@ export class UserService {
     }
 
     // If this happens to be the lucky app that is refreshing
-    this.localStorageService.add('user-service-is-refreshing', true);
+    this.localStorageService.set('user-service-is-refreshing', true);
     this.http.get<any>('/api/user/refresh-jwt')
         .subscribe(
         response => {
           this.isLoggedInObservable.next(true);
           this.jwtExp = response.jwtExp;
-          this.localStorageService.add('user-service-jwt-exp', this.jwtExp);
+          this.localStorageService.set('user-service-jwt-exp', this.jwtExp);
           this.localStorageService.remove('user-service-is-refreshing');
 
           this._setRefreshJwt();
