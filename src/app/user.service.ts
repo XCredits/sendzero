@@ -113,7 +113,7 @@ export class UserService {
         Number(this.localStorageService.get('user-service-jwt-exp'));
     if (this.jwtExp && lsJwtExp > this.jwtExp) {
       this.jwtExp = lsJwtExp;
-      this._refreshSet();
+      this._setRefreshJwt();
     }
 
     // If this happens to be one lucky app
@@ -123,7 +123,7 @@ export class UserService {
           this.localStorageService.add('user-service-jwt-exp', this.jwtExp);
           this.localStorageService.remove('user-service-is-refreshing');
 
-          this._refreshSet();
+          this._setRefreshJwt();
         });
         // On failure (unauthenticated), directs to /login page
         // On failure (timeout), tries again in 10 seconds
@@ -131,7 +131,7 @@ export class UserService {
             // directs to /login page
   }
 
-  private _refreshSet () {
+  private _setRefreshJwt () {
     const self = this;
     // Call a refresh token 15 seconds before expiry
     const refreshTime = (this.jwtExp - 15) * 1000;
