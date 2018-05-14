@@ -40,7 +40,7 @@ export class UserService {
     // HTTP cookie, the front-end can't see the JWT.
     this.jwtRefreshTokenExp =
         this.localStorageService.get('user-service-jwt-refresh-token-exp');
-    if (Date.now() / 1000 < this.jwtRefreshTokenExp) {
+    if (this.jwtRefreshTokenExp && Date.now() / 1000 < this.jwtRefreshTokenExp) {
       this.refreshJwt();
       // TODO: update user needs to wait until after refreshJwt
       this.updateUserDetails();
