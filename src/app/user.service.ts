@@ -115,7 +115,7 @@ export class UserService {
     if (this.jwtExp && lsJwtExp > this.jwtExp) {
       this.jwtExp = lsJwtExp;
       this._setRefreshJwt();
-      // we shouldn't have to update user in this section because it is updated 
+      // we shouldn't have to update user in this section because it is updated
       // elsewhere
       return;
     }
@@ -123,17 +123,21 @@ export class UserService {
     // If this happens to be the lucky app that is refreshing
     this.localStorageService.add('user-service-is-refreshing', true);
     this.http.get<any>('/api/user/refresh-jwt')
-        .subscribe((response) => {
+        .subscribe(response => {
           this.jwtExp = response.jwtExp;
           this.localStorageService.add('user-service-jwt-exp', this.jwtExp);
           this.localStorageService.remove('user-service-is-refreshing');
 
           this._setRefreshJwt();
+        },
+        errorResponse => {
+          // On failure
+          this.localStorageService.remove('user-service-is-refreshing');
+          if (errorResponse.status === 401) {
+            // clear all data jwt and user
+            // call next on user observable
+          }
         });
-        // On failure
-        // this.localStorageService.remove('user-service-is-refreshing');
-        // (unauthenticated), directs to /login page
-        // clear all data jwt and user
         // On failure (timeout), tries again in 10 seconds
             // gives up after 1 minute
             // directs to /login page
@@ -157,7 +161,9 @@ export class UserService {
   }
 
   isLoggedIn() {
-    if (this.user && this.jwtExp > Math.round(Date.now() / 1000)) {
+    if (this.user &&
+        this.jwtExp &&
+        Math.round(Date.now() / 1000) < this.jwtExp) {
       return true;
     } else {
       return false;
