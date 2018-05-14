@@ -107,6 +107,7 @@ export class UserService {
     if (isRefreshing) { // currently checking, come back soon, say 1 second
       this.refreshJwtTimeoutId =
           setTimeout(function() { self.refreshJwt(); }, 1000);
+      return;
     }
     // If the expiry time has changed, update expiry and wait until next time
     const lsJwtExp =
@@ -114,9 +115,12 @@ export class UserService {
     if (this.jwtExp && lsJwtExp > this.jwtExp) {
       this.jwtExp = lsJwtExp;
       this._setRefreshJwt();
+      // we shouldn't have to update user in this section because it is updated 
+      // elsewhere
+      return;
     }
 
-    // If this happens to be one lucky app
+    // If this happens to be the lucky app that is refreshing
     this.http.get<any>('/api/user/refresh-jwt')
         .subscribe((response) => {
           this.jwtExp = response.jwtExp;
