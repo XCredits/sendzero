@@ -43,18 +43,23 @@ export class UserService {
       private localStorageService: LocalStorageService) {
     this.tabId = this._insecureRandomNumber();
 
+    console.log('Starting constructor');
     // Check if user is logged in. Note that because the JWT is stored in the
     // HTTP cookie, the front-end can't see the JWT.
     this.jwtRefreshTokenExp =
         this.localStorageService.get('user-service-jwt-refresh-token-exp');
+
     this.userChecker();
     if (this.jwtRefreshTokenExp &&
         Date.now() / 1000 < this.jwtRefreshTokenExp) {
+
+      console.log('Refresh token found and expires after now');
       this.refreshJwt();
       // Update user waits until after refreshJwt
       this.isLoggedInObservable
           .pipe(take(1))
           .subscribe((isLoggedIn) => {
+            console.log('Decided is logged in');
             if (isLoggedIn) {
               this.updateUserDetails();
             }
@@ -104,6 +109,7 @@ export class UserService {
    *  User is stored in the localstorage
    */
   userChecker() {
+    console.log('userChecker');
     const self = this;
     const lsUserSetTime: number =
         this.localStorageService.get('user-service-user-set-time');
