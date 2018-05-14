@@ -97,9 +97,10 @@ export class UserService {
     }
   }
 
-  // userChecker is a method used to check user across tabs
+  /**
+   *  userChecker is a method used to check user across tabs
+   */
   userChecker () {
-    // setTimeout
     const self = this;
     const lsUserSetTime =
         this.localStorageService.get('user-service-user-set-time');
