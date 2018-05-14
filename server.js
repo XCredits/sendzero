@@ -9,7 +9,8 @@ const http = require('http');
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 
-app.use(bodyParser());
+app.use(bodyParser.urlencoded({ extended: true })); // extended gives full JSON
+app.use(bodyParser.json());
 app.use(cookieParser());
 
 const routes = require('./server/routes');
