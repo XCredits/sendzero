@@ -16,7 +16,8 @@ export class UserService {
   private userSetTime: number; // in milliseconds
   private jwtExp: number; // in seconds
   private jwtRefreshTokenExp: number; // in seconds
-  private refreshTimeoutId: any;
+  private refreshJwtTimeoutId: any;
+  private refreshUserTimeoutId: any;
   private tabId: number;
 
   userObservable: BehaviorSubject<User> = new BehaviorSubject<User>(this.user);
@@ -79,14 +80,21 @@ export class UserService {
   }
 
   // TODO create a checker that sees if the user is updated in local storage
-  // setTimeout
-  // const lsUserSetTime = this.localStorageService.get('user-service-user-set-time');
-  // if this.userSetTime < lsUserSetTime
-  //   this.userSetTime = lsUserSetTime;
-  //   const lsUser = this.localStorageService.get('user-set-time');
-  //   if (!isEqual(this.user, lsUser) {
-  //     this.user = lsUser;
-  //   }
+  userChecker () {
+    // setTimeout
+    const self = this;
+    this.refreshUserTimeoutId =
+        setTimeout(function() { self.userChecker(); }, 1000);
+    const lsUserSetTime = this.localStorageService.get('user-service-user-set-time');
+    if (this.userSetTime < lsUserSetTime) {
+      // this.userSetTime = lsUserSetTime;
+      const lsUser = this.localStorageService.get('user-set-time');
+      if (!isEqual(this.user, lsUser)) {
+        // this.user = lsUser;
+        this.userObservable.next(this.user);
+      }
+    }
+  }
 
   // TODO Separate out the refreshing from refreshing attempt. Make this an
   // observable.
@@ -97,7 +105,7 @@ export class UserService {
 
     // If another tab is checking, wait for a response
     if (isRefreshing) { // currently checking, come back soon, say 1 second
-      this.refreshTimeoutId =
+      this.refreshJwtTimeoutId =
           setTimeout(function() { self.refreshJwt(); }, 1000);
     }
     // If the expiry time has changed, update expiry and wait until next time
@@ -128,8 +136,8 @@ export class UserService {
     // Call a refresh token 15 seconds before expiry
     const refreshTime = (this.jwtExp - 15) * 1000;
     const refreshDuration = refreshTime - Date.now();
-    clearTimeout(this.refreshTimeoutId);
-    this.refreshTimeoutId =
+    clearTimeout(this.refreshJwtTimeoutId);
+    this.refreshJwtTimeoutId =
         setTimeout(function() { self.refreshJwt(); }, refreshDuration);
   }
 
@@ -166,7 +174,7 @@ export class UserService {
           this.user = undefined;
           this.jwtExp = undefined;
           this.jwtRefreshTokenExp = undefined;
-          clearTimeout(this.refreshTimeoutId);
+          clearTimeout(this.refreshJwtTimeoutId);
 
           // TODO clear localstorage
 
