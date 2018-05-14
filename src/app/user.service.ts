@@ -25,11 +25,11 @@ export class UserService {
   nav: NavObj;
 
   // Local storage variables
-  // user-service-jwt-exp
-  // user-service-jwt-refresh-token-exp // a proxy for isLoggedIn
-  // user-service-user
-  // user-service-user-set-time
-  // user-service-is-refreshing
+  // user-service-jwt-exp // <number>
+  // user-service-jwt-refresh-token-exp // <number> a proxy for isLoggedIn
+  // user-service-user // <User>
+  // user-service-user-set-time // <number>, in milliseconds
+  // user-service-is-refreshing // <boolean>
 
   constructor( private http: HttpClient,
       private router: Router,
@@ -121,6 +121,7 @@ export class UserService {
     }
 
     // If this happens to be the lucky app that is refreshing
+    this.localStorageService.add('user-service-is-refreshing', true);
     this.http.get<any>('/api/user/refresh-jwt')
         .subscribe((response) => {
           this.jwtExp = response.jwtExp;
@@ -129,7 +130,10 @@ export class UserService {
 
           this._setRefreshJwt();
         });
-        // On failure (unauthenticated), directs to /login page
+        // On failure
+        // this.localStorageService.remove('user-service-is-refreshing');
+        // (unauthenticated), directs to /login page
+        // clear all data jwt and user
         // On failure (timeout), tries again in 10 seconds
             // gives up after 1 minute
             // directs to /login page
