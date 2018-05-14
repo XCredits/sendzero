@@ -47,6 +47,7 @@ export class UserService {
     // HTTP cookie, the front-end can't see the JWT.
     this.jwtRefreshTokenExp =
         this.localStorageService.get('user-service-jwt-refresh-token-exp');
+    this.userChecker();
     if (this.jwtRefreshTokenExp &&
         Date.now() / 1000 < this.jwtRefreshTokenExp) {
       this.refreshJwt();
@@ -91,7 +92,8 @@ export class UserService {
       this.userSetTime = Date.now();
       // Store user in local storage
       this.localStorageService.set('user-service-user', this.user);
-      this.localStorageService.set('user-service-user-set-time', this.userSetTime);
+      this.localStorageService.set('user-service-user-set-time',
+          this.userSetTime);
 
       this.userObservable.next(this.user);
     }
@@ -99,16 +101,17 @@ export class UserService {
 
   /**
    *  userChecker is a method used to check user across tabs
+   *  User is stored in the localstorage
    */
-  userChecker () {
+  userChecker() {
     const self = this;
-    const lsUserSetTime =
+    const lsUserSetTime: number =
         this.localStorageService.get('user-service-user-set-time');
-    if (this.userSetTime < lsUserSetTime) {
-      // this.userSetTime = lsUserSetTime;
+    if (this.userSetTime !== lsUserSetTime) {
       const lsUser: User = this.localStorageService.get('user-service-user');
-      if (lsUser && !isEqual(this.user, lsUser)) {
+      if (!isEqual(this.user, lsUser)) {
         this.user = lsUser;
+        this.userSetTime = lsUserSetTime;
         this.userObservable.next(this.user);
       }
     }
