@@ -47,7 +47,8 @@ export class UserService {
     // HTTP cookie, the front-end can't see the JWT.
     this.jwtRefreshTokenExp =
         this.localStorageService.get('user-service-jwt-refresh-token-exp');
-    if (this.jwtRefreshTokenExp && Date.now() / 1000 < this.jwtRefreshTokenExp) {
+    if (this.jwtRefreshTokenExp &&
+        Date.now() / 1000 < this.jwtRefreshTokenExp) {
       this.refreshJwt();
       // Update user waits until after refreshJwt
       this.isLoggedInObservable
@@ -74,6 +75,8 @@ export class UserService {
     this.localStorageService.add('user-service-jwt-exp', this.jwtExp);
     this.localStorageService.add('user-service-jwt-refresh-token-exp',
         this.jwtRefreshTokenExp);
+
+    this.isLoggedInObservable.next(true);
 
     this._setUser(user);
   }
@@ -102,7 +105,7 @@ export class UserService {
         this.localStorageService.get('user-service-user-set-time');
     if (this.userSetTime < lsUserSetTime) {
       // this.userSetTime = lsUserSetTime;
-      const lsUser: User = this.localStorageService.get('user-set-time');
+      const lsUser: User = this.localStorageService.get('user-service-user');
       if (lsUser && !isEqual(this.user, lsUser)) {
         this.user = lsUser;
         this.userObservable.next(this.user);
