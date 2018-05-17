@@ -10,6 +10,8 @@ import { LocalStorageService } from 'angular-2-local-storage';
 // https://www.youtube.com/watch?v=WveRq-tlb6I
 // https://www.youtube.com/watch?v=wswK6AzgvTE
 
+const routeAfterLogout = '/';
+
 @Injectable()
 export class UserService {
 
@@ -20,15 +22,12 @@ export class UserService {
   private refreshJwtTimeoutId: any;
   private refreshUserTimeoutId: any;
   private tabId: number;
-  private _isLoggedIn: boolean;
   private refreshJwtAttempts: number;
 
   // Below we only only activate the subscribe after userObservable has
   // next called. The '1' refers to how many states are kept in the buffer to be
   // replay for the subscription.
   userObservable: Subject<User> = new ReplaySubject<User>(1);
-
-  isLoggedInObservable: Subject<boolean> = new ReplaySubject<boolean>(1);
 
   nav: NavObj;
 
@@ -44,7 +43,6 @@ export class UserService {
       private localStorageService: LocalStorageService) {
     this.tabId = this._insecureRandomNumber();
 
-    console.log('Starting constructor');
     // Check if user is logged in. Note that because the JWT is stored in the
     // HTTP cookie, the front-end can't see the JWT.
     this.jwtRefreshTokenExp =
@@ -53,8 +51,6 @@ export class UserService {
     this.userLocalStorageChecker();
     if (this.jwtRefreshTokenExp &&
         Date.now() / 1000 < this.jwtRefreshTokenExp) {
-
-      console.log('Refresh token found and expires after now');
       this.checkThenRefreshJwt();
     } else {
       this.userObservable.next(undefined);
@@ -102,7 +98,6 @@ export class UserService {
    *  User is stored in the localstorage
    */
   userLocalStorageChecker() {
-    console.log('userLocalStorageChecker');
     const self = this;
     this.compareUserLsUserThenUpdate();
     clearTimeout(this.refreshUserTimeoutId);
@@ -110,8 +105,7 @@ export class UserService {
         setTimeout(function() { self.userLocalStorageChecker(); }, 1000);
   }
 
-  // TODO Separate out the refreshing from refreshing attempt. Make this an
-  // observable.
+
   checkThenRefreshJwt() {
     const self = this;
     const isRefreshing =
@@ -143,7 +137,6 @@ export class UserService {
     this.http.get<any>('/api/user/refresh-jwt')
         .subscribe(
         response => {
-          this.isLoggedInObservable.next(true);
           this.jwtExp = response.jwtExp;
           this.localStorageService.set('user-service-jwt-exp', this.jwtExp);
           this.localStorageService.remove('user-service-is-refreshing');
@@ -180,6 +173,9 @@ export class UserService {
         });
   }
 
+  /**
+   * Sets the timeout on the JWT
+   */
   private _setRefreshJwt () {
     const self = this;
     // Call a refresh token 15 seconds before expiry
@@ -190,6 +186,10 @@ export class UserService {
         setTimeout(function() { self.checkThenRefreshJwt(); }, refreshDuration);
   }
 
+  /**
+   * Determines if the user has changed. If the user has changed, then the user
+   * is updated, and an observable is fired.
+   */
   private compareUserLsUserThenUpdate() {
     const lsUserSetTime: number =
         this.localStorageService.get('user-service-user-set-time');
@@ -210,15 +210,6 @@ export class UserService {
         });
   }
 
-  isLoggedIn() {
-    if (this.user &&
-        this.jwtExp &&
-        Math.round(Date.now() / 1000) < this.jwtExp) {
-      return true;
-    } else {
-      return false;
-    }
-  }
 
   successNavigate(defaultNav) {
     if (this.nav) {
@@ -261,7 +252,7 @@ export class UserService {
     this.userObservable.next(undefined);
 
     // go to default location
-    this.router.navigateByUrl('/');
+    this.router.navigateByUrl(routeAfterLogout);
   }
 
   private _insecureRandomNumber() {
