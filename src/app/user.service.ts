@@ -41,7 +41,6 @@ export class UserService {
   constructor( private http: HttpClient,
       private router: Router,
       private localStorageService: LocalStorageService) {
-    this.tabId = this._insecureRandomNumber();
 
     // Check if user is logged in. Note that because the JWT is stored in the
     // HTTP cookie, the front-end can't see the JWT.
@@ -253,10 +252,6 @@ export class UserService {
 
     // go to default location
     this.router.navigateByUrl(routeAfterLogout);
-  }
-
-  private _insecureRandomNumber() {
-    return Math.floor(1000000000000 * Math.random());
   }
 }
 
