@@ -170,6 +170,10 @@ export class SendZeroService {
         this.fileArrayOffset = CHUNK_SIZE;
         this.receivedChunks++;
         this.ref.tick();
+        // If we had a file < 60kb, we only got one chunk, so exit now.
+        if (this.maxFileChunks === 1) {
+          this.makeBlob();
+        }
       } else if (this.receivedChunks < this.maxFileChunks - 1) {
         this.fileArray.set(data, this.fileArrayOffset);
         this.fileArrayOffset += CHUNK_SIZE;
