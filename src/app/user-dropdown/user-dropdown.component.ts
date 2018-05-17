@@ -16,11 +16,12 @@ export class UserDropdownComponent implements OnInit {
   constructor(private userService: UserService) { }
 
   ngOnInit() {
-    this.isLoggedIn = true;
     this.userService.userObservable
         .subscribe(user => {
+          console.log('Got into user observable');
+          console.log(user);
           this.user = user;
-          this.isLoggedIn = this.userService.isLoggedIn();
+          this.isLoggedIn = !!this.user;
         });
   }
 

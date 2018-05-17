@@ -46,7 +46,7 @@ export class RegisterComponent implements OnInit {
         .subscribe(
             data => {
               this.waiting = false;
-              this.userService.storeUser(data);
+              this.userService.authenticationResult(data);
               this.userService.successNavigate();
             },
             errorResponse => {
