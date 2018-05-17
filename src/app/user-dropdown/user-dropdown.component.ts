@@ -21,11 +21,13 @@ export class UserDropdownComponent implements OnInit {
           console.log('Got into user observable');
           console.log(user);
           this.user = user;
-          this.userService.isLoggedInObservable
-              .subscribe(isLoggedIn => {
-                this.isLoggedIn = isLoggedIn;
-              });
+          this.isLoggedIn = !!this.user;
         });
+
+    // this.userService.isLoggedInObservable
+    //     .subscribe(isLoggedIn => {
+    //       this.isLoggedIn = isLoggedIn;
+    //     });
   }
 
   logout() {
