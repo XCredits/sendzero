@@ -21,12 +21,13 @@ export class UserService {
   private refreshUserTimeoutId: any;
   private tabId: number;
   private _isLoggedIn: boolean;
+  private refreshJwtAttempts: number;
 
-  userObservable: Subject<User> = new ReplaySubject<User>(1);
-
-  // Below we only only activate the subscribe after isLoggedInObservable has
+  // Below we only only activate the subscribe after userObservable has
   // next called. The '1' refers to how many states are kept in the buffer to be
   // replay for the subscription.
+  userObservable: Subject<User> = new ReplaySubject<User>(1);
+
   isLoggedInObservable: Subject<boolean> = new ReplaySubject<boolean>(1);
 
   nav: NavObj;
@@ -49,23 +50,14 @@ export class UserService {
     this.jwtRefreshTokenExp =
         this.localStorageService.get('user-service-jwt-refresh-token-exp');
 
-    this.userChecker();
+    this.userLocalStorageChecker();
     if (this.jwtRefreshTokenExp &&
         Date.now() / 1000 < this.jwtRefreshTokenExp) {
 
       console.log('Refresh token found and expires after now');
-      this.refreshJwt();
-      // Update user waits until after refreshJwt
-      this.isLoggedInObservable
-          .pipe(take(1))
-          .subscribe((isLoggedIn) => {
-            console.log('Decided is logged in');
-            if (isLoggedIn) {
-              this.updateUserDetails();
-            }
-          });
+      this.checkThenRefreshJwt();
     } else {
-      this.isLoggedInObservable.next(false);
+      this.userObservable.next(undefined);
       this.jwtRefreshTokenExp = undefined;
       this.localStorageService.remove('user-service-jwt-refresh-token-exp');
     }
@@ -82,9 +74,10 @@ export class UserService {
     this.localStorageService.set('user-service-jwt-refresh-token-exp',
         this.jwtRefreshTokenExp);
 
-    this.isLoggedInObservable.next(true);
-
     this._setUser(user);
+
+    // Below should start the jwt refreshers
+    this.checkThenRefreshJwt();
   }
 
   /**
@@ -105,30 +98,21 @@ export class UserService {
   }
 
   /**
-   *  userChecker is a method used to check user across tabs
+   *  userLocalStorageChecker constantly checks user logged in status across tabs
    *  User is stored in the localstorage
    */
-  userChecker() {
-    console.log('userChecker');
+  userLocalStorageChecker() {
+    console.log('userLocalStorageChecker');
     const self = this;
-    const lsUserSetTime: number =
-        this.localStorageService.get('user-service-user-set-time');
-    if (this.userSetTime !== lsUserSetTime) {
-      const lsUser: User = this.localStorageService.get('user-service-user');
-      if (!isEqual(this.user, lsUser)) {
-        this.user = lsUser;
-        this.userSetTime = lsUserSetTime;
-        this.userObservable.next(this.user);
-      }
-    }
+    this.compareUserLsUserThenUpdate();
     clearTimeout(this.refreshUserTimeoutId);
     this.refreshUserTimeoutId =
-        setTimeout(function() { self.userChecker(); }, 1000);
+        setTimeout(function() { self.userLocalStorageChecker(); }, 1000);
   }
 
   // TODO Separate out the refreshing from refreshing attempt. Make this an
   // observable.
-  refreshJwt() {
+  checkThenRefreshJwt() {
     const self = this;
     const isRefreshing =
         this.localStorageService.get('user-service-is-refreshing');
@@ -137,21 +121,23 @@ export class UserService {
     if (isRefreshing) { // currently checking, come back soon, say 1 second
       clearTimeout(this.refreshJwtTimeoutId);
       this.refreshJwtTimeoutId =
-          setTimeout(function() { self.refreshJwt(); }, 1000);
+          setTimeout(function() { self.checkThenRefreshJwt(); }, 1000);
       return;
     }
     // If the expiry time has changed, update expiry and wait until next time
     const lsJwtExp =
         Number(this.localStorageService.get('user-service-jwt-exp'));
-    if (this.jwtExp && lsJwtExp > this.jwtExp) {
-      this.isLoggedInObservable.next(true);
+    if (this.jwtExp && this.jwtExp < lsJwtExp && lsJwtExp < Date.now() / 1000) {
       this.jwtExp = lsJwtExp;
+      this.compareUserLsUserThenUpdate();
       this._setRefreshJwt();
-      // we shouldn't have to update user in this section because it is updated
-      // elsewhere
       return;
     }
 
+    this.refreshJwt();
+  }
+
+  refreshJwt() {
     // If this happens to be the lucky app that is refreshing
     this.localStorageService.set('user-service-is-refreshing', true);
     this.http.get<any>('/api/user/refresh-jwt')
@@ -162,20 +148,34 @@ export class UserService {
           this.localStorageService.set('user-service-jwt-exp', this.jwtExp);
           this.localStorageService.remove('user-service-is-refreshing');
 
+          // If the user has not been set (e.g. this page has just been loaded)
+          if (!this.user) {
+            this.updateUserDetails();
+          }
           this._setRefreshJwt();
         },
         errorResponse => {
           // On failure
           this.localStorageService.remove('user-service-is-refreshing');
           if (errorResponse.status === 401) {
-            // clear all data jwt and user
-            // call next on user observable
-            this.isLoggedInObservable.next(false);
+            // Clear all data, call next on user observable
+            this.clearAllUserData();
+            // Reset refresh counter
+            this.refreshJwtAttempts = undefined;
           } else {
             // On failure (timeout), tries again in 10 seconds
             // gives up after 1 minute
             // directs to /login page
-            this.refreshJwt();
+            if (this.refreshJwtAttempts === undefined) {
+              this.refreshJwtAttempts = 0;
+            }
+            if (this.refreshJwtAttempts < 6) {
+              this.refreshJwtAttempts++;
+              const self = this;
+              setTimeout(function() { self.checkThenRefreshJwt(); }, 10000);
+            } else {
+              this.clearAllUserData();
+            }
           }
         });
   }
@@ -187,7 +187,20 @@ export class UserService {
     const refreshDuration = refreshTime - Date.now();
     clearTimeout(this.refreshJwtTimeoutId);
     this.refreshJwtTimeoutId =
-        setTimeout(function() { self.refreshJwt(); }, refreshDuration);
+        setTimeout(function() { self.checkThenRefreshJwt(); }, refreshDuration);
+  }
+
+  private compareUserLsUserThenUpdate() {
+    const lsUserSetTime: number =
+        this.localStorageService.get('user-service-user-set-time');
+    if (this.userSetTime !== lsUserSetTime) {
+      this.userSetTime = lsUserSetTime;
+      const lsUser: User = this.localStorageService.get('user-service-user');
+      if (!isEqual(this.user, lsUser)) {
+        this.user = lsUser;
+        this.userObservable.next(this.user);
+      }
+    }
   }
 
   updateUserDetails() {
@@ -221,26 +234,34 @@ export class UserService {
     // Send message to server
     this.http.post('/api/user/logout', {})
         .subscribe(() => {
-          // Clean up old data
-          this.user = undefined;
-          this.jwtExp = undefined;
-          this.jwtRefreshTokenExp = undefined;
-          clearTimeout(this.refreshJwtTimeoutId);
-
-          // TODO clear localstorage
-          this.localStorageService.remove('user-service-jwt-exp');
-          this.localStorageService.remove('user-service-jwt-refresh-token-exp');
-          this.localStorageService.remove('user-service-user');
-          this.localStorageService.remove('user-service-user-set-time');
-          this.localStorageService.remove('user-service-is-refreshing');
-
-          // inform the rest of the app that a log out has occurred
-          this.userObservable.next(this.user);
-          this.isLoggedInObservable.next(false);
-
-          // go to default location
-          this.router.navigateByUrl('/');
+          this.clearAllUserData();
+        },
+        (errorResponse) => {
+          console.error('Error logging out.');
+          console.log(errorResponse);
+          this.clearAllUserData();
         });
+  }
+
+  private clearAllUserData() {
+    // Clean up old data
+    this.user = undefined;
+    this.jwtExp = undefined;
+    this.jwtRefreshTokenExp = undefined;
+    clearTimeout(this.refreshJwtTimeoutId);
+
+    // Clear localstorage
+    this.localStorageService.remove('user-service-jwt-exp');
+    this.localStorageService.remove('user-service-jwt-refresh-token-exp');
+    this.localStorageService.remove('user-service-user');
+    this.localStorageService.remove('user-service-user-set-time');
+    this.localStorageService.remove('user-service-is-refreshing');
+
+    // inform the rest of the app that a log out has occurred
+    this.userObservable.next(undefined);
+
+    // go to default location
+    this.router.navigateByUrl('/');
   }
 
   private _insecureRandomNumber() {
