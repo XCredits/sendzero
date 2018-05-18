@@ -22,7 +22,13 @@ export class AuthGuard implements CanActivate {
       map(user => {
         const authenticated: boolean = !!user;
         if (!authenticated) {
-          this.router.navigate(['/login']);
+          console.log(next);
+          // Store the ActivatedRouteSnapShot in UserService navigate
+          // send redirect=1 as a param first time
+          // if no redirect, clear auth service navigation
+          // Preserve redirect when moving between login and register.
+          // https://www.thepolyglotdeveloper.com/2016/10/passing-complex-data-angular-2-router-nativescript/
+          this.router.navigate(['/login'], { queryParams: { redirect: 1 } });
           return false;
         } else {
           return true;
