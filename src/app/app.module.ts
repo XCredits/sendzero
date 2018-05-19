@@ -70,6 +70,7 @@ import { MailingListComponent } from './mailing-list/mailing-list.component';
 import { ProfileComponent } from './profile/profile.component';
 import { UserDropdownComponent } from './user-dropdown/user-dropdown.component';
 import { AdminComponent } from './admin/admin.component';
+import { UnauthorizedComponent } from './unauthorized/unauthorized.component';
 
 @NgModule({
   declarations: [
@@ -90,6 +91,7 @@ import { AdminComponent } from './admin/admin.component';
     ProfileComponent,
     UserDropdownComponent,
     AdminComponent,
+    UnauthorizedComponent,
   ],
   imports: [
     BrowserModule,
@@ -169,6 +171,11 @@ import { AdminComponent } from './admin/admin.component';
         component: AdminComponent,
         data: { title: 'Admin' },
         canActivate: [AdminGuard],
+      },
+      {
+        path: 'unauthorized',
+        component: UnauthorizedComponent,
+        data: { title: 'Unauthorized' },
       },
       { // Default route
         path: '',
