@@ -1,6 +1,6 @@
 const { check, validationResult } = require('express-validator/check');
 const MailingList = require('../models/mailing-list.model.js');
-var Promise = require("bluebird");
+var Promise = require('bluebird');
 
 module.exports = function (app) {
   app.post('/api/join-mailing-list', validateJoinMailingList, joinMailingList);
@@ -24,7 +24,7 @@ function joinMailingList(req, res) {
   mailingListUser.familyName = req.body.familyName;
   return mailingListUser.save()
       .then((result) => {
-        res.status(200).send({ message: "Success" });
+        res.status(200).send({ message: 'Success' });
       })
       .catch((error) => {
         console.log('Error');
