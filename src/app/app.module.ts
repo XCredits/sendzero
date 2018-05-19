@@ -69,6 +69,7 @@ import { RegisterComponent } from './register/register.component';
 import { MailingListComponent } from './mailing-list/mailing-list.component';
 import { ProfileComponent } from './profile/profile.component';
 import { UserDropdownComponent } from './user-dropdown/user-dropdown.component';
+import { AdminComponent } from './admin/admin.component';
 
 @NgModule({
   declarations: [
@@ -88,6 +89,7 @@ import { UserDropdownComponent } from './user-dropdown/user-dropdown.component';
     MailingListComponent,
     ProfileComponent,
     UserDropdownComponent,
+    AdminComponent,
   ],
   imports: [
     BrowserModule,

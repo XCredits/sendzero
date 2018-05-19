@@ -30,6 +30,7 @@ export class AdminGuard implements CanActivate {
           return false;
         } else if (authenticated && !user.isAdmin) {
           // serve permission error page
+          return true;
         } else {
           return true;
         }
