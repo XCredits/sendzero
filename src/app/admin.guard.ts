@@ -30,7 +30,8 @@ export class AdminGuard implements CanActivate {
           return false;
         } else if (authenticated && !user.isAdmin) {
           // serve permission error page
-          return true;
+          this.router.navigate(['/unauthorized']);
+          return false;
         } else {
           return true;
         }
