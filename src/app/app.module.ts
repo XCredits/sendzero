@@ -6,6 +6,7 @@ import { RouterModule } from '@angular/router';
 import { LocalStorageModule } from 'angular-2-local-storage';
 import { AppComponent } from './app.component';
 import { UserService } from './user.service';
+import { AuthGuard } from './auth.guard';
 
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 // import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
@@ -123,6 +124,7 @@ import { UserDropdownComponent } from './user-dropdown/user-dropdown.component';
         path: 'profile',
         component: ProfileComponent,
         data: { title: 'Profile' },
+        canActivate: [AuthGuard],
       },
       {
         path: 'settings',
