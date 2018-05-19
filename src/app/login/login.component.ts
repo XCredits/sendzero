@@ -15,6 +15,7 @@ export class LoginComponent implements OnInit {
   waiting = false;
   formErrorMessage: string;
   loginRegisterSwitchQueryParams: Params;
+  redirectUrl: string;
 
   constructor( private http: HttpClient,
     private userService: UserService,
@@ -25,6 +26,7 @@ export class LoginComponent implements OnInit {
       // on register success.
       this.activatedRoute.queryParams.subscribe((params: Params) => {
         this.loginRegisterSwitchQueryParams = params;
+        this.redirectUrl = params.redirect;
       });
     }
 
@@ -50,7 +52,7 @@ export class LoginComponent implements OnInit {
         .subscribe(data => {
           this.waiting = false;
           this.userService.authenticationResult(data);
-          this.userService.successNavigate();
+          this.userService.successNavigate(this.redirectUrl);
         },
         errorResponse => {
           this.waiting = false;
