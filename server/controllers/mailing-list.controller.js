@@ -1,9 +1,12 @@
 const { check, validationResult } = require('express-validator/check');
 const MailingList = require('../models/mailing-list.model.js');
 var Promise = require('bluebird');
+const auth = require('../config/jwt-auth.js');
 
 module.exports = function (app) {
   app.post('/api/join-mailing-list', validateJoinMailingList, joinMailingList);
+  app.get('/api/admin/mailing-list-count', auth.jwt, auth.isAdmin, 
+      mailingListCount);
 }
 
 // /api/join-mailing-list
@@ -33,3 +36,10 @@ function joinMailingList(req, res) {
       });
 }
 
+// /api/admin/mailing-list-count
+function mailingListCount(req, res) {
+  return MailingList.count()
+      .then(count => {
+        res.send({ count: count });
+      });
+}
