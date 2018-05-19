@@ -5,7 +5,7 @@ var Promise = require("bluebird");
 module.exports = function (app) {
   app.post('/api/join-mailing-list', 
     viewRequest,
-    //validateJoinMailingList,
+    validateJoinMailingList,
     viewRequest, 
     joinMailingList, 
     viewRequest);
@@ -17,13 +17,11 @@ function viewRequest(req, res, next){
 }
 
 // /api/join-mailing-list
-function validateJoinMailingList(){
-  // This function returns an array of validation statements
-  return [check('email').isEmail().withMessage('email not valid'),
-    check('givenName').isString(),
-    check('familyName').isString(),
-  ];
-}
+let validateJoinMailingList = [
+    check('email').isEmail().withMessage('email not valid'),
+    check('givenName').isString().withMessage('givenName not valid'),
+    check('familyName').isString().withMessage('familyName not valid'),
+];
 
 function joinMailingList(req, res) {
   console.log("Successfully called backend route");
