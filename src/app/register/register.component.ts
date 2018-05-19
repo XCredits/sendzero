@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
+import {Router, ActivatedRoute, Params} from '@angular/router';
 import { UserService } from '../user.service';
 
 @Component({
@@ -13,10 +14,19 @@ export class RegisterComponent implements OnInit {
   submitSuccess = false;
   waiting = false;
   formErrorMessage: string;
+  loginRegisterSwitchQueryParams: Params;
 
   constructor( private http: HttpClient,
-      private userService: UserService
-    ) {}
+      private userService: UserService,
+      private activatedRoute: ActivatedRoute ) {
+
+        // The following is to ensure that when a user is redirected for the
+        // purposes of logging in that they are still redirected to the correct
+        // on register success.
+        this.activatedRoute.queryParams.subscribe((params: Params) => {
+          this.loginRegisterSwitchQueryParams = params;
+        });
+      }
 
   ngOnInit() {
     this.form = new FormGroup ({

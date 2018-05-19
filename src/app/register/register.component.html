@@ -2,7 +2,7 @@
   <mat-card class="simple-form-card">
     <mat-card-title>	Register </mat-card-title>
     <mat-card-subtitle>	Already have an account? 
-      <a routerLink="/login">
+      <a routerLink="/login" [queryParams]="loginRegisterSwitchQueryParams">
         Log in here.
       </a>
     </mat-card-subtitle>
