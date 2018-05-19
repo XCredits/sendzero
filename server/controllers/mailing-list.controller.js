@@ -19,9 +19,10 @@ function viewRequest(req, res, next){
 // /api/join-mailing-list
 function validateJoinMailingList(){
   // This function returns an array of validation statements
-  return [check('email').isEmail().withMessage('email not valid'), 
-      // check('givenName').isLength({ min: 5 }),
-      ];
+  return [check('email').isEmail().withMessage('email not valid'),
+    check('givenName').isString(),
+    check('familyName').isString(),
+  ];
 }
 
 function joinMailingList(req, res) {
