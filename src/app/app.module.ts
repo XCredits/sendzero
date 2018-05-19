@@ -7,6 +7,7 @@ import { LocalStorageModule } from 'angular-2-local-storage';
 import { AppComponent } from './app.component';
 import { UserService } from './user.service';
 import { AuthGuard } from './auth.guard';
+import { AdminGuard } from './admin.guard';
 
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 // import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
@@ -160,6 +161,12 @@ import { UserDropdownComponent } from './user-dropdown/user-dropdown.component';
         path: 'register',
         component: RegisterComponent,
         data: { title: 'Register' },
+      },
+      {
+        path: 'admin',
+        component: AdminComponent,
+        data: { title: 'Admin' },
+        canActivate: [AdminGuard],
       },
       { // Default route
         path: '',
