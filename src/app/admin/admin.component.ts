@@ -15,7 +15,10 @@ export class AdminComponent implements OnInit {
     this.http.get('/api/admin/mailing-list-count')
         .subscribe(data => {
           this.mailingListCount = data.count;
-        });
+        },
+        () => {
+        }
+        );
   }
 
 }
