@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import {MatSnackBar} from '@angular/material';
 
 @Component({
   selector: 'app-admin',
@@ -9,7 +10,10 @@ import { HttpClient } from '@angular/common/http';
 export class AdminComponent implements OnInit {
   mailingListCount: number;
 
-  constructor( private http: HttpClient ) { }
+  constructor(
+      private http: HttpClient,
+      private snackBar: MatSnackBar,
+  ) { }
 
   ngOnInit() {
     this.http.get('/api/admin/mailing-list-count')
@@ -17,6 +21,9 @@ export class AdminComponent implements OnInit {
           this.mailingListCount = data.count;
         },
         () => {
+          this.snackBar.open('Network error', 'Dismiss', {
+            duration: 5000
+          });
         }
         );
   }
