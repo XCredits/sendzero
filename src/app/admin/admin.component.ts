@@ -16,7 +16,7 @@ export class AdminComponent implements OnInit {
   ) { }
 
   ngOnInit() {
-    this.http.get('/api/admin/mailing-list-count')
+    this.http.get<any>('/api/admin/mailing-list-count')
         .subscribe(data => {
           this.mailingListCount = data.count;
         },

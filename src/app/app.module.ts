@@ -71,6 +71,7 @@ import { ProfileComponent } from './profile/profile.component';
 import { UserDropdownComponent } from './user-dropdown/user-dropdown.component';
 import { AdminComponent } from './admin/admin.component';
 import { UnauthorizedComponent } from './unauthorized/unauthorized.component';
+import { MailingListChartComponent } from './mailing-list-chart/mailing-list-chart.component';
 
 @NgModule({
   declarations: [
@@ -92,6 +93,7 @@ import { UnauthorizedComponent } from './unauthorized/unauthorized.component';
     UserDropdownComponent,
     AdminComponent,
     UnauthorizedComponent,
+    MailingListChartComponent,
   ],
   imports: [
     BrowserModule,
