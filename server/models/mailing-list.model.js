@@ -12,9 +12,9 @@ var MailingListSchema = new Schema({
   }
 );
 
-UserSchema.index({ userId: 1 });
-UserSchema.index({ timeSubscribe: 1 });
-UserSchema.index({ email: 1 });
+MailingListSchema.index({ userId: 1 });
+MailingListSchema.index({ timeSubscribe: 1 });
+MailingListSchema.index({ email: 1 });
 
 
 module.exports = mongoose.model('MailingList', MailingListSchema);
