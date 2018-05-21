@@ -42,42 +42,38 @@ export class MailingListChartComponent implements OnInit {
 
 
     const data1 = [];
-    const data2 = [];
-    for (let i = 0; i < 1000; i++) {
-      data1.push({x: i, y: (1000 - i) + Math.random() * 100} );
-      data2.push({x: i, y: (1000 - i) + Math.random() * 100} );
+    const labels = [];
+    for (let i = 0; i < 100; i++) {
+      labels.push(i);
+      data1.push(Math.random() * 100);
     }
 
     const color = Chart.helpers.color; // this, I believe, is the same 'color' as used in 'npm install color'
     const scatterChartData = {
+      labels: labels,
       datasets: [{
-        label: 'My First dataset',
-        showLine: true,
-        fill: false,
-        pointRadius: 0.1,
-        borderColor: this.chartColors.red,
-        backgroundColor: color(this.chartColors.red).alpha(0.2).rgbString(),
-        data: data1
-      }, {
         label: 'My Second dataset',
-        showLine: true,
-        fill: false,
-        pointRadius: 0.1,
         borderColor: this.chartColors.blue,
+        borderWidth: 1,
         backgroundColor: color(this.chartColors.blue).alpha(0.2).rgbString(),
-        data: data2
+        data: data1,
       }]
     };
 
     const ctx = this.chart1.nativeElement.getContext('2d');
-    const chart1Obj = Chart.Scatter(ctx, {
+    const chart1Obj = new Chart(ctx, {
+      type: 'bar',
       data: scatterChartData,
       options: {
-        title: {
-          display: true,
-          text: 'Chart.js Scatter Chart'
-                  },
-                  showLine: true
+        showLine: true,
+        scales: {
+          xAxes: [{
+              ticks: {
+                autoSkip: true,
+                maxTicksLimit: 23
+              }
+          }]
+      }
       }
     });
   }
