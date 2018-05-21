@@ -29,21 +29,36 @@ export class MailingListChartComponent implements OnInit {
   };
 
   ngOnInit() {
-    this.http.get<any>('/api/admin/mailing-list-count')
-    .subscribe(data => {
-      this.mailingListCount = data.count;
-    },
-    () => {
-      this.snackBar.open('Network error', 'Dismiss', {
-        duration: 5000
-      });
-    }
-    );
+    this.http.post<any>('/api/admin/mailing-list-count', {})
+        .subscribe(data => {
+          this.mailingListCount = data.count;
+        },
+        () => {
+          this.snackBar.open('Network error', 'Dismiss', {
+            duration: 5000
+          });
+        }
+        );
 
+    this.http.post<any>('/api/admin/mailing-list-count',
+          {
+            start: 15613, // in milliseconds, gets floored based on range
+            end: 15313, // in milliseconds, gets ceiled based on range // default behaviour max return 100
+            scale: 'seconds' // second minute hour day week month year
+          })
+        .subscribe(data => {
+          this.mailingListCount = data.count;
+        },
+        () => {
+          this.snackBar.open('Network error', 'Dismiss', {
+            duration: 5000
+          });
+        }
+        );
 
     const data1 = [];
     const labels = [];
-    for (let i = 0; i < 100; i++) {
+    for (let i = 0; i < 101; i++) {
       labels.push(i);
       data1.push(Math.random() * 100);
     }
@@ -69,8 +84,10 @@ export class MailingListChartComponent implements OnInit {
         scales: {
           xAxes: [{
               ticks: {
-                autoSkip: true,
-                maxTicksLimit: 23
+                // autoSkip: true,
+                // maxTicksLimit: 10,
+                // evenLabelSpacing: true,
+                // labelSpacing: 5,
               }
           }]
       }

@@ -5,8 +5,10 @@ const auth = require('../config/jwt-auth.js');
 
 module.exports = function (app) {
   app.post('/api/join-mailing-list', validateJoinMailingList, joinMailingList);
-  app.get('/api/admin/mailing-list-count', auth.jwt, auth.isAdmin, 
+  app.post('/api/admin/mailing-list-count', auth.jwt, auth.isAdmin, 
       mailingListCount);
+  app.post('/api/admin/mailing-list-stats', auth.jwt, auth.isAdmin, 
+      mailingListStats);
 }
 
 // /api/join-mailing-list
@@ -39,7 +41,65 @@ function joinMailingList(req, res) {
 // /api/admin/mailing-list-count
 function mailingListCount(req, res) {
   return MailingList.count()
-      .then(count => {
-        res.send({ count: count });
-      });
+        .then(count => {
+          res.send({ count: count });
+        });
+}
+
+function mailingListStats(req, res) {
+  console.log('req.body');
+  console.log(req.body);
+  let maxStatsReturned = 1000;
+
+  // if (!req.body.scale) {
+    
+  // } else {
+  //   let generateScale = function ({scale, start, end}) {
+  //     const standardReturn = 20;
+  //     let stepSizeMs;
+  //     switch (scale) {
+  //       case 'seconds':
+  //         stepSizeMs = 1000;
+  //         break;
+  //       case 'minutes':
+  //         stepSizeMs = 1000 * 60;
+  //         break;
+  //       case 'hours':
+  //         stepSizeMs = 1000 * 60 * 60;
+  //         break;
+  //       case 'days':
+  //         stepSizeMs = 1000 * 60 * 60 * 24;
+  //         break;
+  //       case 'weeks':
+  //         stepSizeMs = 1000 * 60 * 60 * 24 *7;
+  //         break;
+  //       default:
+  //         break;
+  //     }
+  //     if (!start, !end) {
+  //       // ceil date now
+  //     }
+  //     // Floor
+
+
+  //   };
+
+
+  //   req.body.scale
+  //   MailingList.aggregate([
+  //     {
+  //       $project: {
+  //         "timeSubscribe": {
+  //           "$range" : [Date.now()-40*24*60*60*1000, Date.now(), 24*60*60*1000]
+  //         }
+  //       }
+  //     }])
+  //     .then(data => {
+  //       console.log(data);
+  //     });
+  //     // count:sum(1)
+  // }
+
+
+  // "Rest stops": { $range: [ 0, "$distance", 25 ] }
 }
