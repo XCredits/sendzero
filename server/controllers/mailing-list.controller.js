@@ -1,5 +1,6 @@
 const { check, validationResult } = require('express-validator/check');
 const MailingList = require('../models/mailing-list.model.js');
+const MailingListStats = require('../models/mailing-list-stats.model.js');
 var Promise = require('bluebird');
 const auth = require('../config/jwt-auth.js');
 
@@ -8,7 +9,7 @@ module.exports = function (app) {
   app.post('/api/admin/mailing-list-count', auth.jwt, auth.isAdmin, 
       mailingListCount);
   app.post('/api/admin/mailing-list-stats', auth.jwt, auth.isAdmin, 
-      mailingListStats);
+      mailingListStatsReport);
 }
 
 // /api/join-mailing-list
@@ -30,6 +31,19 @@ function joinMailingList(req, res) {
   return mailingListUser.save()
       .then((result) => {
         res.status(200).send({ message: 'Success' });
+        // Floor it to the current hour
+        let time = new Date(Math.floor( Date.now() / (60*1000)) * (60*1000));
+        return MailingListStats.update({time: time},
+              {$inc: {count: 1}})
+            .then(result => {
+              // No saved element, starting from scratch
+              if (result.nModified === 0) {
+                var statElement = new MailingListStats();
+                statElement.time = time;
+                return statElement.save();
+              }
+              return null;
+            });
       })
       .catch((error) => {
         console.log('Error');
@@ -46,7 +60,7 @@ function mailingListCount(req, res) {
         });
 }
 
-function mailingListStats(req, res) {
+function mailingListStatsReport(req, res) {
   console.log('req.body');
   console.log(req.body);
   let maxStatsReturned = 1000;
