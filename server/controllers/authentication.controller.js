@@ -42,6 +42,7 @@
 
 
 const User = require('../models/user.model.js');
+const UserStats = require('../models/user-stats.model.js');
 const Session = require('../models/session.model.js');
 const jwt = require('jsonwebtoken');
 const auth = require('../config/jwt-auth.js');

@@ -1,6 +1,7 @@
 const { check, validationResult } = require('express-validator/check');
 const MailingList = require('../models/mailing-list.model.js');
 const MailingListStats = require('../models/mailing-list-stats.model.js');
+const statsService = require('../services/stats.service.js');
 var Promise = require('bluebird');
 const auth = require('../config/jwt-auth.js');
 
@@ -31,19 +32,7 @@ function joinMailingList(req, res) {
   return mailingListUser.save()
       .then((result) => {
         res.status(200).send({ message: 'Success' });
-        // Floor it to the current hour
-        let time = new Date(Math.floor( Date.now() / (60*1000)) * (60*1000));
-        return MailingListStats.update({time: time},
-              {$inc: {count: 1}})
-            .then(result => {
-              // No saved element, starting from scratch
-              if (result.nModified === 0) {
-                var statElement = new MailingListStats();
-                statElement.time = time;
-                return statElement.save();
-              }
-              return null;
-            });
+        return statsService.increment(MailingListStats);
       })
       .catch((error) => {
         console.log('Error');
