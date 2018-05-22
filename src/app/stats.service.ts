@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import * as moment from 'moment';
 
 @Injectable()
 export class StatsService {
@@ -21,7 +22,7 @@ export class StatsService {
       const value = [];
       for (let time_i = start; time_i <= end ; time_i = time_i + inc) {
         time.push(time_i);
-        if (sparseTime.indexOf(time_i)) {
+        if (sparseTime.indexOf(time_i) >= 0) {
           value.push(sparseValue[sparseTime.indexOf(time_i)]);
         } else {
           value.push(0);
@@ -36,6 +37,10 @@ export class StatsService {
   generateTimeLabels(time, type) {
     if (type === 'hour') {
       // Pull all the values
+      return time.map(ele => {
+        console.log(ele);
+        return moment(ele).format('YYYY/MM/DD HH:mm');
+      });
     }
     return;
   }

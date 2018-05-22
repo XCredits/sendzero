@@ -3,7 +3,6 @@ import { HttpClient } from '@angular/common/http';
 import { MatSnackBar } from '@angular/material';
 import * as Chart from 'chart.js';
 import { StatsService } from '../stats.service';
-import * as moment from 'moment';
 
 @Component({
   selector: 'app-mailing-list-chart',
@@ -45,16 +44,17 @@ export class MailingListChartComponent implements OnInit {
 
     this.http.post<any>('/api/admin/mailing-list-stats', {})
         .subscribe(sparseData => {
-          console.log('data');
-          console.log(sparseData);
-
-          const data = this.statsService.fillOutData(sparseData, 'hour');
-
+          const dataIntermediate = this.statsService.fillOutData(sparseData, 'hour');
+          const data = {
+            labels: this.statsService.generateTimeLabels(dataIntermediate.time, 'hour'),
+            value: dataIntermediate.value,
+          };
+          data.labels = this.statsService.generateTimeLabels(dataIntermediate.time, 'hour');
           const edgeColor = this.chartColors.blue;
           const backgroundColor =
               Chart.helpers.color(this.chartColors.blue).alpha(0.2).rgbString();
           const dataCollection = {
-            labels: data.time,
+            labels: data.labels,
             datasets: [{
               label: 'Mailing list signup',
               borderColor: this.chartColors.blue,
@@ -76,7 +76,7 @@ export class MailingListChartComponent implements OnInit {
                       autoSkip: true,
                       maxTicksLimit: 20,
                       evenLabelSpacing: true,
-                      // labelSpacing: 5,
+                      // labelSpacing: 24,
                     }
                 }],
                 yAxes: [{
@@ -94,44 +94,6 @@ export class MailingListChartComponent implements OnInit {
           });
         }
         );
-
-    // const data1 = [];
-    // const labels = [];
-    // for (let i = 0; i < 101; i++) {
-    //   labels.push(i);
-    //   data1.push(Math.random() * 100);
-    // }
-
-    // const color = Chart.helpers.color; // this, I believe, is the same 'color' as used in 'npm install color'
-    // const scatterChartData = {
-    //   labels: labels,
-    //   datasets: [{
-    //     label: 'My Second dataset',
-    //     borderColor: this.chartColors.blue,
-    //     borderWidth: 1,
-    //     backgroundColor: color(this.chartColors.blue).alpha(0.2).rgbString(),
-    //     data: data1,
-    //   }]
-    // };
-
-    // const ctx = this.chart1.nativeElement.getContext('2d');
-    // const chart1Obj = new Chart(ctx, {
-    //   type: 'bar',
-    //   data: scatterChartData,
-    //   options: {
-    //     showLine: true,
-    //     scales: {
-    //       xAxes: [{
-    //           ticks: {
-    //             // autoSkip: true,
-    //             // maxTicksLimit: 10,
-    //             // evenLabelSpacing: true,
-    //             // labelSpacing: 5,
-    //           }
-    //       }]
-    //   }
-    //   }
-    // });
   }
 
 }
