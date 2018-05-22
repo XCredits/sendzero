@@ -74,6 +74,8 @@ import { AdminComponent } from './admin/admin.component';
 import { UnauthorizedComponent } from './unauthorized/unauthorized.component';
 import { MailingListChartComponent } from './mailing-list-chart/mailing-list-chart.component';
 import { UserRegisterChartComponent } from './user-register-chart/user-register-chart.component';
+import { TermsComponent } from './terms/terms.component';
+import { PrivacyComponent } from './privacy/privacy.component';
 
 @NgModule({
   declarations: [
@@ -97,6 +99,8 @@ import { UserRegisterChartComponent } from './user-register-chart/user-register-
     UnauthorizedComponent,
     MailingListChartComponent,
     UserRegisterChartComponent,
+    TermsComponent,
+    PrivacyComponent,
   ],
   imports: [
     BrowserModule,
@@ -181,6 +185,16 @@ import { UserRegisterChartComponent } from './user-register-chart/user-register-
         component: AdminComponent,
         data: { title: 'Admin' },
         canActivate: [AdminGuard],
+      },
+      {
+        path: 'terms',
+        component: TermsComponent,
+        data: { title: 'Terms' },
+      },
+      {
+        path: 'privacy',
+        component: PrivacyComponent,
+        data: { title: 'Privacy' },
       },
       {
         path: 'unauthorized',
