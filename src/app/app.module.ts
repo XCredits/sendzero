@@ -73,6 +73,7 @@ import { UserDropdownComponent } from './user-dropdown/user-dropdown.component';
 import { AdminComponent } from './admin/admin.component';
 import { UnauthorizedComponent } from './unauthorized/unauthorized.component';
 import { MailingListChartComponent } from './mailing-list-chart/mailing-list-chart.component';
+import { UserRegisterChartComponent } from './user-register-chart/user-register-chart.component';
 
 @NgModule({
   declarations: [
@@ -95,6 +96,7 @@ import { MailingListChartComponent } from './mailing-list-chart/mailing-list-cha
     AdminComponent,
     UnauthorizedComponent,
     MailingListChartComponent,
+    UserRegisterChartComponent,
   ],
   imports: [
     BrowserModule,

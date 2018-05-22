@@ -38,7 +38,6 @@ export class StatsService {
     if (type === 'hour') {
       // Pull all the values
       return time.map(ele => {
-        console.log(ele);
         return moment(ele).format('YYYY/MM/DD HH:mm');
       });
     }
