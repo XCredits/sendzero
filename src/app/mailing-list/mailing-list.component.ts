@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { MatSnackBar } from '@angular/material';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
 
 @Component({
@@ -12,7 +13,10 @@ export class MailingListComponent implements OnInit {
   waiting = false;
   formErrorMessage: string;
 
-  constructor( private http: HttpClient ) { }
+  constructor(
+    private http: HttpClient,
+    private snackBar: MatSnackBar,
+  ) { }
 
   ngOnInit() {
     this.form = new FormGroup ({
@@ -37,10 +41,16 @@ export class MailingListComponent implements OnInit {
         .subscribe(
         data => {
           this.waiting = false;
+          this.snackBar.open('Successfully registered', 'Dismiss', {
+            duration: 5000
+          });
         },
         errorResponse => {
           this.waiting = false;
           this.formErrorMessage = 'There was a problem submitting the form.';
+          this.snackBar.open('Network error', 'Dismiss', {
+            duration: 5000
+          });
         });
   };
 }
