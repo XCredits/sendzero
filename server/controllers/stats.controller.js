@@ -22,6 +22,9 @@ module.exports = function (app) {
 
 // /api/admin/mailing-list-count
 function mailingListCount(req, res) {
+  // Validation
+  // ...
+
   return MailingList.count()
         .then(count => {
           res.send({ count: count });
@@ -30,6 +33,9 @@ function mailingListCount(req, res) {
 
 // /api/admin/user-register-stats'
 function mailingListStatsReport(req, res) {
+  // Validation
+  // ...
+
   MailingListStats.find({}, {time:1, count:1})
       .then(results => {
         const resultsFiltered = results.map(x => {
@@ -45,6 +51,9 @@ function mailingListStatsReport(req, res) {
 
 // /api/admin/user-register-count
 function userRegisterCount(req, res) {
+  // Validation
+  // ...
+
   return User.count()
         .then(count => {
           res.send({ count: count });
@@ -53,6 +62,9 @@ function userRegisterCount(req, res) {
 
 // /api/admin/mailing-list-stats'
 function userRegisterStatsReport(req, res) {
+  // Validation
+  // ...
+  
   UserStats.find({}, {time:1, count:1})
       .then(results => {
         const resultsFiltered = results.map(x => {

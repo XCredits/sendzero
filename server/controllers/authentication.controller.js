@@ -39,8 +39,7 @@
 // attach the XSRF Token to the request header that the server has set in the 
 // cookie. This means that ALL get requests could potentially be called from any
 
-
-
+var validator = require('validator');
 const User = require('../models/user.model.js');
 const UserStats = require('../models/user-stats.model.js');
 const statsService = require('../services/stats.service.js');
@@ -67,20 +66,39 @@ module.exports = function (app) {
 }
 
 function register(req, res) {
-  // validate
-  
+  // Extract req.body
+  const email = req.body.email;
+  const givenName = req.body.givenName;
+  const familyName = req.body.familyName;
+  var username = req.body.username;
+  const password = req.body.password;
+  // Validate
+  if (typeof email !== 'string' ||
+      typeof givenName !== 'string' ||
+      typeof familyName !== 'string' ||
+      typeof username !== 'string' ||
+      typeof password !== 'string' ||
+      !validator.isEmail(email) ||
+      !validator.isAlphanumeric(username) ||
+      !validator.isLength(password, 8)
+    ){
+    return res.status(422).json({message: 'Request failed validation'});
+  }
+  // Sanitize
+  username = username.toLowerCase();
+
   // check that there is not an existing user with this username
-  return User.findOne({username: req.body.username})
+  return User.findOne({username: username})
       .then(existingUser => {
         if (existingUser){
           return res.status(409).send({message: 'Username already taken.'})
         }
         var user = new User();
-        user.givenName = req.body.givenName;
-        user.familyName = req.body.familyName;
-        user.username = req.body.username;
-        user.email = req.body.email;
-        user.createPasswordHash(req.body.password);
+        user.givenName = givenName;
+        user.familyName = familyName;
+        user.username = username;
+        user.email = email;
+        user.createPasswordHash(password);
         return user.save()
             .then(() => {
               return createAndSendRefreshAndSessionJwt(user, req, res)
@@ -108,6 +126,18 @@ function register(req, res) {
 }
 
 function login(req, res) {
+  var username = req.body.username;
+  const password = req.body.password; // note length should not be checked when logging in
+  // Validate
+  if (typeof username !== 'string' ||
+      typeof password !== 'string' ||
+      !validator.isAlphanumeric(username)
+    ){
+    return res.status(422).json({message: 'Request failed validation'});
+  }
+  // Sanitize (update username)
+  req.body.username = username.toLowerCase();
+
   passport.authenticate('local', function(err, user, info){
     if (err) {
       return res.status(500).json(err);
@@ -141,6 +171,7 @@ function refreshJwt(req, res) {
 }
 
 function userDetails(req, res) {
+  // Validate not necessary at this point (no req.body use)
   return User.findOne({_id: req.userId})
       .then(user => {
         res.send(user.frontendData());
@@ -148,12 +179,23 @@ function userDetails(req, res) {
 }
 
 function changePassword(req, res) {
+  const password = req.body.password;
+  const newPassword = req.body.newPassword;
+  // Validate
+  if (typeof password !== 'string' ||
+      typeof newPassword !== 'string' ||
+      typeof req.jwt.username !== 'string' ||
+      !validator.isLength(newPassword, 8)
+    ){
+    return res.status(422).json({message: 'Request failed validation'});
+  }
+
   // Attach the user name to the body
   req.body.username = req.jwt.username;
   // Check password
   passport.authenticate('local', function(err, user, info){
     // Create new password hash
-    user.createPasswordHash(req.body.newPassword);
+    user.createPasswordHash(newPassword);
     user.save(()=>{
           return res.send({message:'Password successfully changed'});
         })
@@ -164,7 +206,17 @@ function changePassword(req, res) {
 }
 
 function requestResetPassword(req, res) {
-  return User.findOne({username:req.body.username})
+  var username = req.body.username;
+  // Validate
+  if (typeof username !== 'string' ||
+      !validator.isAlphanumeric(username)
+    ){
+    return res.status(422).json({message: 'Request failed validation'});
+  }
+  // Sanitize
+  username = username.toLowerCase();
+
+  return User.findOne({username: username})
       .then(user=>{
         // Success object must be identical, to avoid people discovering emails in the system
         const successObject = {message: 'Email sent if users found in database.'}
@@ -196,11 +248,18 @@ function requestResetPassword(req, res) {
 }
 
 function resetPassword(req, res) {
+  var password = req.body.password;
+  // Validate
+  if (typeof password !== 'string'||
+      !validator.isLength(password, 8)) {
+    return res.status(422).json({message: 'Request failed validation'});
+  }
+
   // Other ideas: https://www.owasp.org/index.php/Forgot_Password_Cheat_Sheet#Step_4.29_Allow_user_to_change_password_in_the_existing_session
   // look up user
   return User.findOne({_id: req.userId}) // req.userId is set in auth.temporaryLinkAuth
       .then(user => {
-        user.createPasswordHash(req.body.password);
+        user.createPasswordHash(password);
         return user.save()
             .then(()=>{
               res.send({message:'Password reset successful'});
@@ -212,8 +271,15 @@ function resetPassword(req, res) {
 }
 
 function forgotUsername(req, res) {
+  var email = req.body.email;
+  // Validate
+  if (typeof email !== 'string' ||
+      !validator.isEmail(email)) {
+    return res.status(422).json({message: 'Request failed validation'});
+  }
+
   // find all users by email
-  return User.find({email: req.body.email}).select('username')
+  return User.find({email: email}).select('username')
       .then(users => {
           // Success object must be identical, to avoid people discovering emails in the system
           const successObject = {message: 'Email sent if users found in database.'}
@@ -238,10 +304,7 @@ function forgotUsername(req, res) {
 }
 
 function logout(req, res) {
-  // get the session from the cookie
-
-  console.log("\n\n\nNeed to check JTI is actually a string\n\n\n");
-  
+  // Validation not necessary 
   // delete it from the DB
   return Session.remove({_id: req.jwtRefreshToken.jti})
       .then(()=>{
@@ -256,23 +319,26 @@ function logout(req, res) {
 }
 
 function createAndSendRefreshAndSessionJwt(user, req, res) {
-  console.log("createAndSendRefreshAndSessionJwt");
+  let userAgentString = req.header('User-Agent').substring(0, 512);
+  // Validate
+  if (typeof userAgentString !== 'string') {
+    return res.status(422).json({message: 'Request failed validation'});
+  }
+
   // Create cross-site request forgery token
   var xsrf = crypto.randomBytes(8).toString('hex');
   // Setting XSRF-TOKEN cookie means that Angular will automatically attach the 
   // XSRF token to the X-XSRF-TOKEN header. 
   // Read more: https://stormpath.com/blog/angular-xsrf
-  console.log('pre save cookie');
   res.cookie('XSRF-TOKEN', xsrf, {secure: !process.env.IS_LOCAL});
 
   const refreshTokenExpiry = Math.floor(
       (Date.now() + Number(process.env.JWT_REFRESH_TOKEN_EXPIRY))/1000);
-  
-  console.log(refreshTokenExpiry);
+
   var session = new Session();
   session.userId = user._id;
   session.exp = new Date(refreshTokenExpiry*1000);
-  session.userAgent = req.header('User-Agent').substring(0, 512);;
+  session.userAgent = userAgentString;
   session.lastObserved = new Date(Date.now());
   return session.save()
       .then((session)=>{
@@ -305,7 +371,6 @@ function createAndSendRefreshAndSessionJwt(user, req, res) {
 }
 
 function setJwtCookie({res, userId, username, isAdmin, xsrf, sessionId}) {
-  console.log("setJwtCookie");
   var jwtObj = {
     sub: userId,
     // Note this id is set using the refresh token session id so that we can
@@ -325,8 +390,8 @@ function setJwtCookie({res, userId, username, isAdmin, xsrf, sessionId}) {
   return {jwtString, jwtObj};
 }
 
-function setJwtRefreshTokenCookie({res, userId, username, isAdmin, xsrf, sessionId, exp}) {
-  console.log("setJwtRefreshTokenCookie");
+function setJwtRefreshTokenCookie(
+    {res, userId, username, isAdmin, xsrf, sessionId, exp}) {
   var jwtObj = {
     sub: userId,
     jti: sessionId,
