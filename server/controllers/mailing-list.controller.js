@@ -1,4 +1,3 @@
-// const { check, validationResult } = require('express-validator/check');
 var validator = require('validator');
 const MailingList = require('../models/mailing-list.model.js');
 const MailingListStats = require('../models/mailing-list-stats.model.js');
@@ -10,31 +9,23 @@ module.exports = function (app) {
   app.post('/api/join-mailing-list', joinMailingList);
 }
 
-// /api/join-mailing-list
-// let validateJoinMailingList = [
-//     check('email').isEmail().withMessage('email not valid'),
-//     check('givenName').isString().withMessage('givenName not valid'),
-//     check('familyName').isString().withMessage('familyName not valid'),
-// ];
-
 function joinMailingList(req, res) {
+  var email = req.body.email;
+  const givenName = req.body.givenName; 
+  const familyName = req.body.familyName; 
   // Validation
-  if (typeof req.body.email !== 'string' ||
-      !validator.isEmail(req.body.email) ||
-      typeof req.body.givenName !== 'string' ||
-      typeof req.body.givenName !== 'string' 
+  if (typeof email !== 'string' ||
+      typeof givenName !== 'string' ||
+      typeof familyName !== 'string' ||
+      !validator.isEmail(email)
     ){
     return res.status(422).json({message: 'Request failed validation'});
   }
 
-  // const errors = validationResult(req);
-  // if (!errors.isEmpty()) {
-  //     return res.status(422).json({ errors: errors.mapped() });
-  // }
   let mailingListUser = new MailingList();
-  mailingListUser.email = req.body.email;
-  mailingListUser.givenName = req.body.givenName;
-  mailingListUser.familyName = req.body.familyName;
+  mailingListUser.email = email;
+  mailingListUser.givenName = givenName;
+  mailingListUser.familyName = familyName;
   return mailingListUser.save()
       .then((result) => {
         res.status(200).send({ message: 'Success' });
