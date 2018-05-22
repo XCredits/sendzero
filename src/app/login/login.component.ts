@@ -43,7 +43,6 @@ export class LoginComponent implements OnInit {
     }
     // Clear state from previous submissions
     this.formErrorMessage = undefined;
-
     this.waiting = true;
     this.http.post('/api/user/login', {
         'username': formData.username,
