@@ -137,6 +137,11 @@ import { UserRegisterChartComponent } from './user-register-chart/user-register-
         canActivate: [AuthGuard],
       },
       {
+        path: 'mailing-list',
+        component: MailingListComponent,
+        data: { title: 'Mailing list' },
+      },
+      {
         path: 'settings',
         component: SettingsComponent,
         data: { title: 'Settings' },

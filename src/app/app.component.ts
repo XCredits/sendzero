@@ -55,6 +55,11 @@ export class AppComponent {
       isLoggedInRoute: true,
     },
     {
+      routerLink: '/mailing-list',
+      icon: 'email',
+      title: 'Mailing list',
+    },
+    {
       routerLink: '/help',
       icon: 'help',
       title: 'Help',
