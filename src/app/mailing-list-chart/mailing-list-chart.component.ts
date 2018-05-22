@@ -40,14 +40,11 @@ export class MailingListChartComponent implements OnInit {
         }
         );
 
-    this.http.post<any>('/api/admin/mailing-list-stats',
-          {
-            start: 15613, // in milliseconds, gets floored based on range
-            end: 15313, // in milliseconds, gets ceiled based on range // default behaviour max return 100
-            scale: 'seconds' // second minute hour day week month year
-          })
+    this.http.post<any>('/api/admin/mailing-list-stats', {})
         .subscribe(data => {
-          this.mailingListCount = data.count;
+          console.log('data');
+          console.log(data);
+          // this.mailingListCount = data.count;
         },
         () => {
           this.snackBar.open('Network error', 'Dismiss', {
