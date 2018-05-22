@@ -55,6 +55,11 @@ export class AppComponent {
       icon: 'settings',
       title: 'Settings',
     },
+    {
+      routerLink: '/admin',
+      icon: 'verified_user',
+      title: 'Admin',
+    },
   ];
 
 
