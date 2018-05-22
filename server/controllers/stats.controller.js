@@ -24,9 +24,12 @@ function mailingListCount(req, res) {
 
 
 function mailingListStatsReport(req, res) {
-  MailingListStats.find({})
+  MailingListStats.find({}, {time:1, count:1})
       .then(results => {
-        res.send(results);
+        const resultsFiltered = results.map(x => {
+            return {time: x.time.getTime(), value: x.count};
+        });
+        res.send(resultsFiltered);
       })
       .catch(err => {
         res.status(500)

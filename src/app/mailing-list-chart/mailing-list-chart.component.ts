@@ -43,10 +43,49 @@ export class MailingListChartComponent implements OnInit {
         );
 
     this.http.post<any>('/api/admin/mailing-list-stats', {})
-        .subscribe(data => {
+        .subscribe(sparseData => {
           console.log('data');
-          console.log(data);
-          // this.mailingListCount = data.count;
+          console.log(sparseData);
+
+          const data = this.statsService.fillOutData(sparseData, 'hour');
+
+          const edgeColor = this.chartColors.blue;
+          const backgroundColor =
+              Chart.helpers.color(this.chartColors.blue).alpha(0.2).rgbString();
+          const dataCollection = {
+            labels: data.time,
+            datasets: [{
+              label: 'Mailing list signup',
+              borderColor: this.chartColors.blue,
+              borderWidth: 1,
+              backgroundColor: backgroundColor,
+              data: data.value,
+            }]
+          };
+
+          const ctx = this.chart1.nativeElement.getContext('2d');
+          const chart1Obj = new Chart(ctx, {
+            type: 'bar',
+            data: dataCollection,
+            options: {
+              showLine: true,
+              scales: {
+                xAxes: [{
+                    ticks: {
+                      autoSkip: true,
+                      maxTicksLimit: 20,
+                      evenLabelSpacing: true,
+                      // labelSpacing: 5,
+                    }
+                }],
+                yAxes: [{
+                  ticks: {
+                      beginAtZero: true
+                  }
+                }]
+              }
+            }
+          });
         },
         () => {
           this.snackBar.open('Network error', 'Dismiss', {
@@ -55,43 +94,43 @@ export class MailingListChartComponent implements OnInit {
         }
         );
 
-    const data1 = [];
-    const labels = [];
-    for (let i = 0; i < 101; i++) {
-      labels.push(i);
-      data1.push(Math.random() * 100);
-    }
+    // const data1 = [];
+    // const labels = [];
+    // for (let i = 0; i < 101; i++) {
+    //   labels.push(i);
+    //   data1.push(Math.random() * 100);
+    // }
 
-    const color = Chart.helpers.color; // this, I believe, is the same 'color' as used in 'npm install color'
-    const scatterChartData = {
-      labels: labels,
-      datasets: [{
-        label: 'My Second dataset',
-        borderColor: this.chartColors.blue,
-        borderWidth: 1,
-        backgroundColor: color(this.chartColors.blue).alpha(0.2).rgbString(),
-        data: data1,
-      }]
-    };
+    // const color = Chart.helpers.color; // this, I believe, is the same 'color' as used in 'npm install color'
+    // const scatterChartData = {
+    //   labels: labels,
+    //   datasets: [{
+    //     label: 'My Second dataset',
+    //     borderColor: this.chartColors.blue,
+    //     borderWidth: 1,
+    //     backgroundColor: color(this.chartColors.blue).alpha(0.2).rgbString(),
+    //     data: data1,
+    //   }]
+    // };
 
-    const ctx = this.chart1.nativeElement.getContext('2d');
-    const chart1Obj = new Chart(ctx, {
-      type: 'bar',
-      data: scatterChartData,
-      options: {
-        showLine: true,
-        scales: {
-          xAxes: [{
-              ticks: {
-                // autoSkip: true,
-                // maxTicksLimit: 10,
-                // evenLabelSpacing: true,
-                // labelSpacing: 5,
-              }
-          }]
-      }
-      }
-    });
+    // const ctx = this.chart1.nativeElement.getContext('2d');
+    // const chart1Obj = new Chart(ctx, {
+    //   type: 'bar',
+    //   data: scatterChartData,
+    //   options: {
+    //     showLine: true,
+    //     scales: {
+    //       xAxes: [{
+    //           ticks: {
+    //             // autoSkip: true,
+    //             // maxTicksLimit: 10,
+    //             // evenLabelSpacing: true,
+    //             // labelSpacing: 5,
+    //           }
+    //       }]
+    //   }
+    //   }
+    // });
   }
 
 }
