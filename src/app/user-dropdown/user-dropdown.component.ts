@@ -18,8 +18,6 @@ export class UserDropdownComponent implements OnInit {
   ngOnInit() {
     this.userService.userObservable
         .subscribe(user => {
-          console.log('Got into user observable');
-          console.log(user);
           this.user = user;
           this.isLoggedIn = !!this.user;
         });

@@ -3,7 +3,7 @@ import {filter} from 'rxjs/operators';
 import { Component, ViewChild } from '@angular/core';
 // Imports needed for router import for title
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
-
+import { UserService } from './user.service';
 
 @Component({
   selector: 'app-root',
@@ -13,10 +13,17 @@ import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 export class AppComponent {
   @ViewChild('sideNavDrawer') sideNavDrawer;
   screenWidth: number;
-  mobileWidth: boolean = false;
+  mobileWidth = false; // boolean
   title: string;
+  user: User;
+  isLoggedIn: boolean;
+  userIsAdmin: boolean;
+
+
   // Edit the area below to create main nav links
-  primaryNavLinks: { routerLink: string, icon: string, title: string }[] = [
+
+  // Primary nav links are shown in both the side and the bottom navs
+  primaryNavLinks: NavLink[] = [
     {
       routerLink: '/home',
       icon: 'home',
@@ -39,11 +46,18 @@ export class AppComponent {
     },
   ];
 
-  secondaryNavLinks: { routerLink: string, icon: string, title: string }[] = [
+  // Secondary nav links are only shown in the side bar
+  secondaryNavLinks: NavLink[] = [
     {
       routerLink: '/profile',
       icon: 'person',
       title: 'Profile',
+      isLoggedInRoute: true,
+    },
+    {
+      routerLink: '/mailing-list',
+      icon: 'email',
+      title: 'Mailing list',
     },
     {
       routerLink: '/help',
@@ -54,6 +68,12 @@ export class AppComponent {
       routerLink: '/settings',
       icon: 'settings',
       title: 'Settings',
+    },
+    {
+      routerLink: '/admin',
+      icon: 'verified_user',
+      title: 'Admin',
+      isAdminRoute: true,
     },
   ];
 
@@ -80,7 +100,11 @@ export class AppComponent {
     }
   }
 
-  constructor(router: Router, route: ActivatedRoute) {
+  constructor(
+      router: Router,
+      route: ActivatedRoute,
+      userService: UserService
+    ) {
     // Set side bar mode
     this.screenWidth = window.innerWidth;
     window.onresize = () => {
@@ -94,9 +118,34 @@ export class AppComponent {
       .forEach(e => {
         this.title = route.root.firstChild.snapshot.data['title'];
       });
+
+    userService.userObservable
+      .subscribe(user => {
+        this.user = user;
+        this.isLoggedIn = !!user;
+        this.userIsAdmin = user ? this.user.isAdmin : false;
+      });
   }
 
   ngAfterViewInit() {
     this.setSideBar();
   }
+}
+
+interface NavLink {
+  routerLink: string;
+  icon: string;
+  title: string;
+  isAdminRoute?: boolean;
+  isLoggedInRoute?: boolean;
+}
+
+interface User {
+  id: string;
+  username: string;
+  givenName: string;
+  familyName: string;
+  email: string;
+  isLoggedIn: boolean;
+  isAdmin: boolean;
 }

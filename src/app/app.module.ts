@@ -6,7 +6,9 @@ import { RouterModule } from '@angular/router';
 import { LocalStorageModule } from 'angular-2-local-storage';
 import { AppComponent } from './app.component';
 import { UserService } from './user.service';
+import { StatsService } from './stats.service';
 import { AuthGuard } from './auth.guard';
+import { AdminGuard } from './admin.guard';
 
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 // import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
@@ -68,6 +70,10 @@ import { RegisterComponent } from './register/register.component';
 import { MailingListComponent } from './mailing-list/mailing-list.component';
 import { ProfileComponent } from './profile/profile.component';
 import { UserDropdownComponent } from './user-dropdown/user-dropdown.component';
+import { AdminComponent } from './admin/admin.component';
+import { UnauthorizedComponent } from './unauthorized/unauthorized.component';
+import { MailingListChartComponent } from './mailing-list-chart/mailing-list-chart.component';
+import { UserRegisterChartComponent } from './user-register-chart/user-register-chart.component';
 
 @NgModule({
   declarations: [
@@ -87,6 +93,10 @@ import { UserDropdownComponent } from './user-dropdown/user-dropdown.component';
     MailingListComponent,
     ProfileComponent,
     UserDropdownComponent,
+    AdminComponent,
+    UnauthorizedComponent,
+    MailingListChartComponent,
+    UserRegisterChartComponent,
   ],
   imports: [
     BrowserModule,
@@ -127,6 +137,11 @@ import { UserDropdownComponent } from './user-dropdown/user-dropdown.component';
         canActivate: [AuthGuard],
       },
       {
+        path: 'mailing-list',
+        component: MailingListComponent,
+        data: { title: 'Mailing list' },
+      },
+      {
         path: 'settings',
         component: SettingsComponent,
         data: { title: 'Settings' },
@@ -160,6 +175,17 @@ import { UserDropdownComponent } from './user-dropdown/user-dropdown.component';
         path: 'register',
         component: RegisterComponent,
         data: { title: 'Register' },
+      },
+      {
+        path: 'admin',
+        component: AdminComponent,
+        data: { title: 'Admin' },
+        canActivate: [AdminGuard],
+      },
+      {
+        path: 'unauthorized',
+        component: UnauthorizedComponent,
+        data: { title: 'Unauthorized' },
       },
       { // Default route
         path: '',
@@ -215,7 +241,7 @@ import { UserDropdownComponent } from './user-dropdown/user-dropdown.component';
     ServiceWorkerModule.register('/ngsw-worker.js',
         {enabled: environment.production})
   ],
-  providers: [UserService],
+  providers: [UserService, StatsService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

@@ -1,4 +1,4 @@
-var mongoose = require('mongoose');
+const mongoose = require('mongoose');
 mongoose.Promise = require("bluebird");
 var Schema = mongoose.Schema;
 
@@ -8,7 +8,13 @@ var MailingListSchema = new Schema({
     email: {type: String, required: true},
     timeSubscribe: {type: Date, default: Date.now},
     timeUnsubscribe: {type: Date},
+    userId: {type: String},
   }
 );
+
+MailingListSchema.index({ userId: 1 });
+MailingListSchema.index({ timeSubscribe: 1 });
+MailingListSchema.index({ email: 1 });
+
 
 module.exports = mongoose.model('MailingList', MailingListSchema);

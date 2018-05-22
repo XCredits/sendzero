@@ -42,6 +42,8 @@
 
 
 const User = require('../models/user.model.js');
+const UserStats = require('../models/user-stats.model.js');
+const statsService = require('../services/stats.service.js');
 const Session = require('../models/session.model.js');
 const jwt = require('jsonwebtoken');
 const auth = require('../config/jwt-auth.js');
@@ -66,7 +68,7 @@ module.exports = function (app) {
 
 function register(req, res) {
   // validate
-
+  
   // check that there is not an existing user with this username
   return User.findOne({username: req.body.username})
       .then(existingUser => {
@@ -81,7 +83,14 @@ function register(req, res) {
         user.createPasswordHash(req.body.password);
         return user.save()
             .then(() => {
-              return createAndSendRefreshAndSessionJwt(user, req, res);
+              return createAndSendRefreshAndSessionJwt(user, req, res)
+                  .then(()=>{
+                    console.log('incrementing');
+                    return statsService.increment(UserStats);
+                  })
+                  .catch((err)=>{
+                    console.log('Error in the stats service');
+                  });
             })
             .catch(dbError => {
               var err;
