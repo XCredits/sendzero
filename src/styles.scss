@@ -30,6 +30,20 @@ body {
   .text-error-color {
     color: red;
   }
+  .white-text {
+    color: white;
+    a {
+      text-decoration: underline;
+    }
+    a:link, 
+    a:visited{
+      color: white;
+    }
+    a:hover, 
+    a:active{
+      color: #aaa
+    }
+  }
 }
 
 @media screen and (min-width: 768px) {
