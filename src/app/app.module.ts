@@ -6,6 +6,7 @@ import { RouterModule } from '@angular/router';
 import { LocalStorageModule } from 'angular-2-local-storage';
 import { AppComponent } from './app.component';
 import { UserService } from './user.service';
+import { StatsService } from './stats.service';
 import { AuthGuard } from './auth.guard';
 import { AdminGuard } from './admin.guard';
 
@@ -233,7 +234,7 @@ import { MailingListChartComponent } from './mailing-list-chart/mailing-list-cha
     ServiceWorkerModule.register('/ngsw-worker.js',
         {enabled: environment.production})
   ],
-  providers: [UserService],
+  providers: [UserService, StatsService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

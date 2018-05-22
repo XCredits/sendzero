@@ -117,8 +117,8 @@ export class AppComponent {
     userService.userObservable
       .subscribe(user => {
         this.user = user;
-        this.isLoggedIn = !!this.user;
-        this.userIsAdmin = this.user.isAdmin;
+        this.isLoggedIn = !!user;
+        this.userIsAdmin = user ? this.user.isAdmin : false;
       });
   }
 

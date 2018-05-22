@@ -1,7 +1,8 @@
 import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import {MatSnackBar} from '@angular/material';
+import { MatSnackBar } from '@angular/material';
 import * as Chart from 'chart.js';
+import { StatsService } from '../stats.service';
 
 @Component({
   selector: 'app-mailing-list-chart',
@@ -15,6 +16,7 @@ export class MailingListChartComponent implements OnInit {
   constructor(
       private http: HttpClient,
       private snackBar: MatSnackBar,
+      private statsService: StatsService,
   ) { }
 
 
