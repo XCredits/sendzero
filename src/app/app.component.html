@@ -9,11 +9,17 @@
       </a>
     </mat-toolbar>
     <mat-nav-list>
-      <a *ngFor="let navLink of primaryNavLinks" mat-list-item routerLink="{{navLink.routerLink}}" (click)="hideSideNavAfterClick()">
+      <a *ngFor="let navLink of primaryNavLinks" mat-list-item
+          [hidden]="(navLink.isAdminRoute && !userIsAdmin) || (navLink.isLoggedInRoute && !isLoggedIn)"
+          routerLink="{{navLink.routerLink}}"
+          (click)="hideSideNavAfterClick()">
         <mat-icon>{{navLink.icon}}</mat-icon>
         {{navLink.title}}
       </a>
-      <a *ngFor="let navLink of secondaryNavLinks" mat-list-item routerLink="{{navLink.routerLink}}" (click)="hideSideNavAfterClick()">
+      <a *ngFor="let navLink of secondaryNavLinks" mat-list-item
+          [hidden]="(navLink.isAdminRoute && !userIsAdmin) || (navLink.isLoggedInRoute && !isLoggedIn)"
+          routerLink="{{navLink.routerLink}}"
+          (click)="hideSideNavAfterClick()">
         <mat-icon>{{navLink.icon}}</mat-icon>
         {{navLink.title}}
       </a>
