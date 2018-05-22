@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { MatSnackBar } from '@angular/material';
 import * as Chart from 'chart.js';
 import { StatsService } from '../stats.service';
+import * as moment from 'moment';
 
 @Component({
   selector: 'app-mailing-list-chart',
