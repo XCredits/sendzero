@@ -48,9 +48,6 @@ export class MailingListComponent implements OnInit {
         errorResponse => {
           this.waiting = false;
           this.formErrorMessage = 'There was a problem submitting the form.';
-          this.snackBar.open('Network error', 'Dismiss', {
-            duration: 5000
-          });
         });
   };
 }
