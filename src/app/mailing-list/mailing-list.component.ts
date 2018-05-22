@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { MatSnackBar } from '@angular/material';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
 
 @Component({
@@ -8,34 +9,48 @@ import { FormGroup, FormControl, Validators } from '@angular/forms';
   styleUrls: ['./mailing-list.component.scss']
 })
 export class MailingListComponent implements OnInit {
-  joinStringForm: FormGroup;
-  joinListMessage: string;
+  form: FormGroup;
+  waiting = false;
+  formErrorMessage: string;
 
-  constructor( private http: HttpClient ) { }
+  constructor(
+    private http: HttpClient,
+    private snackBar: MatSnackBar,
+  ) { }
 
   ngOnInit() {
-    this.joinStringForm = new FormGroup ({
+    this.form = new FormGroup ({
       givenName: new FormControl(''),
       familyName: new FormControl(''),
       email: new FormControl('', [Validators.required, Validators.email]),
     });
   }
 
-  joinStringSubmit = function (formData) {
-    console.log(formData);
-    console.log(this.joinStringForm);
-
-    if (this.joinStringForm.invalid) {
+  submit = function (formData) {
+    if (this.form.invalid) {
       return;
     }
+    // Clear state from previous submissions
+    this.formErrorMessage = undefined;
+    this.waiting = true;
     this.http.post('/api/join-mailing-list', {
         'givenName': formData.givenName,
         'familyName': formData.familyName,
         'email': formData.email
         })
-        .subscribe(data => {
-          console.log('received message');
-          this.joinListMessage = data.message;
+        .subscribe(
+        data => {
+          this.waiting = false;
+          this.snackBar.open('Successfully registered', 'Dismiss', {
+            duration: 5000
+          });
+        },
+        errorResponse => {
+          this.waiting = false;
+          this.formErrorMessage = 'There was a problem submitting the form.';
+          this.snackBar.open('Network error', 'Dismiss', {
+            duration: 5000
+          });
         });
   };
 }
