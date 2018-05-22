@@ -40,7 +40,7 @@
 // cookie. This means that ALL get requests could potentially be called from any
 
 
-
+const { check, validationResult } = require('express-validator/check');
 const User = require('../models/user.model.js');
 const UserStats = require('../models/user-stats.model.js');
 const statsService = require('../services/stats.service.js');
@@ -66,6 +66,13 @@ module.exports = function (app) {
   app.post('/api/user/logout', auth.jwtRefreshToken, logout);
 }
 
+let validateJoinMailingList = [
+  check('email').isEmail().withMessage('email not valid'),
+  check('givenName').isString().withMessage('givenName not valid'),
+  check('familyName').isString().withMessage('familyName not valid'),
+  check('password').isString().withMessage('password not valid'),
+  check('username').isString().withMessage('password not valid'),
+];
 function register(req, res) {
   // validate
   
