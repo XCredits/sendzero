@@ -43,6 +43,7 @@ var validator = require('validator');
 const User = require('../models/user.model.js');
 const UserStats = require('../models/user-stats.model.js');
 const statsService = require('../services/stats.service.js');
+const emailService = require('../services/email.service.js');
 const Session = require('../models/session.model.js');
 const jwt = require('jsonwebtoken');
 const auth = require('../config/jwt-auth.js');

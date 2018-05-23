@@ -110,9 +110,8 @@ gcloud app deploy
 Deployed service [default] to [https://test-project-197703.appspot.com]
 ~~~
 
-
-
-
+# Instructions for setting up SendGrid emails
+Copy `sendgrid.env.example` and rename to `sendgrid.env`. Put your SendGridKey between the quotes.
 
 # How this app was created
 ## Install Angular
