@@ -111,7 +111,6 @@ sendRegisterWelcome: function({userId, email, givenName, familyName}) {
       last_name: familyName,
     },
   };
-  console.log('SENDING WELCOME');
   return sendgridMail.send(msg);
 },
 

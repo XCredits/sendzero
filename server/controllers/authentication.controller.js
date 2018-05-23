@@ -106,37 +106,29 @@ function register(req, res) {
               // block on failure
               return createAndSendRefreshAndSessionJwt(user, req, res)
                   .then(()=>{
-                    console.log('incrementing');
                     return statsService.increment(UserStats)
                         .catch((err)=>{
                           console.log('Error in the stats service');
-                          console.log(err);
                         })
                   })
                   .then(()=>{
-                    console.log('email1');
-                    console.log(emailService);
                     return emailService.addUserToMailingList({
                           givenName, familyName, email, userId: user._id,
                         })
                         .catch((err)=>{
                           console.log('Error in the mailing list service');
-                          console.log(err);
                         });
                   })
                   .then(()=>{
-                    console.log('email2');
                     return emailService.sendRegisterWelcome({
                           givenName, familyName, email,
                         })
                         .catch((err)=>{
                           console.log('Error in the send email service');
-                          console.log(err);
                         });
                   })
                   .catch((err) =>{
                     console.log('Error in createAndSendRefreshAndSessionJwt');
-                    console.log(err);
                   });
             })
             .catch(dbError => {
@@ -150,8 +142,6 @@ function register(req, res) {
             });
       })
       .catch((err)=>{
-        console.log('err');
-        console.log(err);
         res.status(500).send({message:'Error accessing database while checking for existing users'});
       });
 }
