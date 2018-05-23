@@ -2,10 +2,12 @@
 
 // using SendGrid's v3 Node.js Library
 // https://github.com/sendgrid/sendgrid-nodejs
+const sendgridMail = require('@sendgrid/mail');
+const sendgridClient = require('@sendgrid/client');
+sendgridMail.setApiKey(process.env.SENDGRID_API_KEY);
+sendgridClient.setApiKey(process.env.SENDGRID_API_KEY);
 
 // #SENDGRID_VERIFICATION START
-// const sgMail = require('@sendgrid/mail');
-// sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 // const msg = {
 //   to: 'test@example.com',
 //   from: 'test@example.com',
@@ -13,7 +15,7 @@
 //   text: 'and easy to do anywhere, even with Node.js',
 //   html: '<strong>and easy to do anywhere, even with Node.js</strong>',
 // };
-// sgMail.send(msg)
+// sendgridMail.send(msg)
 //     .then(() => {console.log('SendGrid worked!')})
 //     .catch((err) => {console.log('Error occurred.'); console.log(err); });
 // #SENDGRID_VERIFICATION END
@@ -32,8 +34,31 @@ exports = {
  * Add the user to the mailing list in the email service provider
  */
 function addUserToMailingList({userId, email, givenName, familyName}) {
-  
+  const data = [
+    {
+      "email": email,
+      "first_name": givenName,
+      "last_name": familyName,
+    },
+  ];
+  var request = {
+    body: data,
+    method: 'POST',
+    url: '/v3/contactdb/recipients',
+  };
+  sendgridClient.request(request)
+      .then(([response, body]) => {
+        console.log(response.statusCode);
+        console.log(response.body);
+      })
 }
+// Testing
+// addUserToMailingList({
+//   email: 'test@test.com', 
+//   givenName: 'Robert', 
+//   familyName: 'Smith'});
+
+
 
 /**
  * Remove the user from the mailing list in the email service provider
