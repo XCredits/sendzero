@@ -43,6 +43,7 @@ var validator = require('validator');
 const User = require('../models/user.model.js');
 const UserStats = require('../models/user-stats.model.js');
 const statsService = require('../services/stats.service.js');
+const emailService = require('../services/email.service.js');
 const Session = require('../models/session.model.js');
 const jwt = require('jsonwebtoken');
 const auth = require('../config/jwt-auth.js');
@@ -101,13 +102,33 @@ function register(req, res) {
         user.createPasswordHash(password);
         return user.save()
             .then(() => {
+              // The below promises are structured to report failure but not
+              // block on failure
               return createAndSendRefreshAndSessionJwt(user, req, res)
                   .then(()=>{
-                    console.log('incrementing');
-                    return statsService.increment(UserStats);
+                    return statsService.increment(UserStats)
+                        .catch((err)=>{
+                          console.log('Error in the stats service');
+                        })
                   })
-                  .catch((err)=>{
-                    console.log('Error in the stats service');
+                  .then(()=>{
+                    return emailService.addUserToMailingList({
+                          givenName, familyName, email, userId: user._id,
+                        })
+                        .catch((err)=>{
+                          console.log('Error in the mailing list service');
+                        });
+                  })
+                  .then(()=>{
+                    return emailService.sendRegisterWelcome({
+                          givenName, familyName, email,
+                        })
+                        .catch((err)=>{
+                          console.log('Error in the send email service');
+                        });
+                  })
+                  .catch((err) =>{
+                    console.log('Error in createAndSendRefreshAndSessionJwt');
                   });
             })
             .catch(dbError => {
@@ -120,7 +141,7 @@ function register(req, res) {
                   message: 'Error in creating user during registration: ' + err});
             });
       })
-      .catch(()=>{
+      .catch((err)=>{
         res.status(500).send({message:'Error accessing database while checking for existing users'});
       });
 }
