@@ -102,13 +102,41 @@ function register(req, res) {
         user.createPasswordHash(password);
         return user.save()
             .then(() => {
+              // The below promises are structured to report failure but not
+              // block on failure
               return createAndSendRefreshAndSessionJwt(user, req, res)
                   .then(()=>{
                     console.log('incrementing');
-                    return statsService.increment(UserStats);
+                    return statsService.increment(UserStats)
+                        .catch((err)=>{
+                          console.log('Error in the stats service');
+                          console.log(err);
+                        })
                   })
-                  .catch((err)=>{
-                    console.log('Error in the stats service');
+                  .then(()=>{
+                    console.log('email1');
+                    console.log(emailService);
+                    return emailService.addUserToMailingList({
+                          givenName, familyName, email, userId: user._id,
+                        })
+                        .catch((err)=>{
+                          console.log('Error in the mailing list service');
+                          console.log(err);
+                        });
+                  })
+                  .then(()=>{
+                    console.log('email2');
+                    return emailService.sendRegisterWelcome({
+                          givenName, familyName, email,
+                        })
+                        .catch((err)=>{
+                          console.log('Error in the send email service');
+                          console.log(err);
+                        });
+                  })
+                  .catch((err) =>{
+                    console.log('Error in createAndSendRefreshAndSessionJwt');
+                    console.log(err);
                   });
             })
             .catch(dbError => {
@@ -121,7 +149,9 @@ function register(req, res) {
                   message: 'Error in creating user during registration: ' + err});
             });
       })
-      .catch(()=>{
+      .catch((err)=>{
+        console.log('err');
+        console.log(err);
         res.status(500).send({message:'Error accessing database while checking for existing users'});
       });
 }
