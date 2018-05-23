@@ -46,10 +46,12 @@ function addUserToMailingList({userId, email, givenName, familyName}) {
     method: 'POST',
     url: '/v3/contactdb/recipients',
   };
-  sendgridClient.request(request)
+  return sendgridClient.request(request)
       .then(([response, body]) => {
-        console.log(response.statusCode);
-        console.log(response.body);
+        if (body.errors.length === 0) {
+          return response.body.persisted_recipients;
+        }
+        throw new Error('Problem adding to email list.');
       })
 }
 // Testing
@@ -57,7 +59,6 @@ function addUserToMailingList({userId, email, givenName, familyName}) {
 //   email: 'test@test.com', 
 //   givenName: 'Robert', 
 //   familyName: 'Smith'});
-
 
 
 /**
