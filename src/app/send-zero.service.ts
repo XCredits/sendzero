@@ -53,7 +53,8 @@ export class SendZeroService {
   // Untyped definitions
   private socket: any;
   private signalClient: any;
-  private peer: any;
+  // Maybe interface this
+  private peers: any;
 
   constructor(private ref: ApplicationRef,
               private sanitizer: DomSanitizer,
@@ -68,6 +69,11 @@ export class SendZeroService {
 
   public init(): void {
     const self = this;
+
+    // Peers is an object keyed by the ids of the peers connected to you.
+    // The value is another object that contains the peer object, file(s) info,
+    // etc.
+    this.peers = {};
 
     // Set up socket
     this.socket = io(SERVER_URL, {transports: ['websocket']});
@@ -106,28 +112,39 @@ export class SendZeroService {
   }
 
   private handleSignalClientPeer(peer: any): void {
-    this.peer = peer;
     // Set up peer handling functions
-    this.peer.on('connect', this.handlePeerConnect.bind(this));
-    this.peer.on('data', this.handlePeerReceiveData.bind(this));
-    this.peer.on('error', this.handlePeerError.bind(this));
+    peer.on('connect', () => this.handlePeerConnect.bind(this)(peer));
+    peer.on('data', this.handlePeerReceiveData.bind(this));
+    peer.on('error', this.handlePeerError.bind(this));
+    // Add to peers list
+    this.peers[peer.id] = {
+      peer: peer,
+      files: [],
+      prompt: 'Connected to peer!'
+    };
   }
 
-  private handlePeerConnect(): void {
-    this.prompt = 'Now connected to peer! Select a file to send!';
-    this.peerId = this.peer.id;
+  private handlePeerConnect(peer: any): void {
+    this.peers[peer.id].prompt = 'Now connected to peer! Select a file to send!';
+    this.peerId = peer.id;
     this.disableSendButton = false;
     this.ref.tick();
   }
 
-  // Data always comes in as Uint8Array of size CHUNK_SIZE
+  // Data always comes in as Uint8Array
   private handlePeerReceiveData(data: Uint8Array): void {
-    // We first try to convert data to String/JSON as metadata of the file
-    // always received as JSON and messages as strings.
-    // If this doesn't work, then we assume that we've received a file.
+    // All data comes in as an Uint8Array which is then converted to a string
+    // which in turn is parsed as a JSON object. (The process is complicated
+    // due to limitations of simple-peer).
+    // The object can be a message (whether the file has been accepted or
+    // rejected, etc) or the file data itself. Ideally every piece of data sent
+    // through should have a "from" and "to" field to prevent intereptions.
+    // TODO: have a type for messages.
+    // If the parsing fails, show an error.
     try {
       // @ts-ignore
-      const messageOrMetadataString = new TextDecoder('utf-8').decode(data);
+      const messageOrDataString = new TextDecoder('utf-8').decode(data);
+      const receivedData = JSON.parse(messageOrDataString);
       // Various cases
       // 1. We receive a message saying we can continue sending file (after
       // we've sent file metadata through)
@@ -135,23 +152,32 @@ export class SendZeroService {
       // sent file metadata through)
       // 3. We're receiving an actual metadata object and we have to ask the
       // user if they want to accept the file by opening the dialog
-      if (messageOrMetadataString === 'File Accepted') {
+      // 4. We're receiving file data.
+      if (receivedData.response && receivedData.response === 'File Accepted') {
         // We can now continue sending our file.
-        this.sendChunkedFile();
-      } else if (messageOrMetadataString === 'File Declined') {
+        this.sendChunkedFile(receivedData);
+      } else if (receivedData.response
+            && receivedData.response === 'File Declined') {
         // We should now clear all file related variables in our state.
-        this.prompt = 'Peer did not accept the file! Please try again.';
+        this.peers[receivedData.from].prompt
+            = 'Peer did not accept the file! Please try again.';
         this.ref.tick();
-        this.fileChunks = null;
-      } else {
-        const fileMetadata = JSON.parse(messageOrMetadataString);
-        if (this.fileReadyForDownload) {
-          this.resetReceiveVariables();
-          window.URL.revokeObjectURL(this.unsafeUrl);
+        this.peers[receivedData.from]
+            .files
+            .find(f => f.id === receivedData.fileId).
+            fileChunks = null;
+      } else if (receivedData.fileName) {
+        const fileMetadata = JSON.parse(receivedData);
+        if (this.peers[receivedData.from]
+              .files.find(f => f.id === receivedData.fileId).fileReadyForDownload) {
+          this.resetReceiveVariables(receivedData.from, receivedData.fileId);
+          window.URL.revokeObjectURL(this.peers[receivedData.from]
+              .files.find(f => f.id === receivedData.fileId)
+              .unsafeUrl);
         }
         // this.fileReadyForDownload = false;
         // Reassign (deep copy) rather than fileMetadata = receivedFileMetaData
-        this.receivedFileMetadata = JSON.parse(messageOrMetadataString);
+        this.receivedFileMetadata = JSON.parse(receivedData);
         this.fileName = this.receivedFileMetadata.fileName;
         // Initialize a Uint8Array
         this.fileArray = new Uint8Array(this.receivedFileMetadata.fileByteSize);
@@ -165,7 +191,7 @@ export class SendZeroService {
       // Then set the rest of the data arrays into our file array
       // If it's the last data array, we get the blob.
 
-      if (this.receivedChunks === 0) {
+      if (this.peers[].receivedChunks === 0) {
         this.fileArray.set(data);
         this.fileArrayOffset = CHUNK_SIZE;
         this.receivedChunks++;
