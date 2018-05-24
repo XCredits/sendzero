@@ -11,8 +11,10 @@ sendgridMail.setSubstitutionWrappers('{{', '}}');
 
 const organizationName = 'XCredits';
 const organizationEmail = 'teamx@xcredits.com';
+const organizationNoReplyEmail = 'noreply@xcredits.com';
 const organizationFromName = 'Team XCredits';
 const registerWelcomeTemplateId = '325bd7af-8542-4d59-bd32-2469cf13b495';
+const mailingListWelcomeTemplateId = '325bd7af-8542-4d59-bd32-2469cf13b495';
 
 
 // #SENDGRID_VERIFICATION START
@@ -115,15 +117,48 @@ sendRegisterWelcome: function({userId, email, givenName, familyName}) {
 },
 
 sendMailingListWelcome: function({userId, email, givenName, familyName}) {
-  
+  const msg = {
+    to: email,
+    from: organizationEmail,
+    subject: 'Welcome to ' + organizationName + (givenName? ', ' + givenName : ''),
+    templateId: mailingListWelcomeTemplateId,
+    substitutions: {
+      first_name: givenName,
+      last_name: familyName,
+    },
+  };
+  return sendgridMail.send(msg);
 },
 
-sendPasswordReset: function({userId, email, givenName, familyName, resetLink}) {
-  
+sendPasswordReset: function({userId, email, givenName, familyName, resetUrl}) {
+  const msg = {
+    to: email,
+    from: organizationNoReplyEmail,
+    subject: 'Password reset for ' + organizationName + (givenName? ', ' + givenName : ''),
+    templateId: passwordResetTemplateId,
+    substitutions: {
+      first_name: givenName,
+      last_name: familyName,
+      reset_url: resetUrl,
+    },
+  };
+  return sendgridMail.send(msg);
 },
 
 sendUsernameRetrieval: function({userId, email, givenName, familyName, userNameArr}) {
-  
+  userNameArr to string!!!
+  const msg = {
+    to: email,
+    from: organizationNoReplyEmail,
+    subject: 'Password reset for ' + organizationName + (givenName? ', ' + givenName : ''),
+    templateId: passwordResetTemplateId,
+    substitutions: {
+      first_name: givenName,
+      last_name: familyName,
+      usernames: resetUrl,
+    },
+  };
+  return sendgridMail.send(msg);
 }
 
 };
