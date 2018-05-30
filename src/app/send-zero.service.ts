@@ -4,6 +4,8 @@ import { OnInit, ApplicationRef } from '@angular/core';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import {MatDialog, MatDialogRef, MAT_DIALOG_DATA} from '@angular/material';
 import { THIS_EXPR } from '@angular/compiler/src/output/output_ast';
+import { ResolveEnd } from '@angular/router/src/events';
+import { shortid } from 'shortid';
 
 
 
@@ -24,31 +26,9 @@ if (String(window.location.hostname) === 'localhost') {
 export class SendZeroService {
   // Typed definitions
   public id: string;
-  public peerId: string;
   public prompt: string;
   public connectionPrompt: string;
-  public url: SafeResourceUrl;
-  private unsafeUrl: string;
   public disableConnectButton: boolean;
-  public disableSendButton: boolean;
-  public fileReadyForDownload: boolean;
-  public fileName: string;
-  // For progress element
-  public maxFileChunks = 0;
-  public receivedChunks = 0;
-  private receivedFileMetadata: {
-    fileName: string,
-    fileType: string,
-    fileSize: number,
-    fileByteSize: number,
-    numberOfChunks: number,
-  };
-  private fileArray: Uint8Array;
-  private fileArrayOffset = 0;
-  private fileReader: FileReader;
-  private file: File;
-  // For file sending
-  private fileChunks: Array<Uint8Array>;
 
   // Untyped definitions
   private socket: any;
@@ -60,11 +40,8 @@ export class SendZeroService {
               private sanitizer: DomSanitizer,
               public dialog: MatDialog) {
     this.id = '';
-    this.peerId = '';
     this.prompt = 'Please wait...';
     this.disableConnectButton = true;
-    this.disableSendButton = true;
-    this.fileReadyForDownload = false;
    }
 
   public init(): void {
@@ -90,11 +67,6 @@ export class SendZeroService {
     this.signalClient.on('ready', this.handleSignalClientReadyState.bind(this));
     this.signalClient.on('request', this.handleSignalClientRequest.bind(this));
     this.signalClient.on('peer', this.handleSignalClientPeer.bind(this));
-
-    // Set up file reader
-    this.fileReader = new FileReader();
-    // Function that determines what to do after reading the file.
-    this.fileReader.onload = ((event) => this.finishReadingFile.bind(this));
   }
 
   private handleSignalClientReadyState(): void {
@@ -112,22 +84,21 @@ export class SendZeroService {
   }
 
   private handleSignalClientPeer(peer: any): void {
+    // Add to peers list
+    this.peers[peer.id] = {
+      peer: peer,
+      id: peer.id,
+      files: [],
+      prompt: 'Connected to peer!'
+    };
     // Set up peer handling functions
     peer.on('connect', () => this.handlePeerConnect.bind(this)(peer));
     peer.on('data', this.handlePeerReceiveData.bind(this));
     peer.on('error', this.handlePeerError.bind(this));
-    // Add to peers list
-    this.peers[peer.id] = {
-      peer: peer,
-      files: [],
-      prompt: 'Connected to peer!'
-    };
   }
 
   private handlePeerConnect(peer: any): void {
     this.peers[peer.id].prompt = 'Now connected to peer! Select a file to send!';
-    this.peerId = peer.id;
-    this.disableSendButton = false;
     this.ref.tick();
   }
 
@@ -141,7 +112,7 @@ export class SendZeroService {
     // a 'type' field. This can be "MESSAGE", "METADATA" or "FILE"
     // Ideally it should also have a "from" and "to" field to prevent
     // interceptions.
-    // If the parsing fails, show an error.
+    // If the parsing fails, we show an error.
     try {
       // @ts-ignore
       const messageOrDataString = new TextDecoder('utf-8').decode(data);
@@ -157,35 +128,34 @@ export class SendZeroService {
       if (receivedData.type === 'MESSAGE'
           && receivedData.message === 'File Accepted') {
         // We can now continue sending our file.
-        this.sendChunkedFile(receivedData);
+        this.sendChunkedFile(receivedData.from, receivedData.fileId);
       } else if (receivedData.type === 'MESSAGE'
           && receivedData.message === 'File Declined') {
         // We should now clear all file related variables in our state.
         this.peers[receivedData.from].prompt
             = 'Peer did not accept the file! Please try again.';
         this.ref.tick();
-        this.peers[receivedData.from]
-            .files
-            .find(f => f.id === receivedData.fileId)
-            .fileChunks = null;
+        const fileToRemove = this.peers[receivedData.from].files
+            .find(f => f.id === receivedData.fileId);
+        const index = this.peers[receivedData.from].files.indexOf(fileToRemove);
+        this.peers[receivedData.from].files.splice(index, 1);
       } else if (receivedData.type === 'METADATA') {
-        const fileMetadata = JSON.parse(receivedData);
-        if (this.peers[receivedData.from]
-              .files.find(f => f.id === receivedData.fileId).fileReadyForDownload) {
-          this.resetReceiveVariables(receivedData.from, receivedData.fileId);
-          window.URL.revokeObjectURL(this.peers[receivedData.from]
-              .files.find(f => f.id === receivedData.fileId)
-              .unsafeUrl);
-        }
-        // this.fileReadyForDownload = false;
         // Reassign (deep copy) rather than fileMetadata = receivedFileMetaData
+        const fileMetadata = JSON.parse(receivedData);
+        // Prepare for a new file but initializing variables like id, name, etc.
         this.peers[receivedData.from]
             .files
-            .find(f => f.id === receivedData.fileId)
-            .metadata = JSON.parse(receivedData);
-        this.fileName = this.receivedFileMetadata.fileName;
-        // Initialize a Uint8Array
-        this.fileArray = new Uint8Array(this.receivedFileMetadata.fileByteSize);
+            .push({
+              id: fileMetadata.id,
+              name: fileMetadata.name,
+              size: fileMetadata.size,
+              readyForDownload: false,
+              // Initialize a Uint8Array
+              fileArray: new Uint8Array(fileMetadata.fileByteSize),
+              receivedChunks: 0,
+              fileArrayOffset: 0,
+              maxFileChunks: fileMetadata.maxFileChunks
+            });
         this.ref.tick();
         this.openReceiveFileDialog(fileMetadata);
       } else if (receivedData.type === 'FILE') {
@@ -195,8 +165,8 @@ export class SendZeroService {
         // Then set the rest of the data arrays into our file array
         // If it's the last data array, we get the blob.
 
-        // Objects in javascript are just references to values
-        // We can just change file here, and it will change the actual object
+        // Objects in javascript are just references
+        // We can just change "file" here, and it will change the actual object
         // Which is a pain to reference every single time.
         const file = this.peers[receivedData.from]
             .files
@@ -233,14 +203,14 @@ export class SendZeroService {
     // let u8Array = Uint8Array.from(this.fileArray);
     const file = this.peers[peerId].files.find(f => f.id === fileId);
     const blob = new Blob([file.fileArray],
-        {type: file.receivedFileMetadata.fileType});
+        {type: file.type});
     const url = window.URL.createObjectURL(blob);
     file.unsafeUrl = url;
     const safeUrl = this.sanitizer.bypassSecurityTrustResourceUrl(url);
     // Set up download prompt
     file.url = safeUrl;
     file.fileReadyForDownload = true;
-    file.prompt = 'File is ready for download!';
+    this.peers[peerId].prompt = 'File is ready for download!';
     this.ref.tick();
     // Resetting the variables is now done when another file is received
     // This is to prevent file info from getting erased immadietaly after it
@@ -265,23 +235,58 @@ export class SendZeroService {
     console.log(err);
   }
 
-  // TODO: Check if return behaviour is correct
-  private finishReadingFile(peerId: string, fileId: string): void {
-    this.prompt = 'Finished processing file. Waiting for confirmation from peer!';
-    this.ref.tick();
-    // Make sure the file has actually been read
-    if (this.fileReader.readyState !== 2) {
-      this.prompt = 'Something went wrong! Please try again.';
-      return;
-    }
-    this.chunkFileAndSendMetadata();
+  public sendFile(file: File): void {
+    this.prompt = 'Now processing file!';
+    const fileId = shortid.generate();
+    this.peers[peerId].files.push({
+      id: fileId,
+      name: file.name,
+      type: file.type,
+      size: file.size
+    });
+    this.readFileAsArrayBuffer(file, peerId, fileId)
+        .then(fileArrayBuffer => {
+          this.finishReadingFile(peerId, fileId, fileArrayBuffer);
+        })
+        .catch(err => {
+          this.peers[peerId].prompt
+              = 'There was an error while processing the file. Please try again or contact us.';
+        });
   }
 
-  private chunkFileAndSendMetadata(): void {
-    // Clear fileChunk arrray since it's a new file
+  private readFileAsArrayBuffer(file: File, peerId: string, fileId: string) {
+    const fileReader = new FileReader();
+
+    return new Promise((resolve, reject) => {
+      fileReader.onerror = () => {
+        fileReader.abort();
+        reject();
+      };
+
+      fileReader.onload = () => {
+        resolve(fileReader.result);
+      };
+
+      fileReader.readAsArrayBuffer(file);
+    });
+  }
+
+  private finishReadingFile(peerId: string, fileId: string,
+      fileArrayBuffer: any): void {
+    this.peers[peerId].prompt = 'Finished processing file. Waiting for confirmation from peer!';
+    this.ref.tick();
+    this.peers[peerId]
+        .files.find(f => f.id === fileId)
+        .fileArray = fileArrayBuffer;
+    this.chunkFileAndSendMetadata(peerId, fileId);
+  }
+
+  private chunkFileAndSendMetadata(peerId: string, fileId: string): void {
+    // Find file
+    const file = this.peers[peerId].files.find(f => f.id === fileId);
     // Make the file into a typed array to send it as the WebRTC API doesn't
     // support sending blobs at this point.
-    const fileView = new Uint8Array(this.fileReader.result);
+    const fileView = new Uint8Array(file.fileArray);
     const fileByteLength = fileView.byteLength;
     // Set number of chunks. We split each file into 60k chunks as simple-peer
     // only supports sending ~64k(?) chunks at one time and does its own
@@ -289,7 +294,7 @@ export class SendZeroService {
     const numberOfChunks = Math.ceil(fileByteLength / CHUNK_SIZE);
     // Pre allocate arrays as assigning chunks is faster than
     // pushing chunks into an array
-    this.fileChunks = Array(numberOfChunks);
+    file.fileChunks = Array(numberOfChunks);
     const chunks = Array(numberOfChunks);
     // Assign chunks
     for (let i = 0; i < numberOfChunks - 1; i++) {
@@ -317,28 +322,24 @@ export class SendZeroService {
       this.ref.tick();
       return;
     }
-    this.peer.send(jsonString);
+    this.peers[peerId].peer.send(jsonString);
 
     // Save chunked file
-    this.fileChunks = chunks;
+    file.chunks = chunks;
   }
 
-  private sendChunkedFile(): void {
-    this.prompt = 'Received confirmation, now sending file!';
+  private sendChunkedFile(peerId: string, fileId: string): void {
+    this.peers[peerId].prompt = 'Received confirmation, now sending file!';
     this.ref.tick();
+    // Find file
+    const file = this.peers[peerId].files.find(f => f.id === fileId);
     // Send chunks
     // We use write instead of send as send closes the connection on big files.
     let chunk;
-    while ((chunk = this.fileChunks.shift()) !== undefined) {
-      this.peer.write(chunk);
+    while ((chunk = file.chunks.shift()) !== undefined) {
+      this.peers[peerId].peer.write(chunk);
     }
-    // console.log(this.fileChunks);
-    // this.fileChunks.forEach(element => {
-    //   console.log(element);
-    //   this.peer.write(element);
-    // });
-
-    this.prompt = 'Finished sending file!';
+    this.peers[peerId].prompt = 'Finished sending file!';
     this.ref.tick();
   }
 
@@ -360,12 +361,6 @@ export class SendZeroService {
 
   public getPeerId(): string {
     return this.peerId.trim();
-  }
-
-  public sendFile(file: File): void {
-    this.prompt = 'Now processing file!';
-    this.file = file;
-    this.fileReader.readAsArrayBuffer(file);
   }
 
   private openConnectionDialog(request: any): void {
