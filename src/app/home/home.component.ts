@@ -17,9 +17,12 @@ export class HomeComponent implements OnInit, OnDestroy {
   // Typed defintions
   title: string;
   id: string;
-  peerId: string;
+  peerToConnectTo: string;
   fileForm: FormGroup;
   sub: Subscription;
+
+  // To use Object.keys() in the template
+  JSObject: Object = Object;
 
   constructor(private ref: ChangeDetectorRef,
               private sanitizer: DomSanitizer,
@@ -44,9 +47,9 @@ export class HomeComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.sendZeroService.init();
     this.sub = this.route.queryParams.subscribe(params => {
-        this.peerId = params['id'] || '';
-        if (this.peerId.length > 0) {
-          this.sendZeroService.setPeerId(this.peerId);
+        const peerId = params['id'] || '';
+        if (peerId.length > 0) {
+          this.sendZeroService.setConnectToPeerId(peerId);
         }
     });
   }
@@ -56,7 +59,6 @@ export class HomeComponent implements OnInit, OnDestroy {
   }
 
   connectToPeer(): void {
-    this.peerId = this.sendZeroService.peerId;
     this.sendZeroService.connectToPeer();
   }
 

@@ -5,16 +5,14 @@ import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import {MatDialog, MatDialogRef, MAT_DIALOG_DATA} from '@angular/material';
 import { THIS_EXPR } from '@angular/compiler/src/output/output_ast';
 import { ResolveEnd } from '@angular/router/src/events';
-import { shortid } from 'shortid';
-
-
-
+// TODO: find out why import doesn't work
+const shortid = require('shortid');
 const io = require('socket.io-client');
 const Peer = require('simple-peer');
 const SimpleSignalClient = require('simple-signal-client');
 // Simple peer splits files greater than ~64k, so we make our lives easier
 // by splitting up files ino 60k chunks
-const CHUNK_SIZE = 60000;
+const CHUNK_SIZE = 55000;
 let SERVER_URL;
 if (String(window.location.hostname) === 'localhost') {
   SERVER_URL = 'http://localhost:3000';
@@ -26,9 +24,12 @@ if (String(window.location.hostname) === 'localhost') {
 export class SendZeroService {
   // Typed definitions
   public id: string;
+  public peerToConnectTo: string;
   public prompt: string;
   public connectionPrompt: string;
   public disableConnectButton: boolean;
+  public disableSendButton: boolean;
+  public selectedPeer: string;
 
   // Untyped definitions
   private socket: any;
@@ -91,6 +92,7 @@ export class SendZeroService {
       files: [],
       prompt: 'Connected to peer!'
     };
+    this.prompt = 'Successfully connected to ' + peer.id;
     // Set up peer handling functions
     peer.on('connect', () => this.handlePeerConnect.bind(this)(peer));
     peer.on('data', this.handlePeerReceiveData.bind(this));
@@ -116,15 +118,17 @@ export class SendZeroService {
     try {
       // @ts-ignore
       const messageOrDataString = new TextDecoder('utf-8').decode(data);
+      console.log(messageOrDataString);
       const receivedData = JSON.parse(messageOrDataString);
       // Various cases
       // 1. We receive a message saying we can continue sending file (after
       // we've sent file metadata through)
       // 2. We receive a message saying we cannot send the file (after we've
       // sent file metadata through)
-      // 3. We're receiving an actual metadata object and we have to ask the
+      // 3. The file we wanted to send was successfully received by the peer.
+      // 4. We're receiving an actual metadata object and we have to ask the
       // user if they want to accept the file by opening the dialog
-      // 4. We're receiving file data.
+      // 5. We're receiving file data.
       if (receivedData.type === 'MESSAGE'
           && receivedData.message === 'File Accepted') {
         // We can now continue sending our file.
@@ -135,26 +139,41 @@ export class SendZeroService {
         this.peers[receivedData.from].prompt
             = 'Peer did not accept the file! Please try again.';
         this.ref.tick();
+        // We now remove file from list of files for the peer that rejected us
         const fileToRemove = this.peers[receivedData.from].files
             .find(f => f.id === receivedData.fileId);
         const index = this.peers[receivedData.from].files.indexOf(fileToRemove);
         this.peers[receivedData.from].files.splice(index, 1);
+      } else if (receivedData.type === 'MESSAGE'
+          && receivedData.message === 'File Received') {
+        // We can now remove the file from our memory and also allow other files
+        // to be sent
+        const peerId = receivedData.from;
+        const fileId = receivedData.fileId;
+        this.disableSendButton = false;
+        this.peers[peerId].prompt = 'Finished sending file!';
+        const fileToRemove = this.peers[peerId]
+            .files
+            .find(f => f.id === fileId);
+        const index = this.peers[peerId].files.indexOf(fileToRemove);
+        this.peers[peerId].files.splice(index, 1);
+        this.ref.tick();
       } else if (receivedData.type === 'METADATA') {
         // Reassign (deep copy) rather than fileMetadata = receivedFileMetaData
-        const fileMetadata = JSON.parse(receivedData);
+        const fileMetadata = JSON.parse(messageOrDataString);
         // Prepare for a new file but initializing variables like id, name, etc.
+        // TODO: Move this to dialog component
         this.peers[receivedData.from]
             .files
             .push({
-              id: fileMetadata.id,
-              name: fileMetadata.name,
-              size: fileMetadata.size,
-              readyForDownload: false,
+              id: fileMetadata.fileId,
+              name: fileMetadata.fileName,
+              size: fileMetadata.fileSize,
+              type: fileMetadata.fileType,
               // Initialize a Uint8Array
               fileArray: new Uint8Array(fileMetadata.fileByteSize),
               receivedChunks: 0,
               fileArrayOffset: 0,
-              maxFileChunks: fileMetadata.maxFileChunks
             });
         this.ref.tick();
         this.openReceiveFileDialog(fileMetadata);
@@ -172,7 +191,7 @@ export class SendZeroService {
             .files
             .find(f => f.id === receivedData.fileId);
         if (file.receivedChunks === 0) {
-          file.fileArray.set(data);
+          file.fileArray.set(receivedData.chunk);
           file.fileArrayOffset = CHUNK_SIZE;
           file.receivedChunks++;
           this.ref.tick();
@@ -181,13 +200,13 @@ export class SendZeroService {
             this.makeBlob(receivedData.from, file.id);
           }
         } else if (file.receivedChunks < file.maxFileChunks - 1) {
-          file.fileArray.set(data, file.fileArrayOffset);
+          file.fileArray.set(receivedData.chunk, file.fileArrayOffset);
           file.fileArrayOffset += CHUNK_SIZE;
           file.receivedChunks++;
           // This is because Angular doesn't detect changes in callbacks.
           this.ref.tick();
         } else {
-          file.fileArray.set(data, file.fileArrayOffset);
+          file.fileArray.set(receivedData.chunk, file.fileArrayOffset);
           file.receivedChunks++;
           this.ref.tick();
           this.makeBlob(receivedData.from, file.id);
@@ -200,7 +219,15 @@ export class SendZeroService {
   }
 
   private makeBlob(peerId: string, fileId: string): void {
-    // let u8Array = Uint8Array.from(this.fileArray);
+    // Before making a blob we send a message to the peer that we
+    // have received the (complete) file.
+    this.peers[peerId].peer.send(JSON.stringify({
+      type: 'MESSAGE',
+      message: 'File Received',
+      from: this.id,
+      to: peerId,
+      fileId: fileId
+    }));
     const file = this.peers[peerId].files.find(f => f.id === fileId);
     const blob = new Blob([file.fileArray],
         {type: file.type});
@@ -211,11 +238,6 @@ export class SendZeroService {
     file.url = safeUrl;
     file.fileReadyForDownload = true;
     this.peers[peerId].prompt = 'File is ready for download!';
-    this.ref.tick();
-    // Resetting the variables is now done when another file is received
-    // This is to prevent file info from getting erased immadietaly after it
-    // arrives.
-    // this.resetReceiveVariables();
     this.ref.tick();
   }
 
@@ -236,8 +258,9 @@ export class SendZeroService {
   }
 
   public sendFile(file: File): void {
-    this.prompt = 'Now processing file!';
     const fileId = shortid.generate();
+    const peerId = this.selectedPeer;
+    this.peers[peerId].prompt = 'Now processing file!';
     this.peers[peerId].files.push({
       id: fileId,
       name: file.name,
@@ -273,7 +296,10 @@ export class SendZeroService {
 
   private finishReadingFile(peerId: string, fileId: string,
       fileArrayBuffer: any): void {
-    this.peers[peerId].prompt = 'Finished processing file. Waiting for confirmation from peer!';
+    this.peers[peerId].prompt
+        = 'Finished processing file. Waiting for confirmation from peer!';
+    // Don't allow the user to send any files for the timebeing
+    this.disableSendButton = true;
     this.ref.tick();
     this.peers[peerId]
         .files.find(f => f.id === fileId)
@@ -307,9 +333,13 @@ export class SendZeroService {
 
     // Set up and send metadata for the file
     const metadata = {
-      fileName: this.file.name,
-      fileType: this.file.type,
-      fileSize: this.file.size,
+      fileName: file.name,
+      type: 'METADATA',
+      from: this.id,
+      to: peerId,
+      fileId: file.id,
+      fileType: file.type,
+      fileSize: file.size,
       fileByteSize: fileByteLength,
       numberOfChunks: numberOfChunks,
     };
@@ -337,15 +367,23 @@ export class SendZeroService {
     // We use write instead of send as send closes the connection on big files.
     let chunk;
     while ((chunk = file.chunks.shift()) !== undefined) {
-      this.peers[peerId].peer.write(chunk);
+      const toSend = JSON.stringify({
+        chunk: chunk,
+        type: 'FILE',
+        fileId: file.id,
+        from: this.id,
+        to: peerId
+      });
+      console.log(toSend.length);
+      console.log(chunk.length);
+      this.peers[peerId].peer.write(toSend);
     }
-    this.peers[peerId].prompt = 'Finished sending file!';
     this.ref.tick();
   }
 
   public connectToPeer(): void {
     this.prompt = 'Connecting...';
-    this.signalClient.connect(this.peerId.trim());
+    this.signalClient.connect(this.peerToConnectTo.trim());
   }
 
   public getId(): string {
@@ -354,13 +392,9 @@ export class SendZeroService {
   }
 
   // In case we get id from URL
-  public setPeerId(id: string): void {
-    this.peerId = id;
+  public setConnectToPeerId(id: string): void {
+    this.peerToConnectTo = id;
     this.ref.tick();
-  }
-
-  public getPeerId(): string {
-    return this.peerId.trim();
   }
 
   private openConnectionDialog(request: any): void {
@@ -378,23 +412,38 @@ export class SendZeroService {
   }
 
   private openReceiveFileDialog(metadata: any): void {
-    metadata.id = this.peerId;
     this.ref.tick();
+    const peerId = metadata.from;
+    const fileId = metadata.fileId;
+    const file = this.peers[peerId].files.find(f => f.id === fileId);
     const dialogRef = this.dialog.open(ReceiveFileDialogComponent, {
       data: metadata,
     });
     this.ref.tick();
     dialogRef.afterClosed().subscribe(result => {
       if (result === true) {
-        this.peer.send('File Accepted');
-        this.fileReadyForDownload = false;
+        this.peers[peerId].peer.send(JSON.stringify({
+          type: 'MESSAGE',
+          message: 'File Accepted',
+          from: this.id,
+          to: peerId,
+          fileId: fileId
+        }));
+        file.fileReadyForDownload = false;
         // Set up maxFileChunks for expected file - we do this for the progress
         // element
-        this.maxFileChunks = metadata.numberOfChunks;
+        file.maxFileChunks = metadata.numberOfChunks;
       } else {
-        this.peer.send('File Declined');
-        // Clear state variables
-        this.resetReceiveVariables();
+        this.peers[peerId].peer.send(JSON.stringify({
+          type: 'MESSAGE',
+          message: 'File Declined',
+          from: this.id,
+          to: peerId,
+          fileId: fileId
+        }));
+        // Rmeove that file object because the file was declined
+        const index = this.peers[peerId].files.indexOf(file);
+        this.peers[peerId].files.splice(index, 1);
       }
     });
   }
@@ -418,7 +467,7 @@ export class ConnectionDialogComponent {
 @Component({
   selector: 'app-receive-file-dialog',
   template: `
-    <h1 mat-dialog-title> User with id {{data.id}} wants to send you a file. Accept?</h1>
+    <h1 mat-dialog-title> User with id {{data.from}} wants to send you a file. Accept?</h1>
     <mat-dialog-content>
       File Name: {{data.fileName}}
       <br>

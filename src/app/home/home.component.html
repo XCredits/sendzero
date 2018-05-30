@@ -16,13 +16,16 @@
   <br>
   <div class="connectionBox">
     <mat-form-field>
-      <input matInput placeholder="Peer ID" type="text" name="peerId" id="peerId" [(ngModel)]="sendZeroService.peerId">
+      <input matInput placeholder="Peer ID" type="text" name="peerId" id="peerId" [(ngModel)]="sendZeroService.peerToConnectTo">
     </mat-form-field>
     <button mat-raised-button required color="primary" (click)="connectToPeer()" id="connectButton" name="connectButton" class="connectButton" [disabled]="sendZeroService.disableConnectButton || sendZeroService.peerId === '' ">
       Connect
     </button>
   </div>
   <div class="fileBox" id="fileBox" >
+    <mat-select [(value)]="sendZeroService.selectedPeer" >
+      <mat-option *ngFor="let peerId of JSObject.keys(sendZeroService.peers)" [(value)]="sendZeroService.peers[peerId].id">{{sendZeroService.peers[peerId].id}}</mat-option>
+    </mat-select>
     <form [formGroup]="fileForm">    
       <mat-form-field>
         <ngx-mat-file-input formControlName="selectFile" placeholder="Select File" valuePlaceholder="No file selected" value="file">
@@ -32,10 +35,15 @@
       <button mat-raised-button color="primary" id="sendFileButton" name="sendFileButton" (click)="sendFile()" [disabled]="sendZeroService.disableSendButton" class="sendFileButton">Send File</button>
     </form>
   </div>
-  <div class="receiveBox" id="receiveBox" *ngIf="sendZeroService.maxFileChunks !== 0">
-    <mat-progress-bar mode="determinate" [value]="sendZeroService.receivedChunks*100/sendZeroService.maxFileChunks">Progress</mat-progress-bar>
-    <div *ngIf="sendZeroService.fileReadyForDownload">
-      <a target="_blank" [href]="sendZeroService.url" [download]="sendZeroService.fileName">Click here to download file {{sendZeroService.fileName}}</a>
+  <div *ngFor="let peerId of JSObject.keys(sendZeroService.peers)">
+    <h3>{{peerId}}: {{sendZeroService.peers[peerId].prompt}}</h3>
+    <div *ngFor="let file of sendZeroService.peers[peerId].files">
+      <div class="receiveBox" id="receiveBox" *ngIf="file.maxFileChunks !== 0">
+        <mat-progress-bar mode="determinate" [value]="file.receivedChunks*100/file.maxFileChunks">Progress</mat-progress-bar>
+        <div *ngIf="file.fileReadyForDownload">
+          <a target="_blank" [href]="file.url" [download]="file.fileName">Click here to download file {{file.name}}</a>
+        </div>
+      </div>
     </div>
   </div>
 </div>
