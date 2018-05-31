@@ -12,7 +12,7 @@ const Peer = require('simple-peer');
 const SimpleSignalClient = require('simple-signal-client');
 // Simple peer splits files greater than ~64k, so we make our lives easier
 // by splitting up files ino 60k chunks
-const CHUNK_SIZE = 55000;
+const CHUNK_SIZE = 60000;
 let SERVER_URL;
 if (String(window.location.hostname) === 'localhost') {
   SERVER_URL = 'http://localhost:3000';
@@ -105,7 +105,7 @@ export class SendZeroService {
   }
 
   // Data always comes in as Uint8Array
-  private handlePeerReceiveData(data: Uint8Array): void {
+  private handlePeerReceiveData(data: any): void {
     // All data comes in as an Uint8Array which is then converted to a string
     // which in turn is parsed as a JSON object. (The process is complicated
     // due to limitations of simple-peer).
@@ -117,9 +117,21 @@ export class SendZeroService {
     // If the parsing fails, we show an error.
     try {
       // @ts-ignore
-      const messageOrDataString = new TextDecoder('utf-8').decode(data);
-      console.log(messageOrDataString);
-      const receivedData = JSON.parse(messageOrDataString);
+      // const messageOrDataString = new TextDecoder('utf-8').decode(data);
+      console.log(data);
+      // const messageOrDataString = String.fromCharCode.apply(null, data);
+      const messageOrDataString = data;
+      console.log(messageOrDataString.length);
+      const receivedData = JSON.parse(messageOrDataString, (key, value) => {
+        if (value.constructor === Array) {
+          const array = new Uint8Array(value.length);
+              for (let i = 0; i < value.length; i++) {
+                array[i] = value[i];
+              }
+          return array;
+        }
+        return value;
+      });
       // Various cases
       // 1. We receive a message saying we can continue sending file (after
       // we've sent file metadata through)
@@ -138,6 +150,7 @@ export class SendZeroService {
         // We should now clear all file related variables in our state.
         this.peers[receivedData.from].prompt
             = 'Peer did not accept the file! Please try again.';
+        this.disableSendButton = false;
         this.ref.tick();
         // We now remove file from list of files for the peer that rejected us
         const fileToRemove = this.peers[receivedData.from].files
@@ -190,23 +203,27 @@ export class SendZeroService {
         const file = this.peers[receivedData.from]
             .files
             .find(f => f.id === receivedData.fileId);
+        // The "chunk" in the object was a string. We now need to convert that
+        // string back to a UInt8Array.
+        // @ts-ignore
+        const chunk = new TextEncoder('utf-8').encode(receivedData.chunk);
         if (file.receivedChunks === 0) {
-          file.fileArray.set(receivedData.chunk);
+          file.fileArray.set(chunk);
           file.fileArrayOffset = CHUNK_SIZE;
           file.receivedChunks++;
           this.ref.tick();
-          // If we had a file < 60kb, we only got one chunk, so exit now.
+          // If we had a file < CHUNK_SIZE, we only got one chunk, so exit now.
           if (file.maxFileChunks === 1) {
             this.makeBlob(receivedData.from, file.id);
           }
         } else if (file.receivedChunks < file.maxFileChunks - 1) {
-          file.fileArray.set(receivedData.chunk, file.fileArrayOffset);
+          file.fileArray.set(chunk, file.fileArrayOffset);
           file.fileArrayOffset += CHUNK_SIZE;
           file.receivedChunks++;
           // This is because Angular doesn't detect changes in callbacks.
           this.ref.tick();
         } else {
-          file.fileArray.set(receivedData.chunk, file.fileArrayOffset);
+          file.fileArray.set(chunk, file.fileArrayOffset);
           file.receivedChunks++;
           this.ref.tick();
           this.makeBlob(receivedData.from, file.id);
@@ -267,7 +284,7 @@ export class SendZeroService {
       type: file.type,
       size: file.size
     });
-    this.readFileAsArrayBuffer(file, peerId, fileId)
+    this.readFileAsArrayBuffer(file, peerId)
         .then(fileArrayBuffer => {
           this.finishReadingFile(peerId, fileId, fileArrayBuffer);
         })
@@ -277,7 +294,7 @@ export class SendZeroService {
         });
   }
 
-  private readFileAsArrayBuffer(file: File, peerId: string, fileId: string) {
+  private readFileAsArrayBuffer(file: File, peerId: string) {
     const fileReader = new FileReader();
 
     return new Promise((resolve, reject) => {
@@ -320,15 +337,14 @@ export class SendZeroService {
     const numberOfChunks = Math.ceil(fileByteLength / CHUNK_SIZE);
     // Pre allocate arrays as assigning chunks is faster than
     // pushing chunks into an array
-    file.fileChunks = Array(numberOfChunks);
-    const chunks = Array(numberOfChunks);
+    file.chunks = Array(numberOfChunks);
     // Assign chunks
     for (let i = 0; i < numberOfChunks - 1; i++) {
       const chunk = fileView.slice(CHUNK_SIZE * i, CHUNK_SIZE * (i + 1));
-      chunks[i] = chunk;
+      file.chunks[i] = chunk;
     }
     // Assign final chunk
-    chunks[numberOfChunks - 1] =
+    file.chunks[numberOfChunks - 1] =
         (fileView.slice(CHUNK_SIZE * (numberOfChunks - 1)));
 
     // Set up and send metadata for the file
@@ -353,9 +369,7 @@ export class SendZeroService {
       return;
     }
     this.peers[peerId].peer.send(jsonString);
-
-    // Save chunked file
-    file.chunks = chunks;
+    // this.peers[peerId].peer.send(metadata);
   }
 
   private sendChunkedFile(peerId: string, fileId: string): void {
@@ -364,26 +378,50 @@ export class SendZeroService {
     // Find file
     const file = this.peers[peerId].files.find(f => f.id === fileId);
     // Send chunks
-    // We use write instead of send as send closes the connection on big files.
     let chunk;
+    // @ts-ignore
+    const decoder = new TextDecoder('utf-8');
     while ((chunk = file.chunks.shift()) !== undefined) {
-      const toSend = JSON.stringify({
-        chunk: chunk,
+      const toSend = {
         type: 'FILE',
         fileId: file.id,
         from: this.id,
-        to: peerId
+        to: peerId,
+        chunk: chunk,
+      };
+      // We convert the chunk (which is a UInt8Array) to a string as
+      // JSON.stringify will convert it to an object (which increases its size
+      // 10x). the converted string will be the same size and also preserve the
+      // array.
+      // toSend.chunk = decoder.decode(chunk);
+      // toSend.chunk = String.fromCharCode.apply(null, chunk);
+      // @ts-ignore
+      // const encoder = new TextEncoder('utf-8');
+      // const string = [];
+      // for (let i = 0; i < toSend.chunk.length; i++) {
+      //   string[i] = toSend.chunk.codePointAt(i);
+      // }
+      const toSendString = JSON.stringify(toSend, (key, value) => {
+        if (value.constructor === Uint8Array) {
+          return  Array.from(value);
+        }
+        return value;
       });
-      console.log(toSend.length);
-      console.log(chunk.length);
-      this.peers[peerId].peer.write(toSend);
+      // console.log(toSendString);
+      // console.log(toSend.chunk.length);
+      // console.log(toSend.chunk.length, JSON.stringify(toSend.chunk).length, JSON.stringify(toSend).length);
+      // console.log(JSON.stringify(toSend).length);
+      // We use write instead of send as send closes the connection on big
+      // files.
+      // this.peers[peerId].peer.write(JSON.stringify(toSend));
+      this.peers[peerId].peer.write(toSendString);
     }
     this.ref.tick();
   }
 
   public connectToPeer(): void {
     this.prompt = 'Connecting...';
-    this.signalClient.connect(this.peerToConnectTo.trim());
+    this.signalClient.connect(this.peerToConnectTo.trim(), {objectMode: true});
   }
 
   public getId(): string {
@@ -404,7 +442,7 @@ export class SendZeroService {
 
     dialogRef.afterClosed().subscribe(result => {
       if (result === true) {
-        request.accept();
+        request.accept({objectMode: true});
       } else {
         this.socket.emit('request declined', request);
       }
