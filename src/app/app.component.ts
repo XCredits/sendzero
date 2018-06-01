@@ -1,6 +1,6 @@
 
 import {filter} from 'rxjs/operators';
-import { Component, ViewChild } from '@angular/core';
+import { Component, ViewChild, AfterViewInit } from '@angular/core';
 // Imports needed for router import for title
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import { UserService } from './user.service';
@@ -10,7 +10,7 @@ import { UserService } from './user.service';
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss']
 })
-export class AppComponent {
+export class AppComponent implements AfterViewInit {
   @ViewChild('sideNavDrawer') sideNavDrawer;
   screenWidth: number;
   mobileWidth = false; // boolean
