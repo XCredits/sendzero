@@ -15,7 +15,8 @@ const organizationNoReplyEmail = 'noreply@xcredits.com';
 const organizationFromName = 'Team XCredits';
 const registerWelcomeTemplateId = '325bd7af-8542-4d59-bd32-2469cf13b495';
 const mailingListWelcomeTemplateId = '325bd7af-8542-4d59-bd32-2469cf13b495';
-
+const passwordResetTemplateId = '8cdb141c-7574-410e-bd36-47f8ef857f6c';
+const usernameRetrievalTemplateId = '';
 
 // #SENDGRID_VERIFICATION START
 // const msg = {
@@ -144,18 +145,24 @@ sendPasswordReset: function({userId, email, givenName, familyName, resetUrl}) {
   };
   return sendgridMail.send(msg);
 },
+// Testing
+// sendPasswordReset({
+//   email: 'test@test.com', 
+//   givenName: 'Robert', 
+//   familyName: 'Smith'
+//   resetUrl: 'https://google.com'});
 
 sendUsernameRetrieval: function({userId, email, givenName, familyName, userNameArr}) {
-  userNameArr to string!!!
+  const usernamesString = userNameArr.join(', ');
   const msg = {
     to: email,
     from: organizationNoReplyEmail,
-    subject: 'Password reset for ' + organizationName + (givenName? ', ' + givenName : ''),
-    templateId: passwordResetTemplateId,
+    subject: 'Username for ' + organizationName + (givenName? ', ' + givenName : ''),
+    templateId: usernameRetrievalTemplateId,
     substitutions: {
       first_name: givenName,
       last_name: familyName,
-      usernames: resetUrl,
+      usernames: usernamesString,
     },
   };
   return sendgridMail.send(msg);
