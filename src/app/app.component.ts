@@ -1,6 +1,6 @@
 
 import {filter} from 'rxjs/operators';
-import { Component, ViewChild, AfterViewInit } from '@angular/core';
+import { Component, ViewChild, OnChanges } from '@angular/core';
 // Imports needed for router import for title
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import { UserService } from './user.service';
@@ -10,7 +10,7 @@ import { UserService } from './user.service';
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss']
 })
-export class AppComponent implements AfterViewInit {
+export class AppComponent implements OnChanges {
   @ViewChild('sideNavDrawer') sideNavDrawer;
   screenWidth: number;
   mobileWidth = false; // boolean
@@ -18,6 +18,8 @@ export class AppComponent implements AfterViewInit {
   user: User;
   isLoggedIn: boolean;
   userIsAdmin: boolean;
+  drawerMode: string;
+  drawerOpened: boolean;
 
 
   // Edit the area below to create main nav links
@@ -90,12 +92,12 @@ export class AppComponent implements AfterViewInit {
 
   setSideBar() {
     if (this.screenWidth < 768) {
-      this.sideNavDrawer.mode = 'push'; // push or over
-      this.sideNavDrawer.opened = false;
+      this.drawerMode = 'push'; // push or over
+      this.drawerOpened = false;
       this.mobileWidth = true;
     } else {
-      this.sideNavDrawer.mode = 'side';
-      this.sideNavDrawer.opened = true;
+      this.drawerMode = 'side';
+      this.drawerOpened = true;
       this.mobileWidth = false;
     }
   }
@@ -125,9 +127,12 @@ export class AppComponent implements AfterViewInit {
         this.isLoggedIn = !!user;
         this.userIsAdmin = user ? this.user.isAdmin : false;
       });
+
+    this.setSideBar(); // set the sidebar values
   }
 
-  ngAfterViewInit() {
+  // set sidebar after every change
+  ngOnChanges() {
     this.setSideBar();
   }
 }
