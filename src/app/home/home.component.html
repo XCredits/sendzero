@@ -41,7 +41,7 @@
       <div class="receiveBox" id="receiveBox" *ngIf="file.maxFileChunks !== 0">
         <mat-progress-bar mode="determinate" [value]="file.receivedChunks*100/file.maxFileChunks">Progress</mat-progress-bar>
         <div *ngIf="file.fileReadyForDownload">
-          <a target="_blank" [href]="file.url" [download]="file.fileName">Click here to download file {{file.name}}</a>
+          <a target="_blank" [href]="file.url" [download]="file.name">Click here to download file {{file.name}}</a>
         </div>
       </div>
     </div>
