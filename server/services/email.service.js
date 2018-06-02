@@ -16,7 +16,7 @@ const organizationFromName = 'Team XCredits';
 const registerWelcomeTemplateId = '325bd7af-8542-4d59-bd32-2469cf13b495';
 const mailingListWelcomeTemplateId = '325bd7af-8542-4d59-bd32-2469cf13b495';
 const passwordResetTemplateId = '8cdb141c-7574-410e-bd36-47f8ef857f6c';
-const usernameRetrievalTemplateId = '';
+const usernameRetrievalTemplateId = '3123a907-b810-486b-9682-843166f5741a';
 
 // #SENDGRID_VERIFICATION START
 // const msg = {
@@ -60,7 +60,7 @@ module.exports = {
         })
   },
   // Testing
-  // addUserToMailingList({
+  // module.exports.addUserToMailingList({
   //   email: 'test@test.com', 
   //   givenName: 'Robert', 
   //   familyName: 'Smith'});
@@ -86,7 +86,7 @@ module.exports = {
         })
   },
   // Testing
-  // removeUserFromMailingList({userId: 'dGVzdEB0ZXN0LmNvbQ=='});
+  // module.exports.removeUserFromMailingList({userId: 'dGVzdEB0ZXN0LmNvbQ=='});
 
   /**
    * In this function, we are calling on the email service to retrieve instances 
@@ -146,14 +146,14 @@ module.exports = {
     return sendgridMail.send(msg);
   },
   // Testing
-  // sendPasswordReset({
+  // module.exports.sendPasswordReset({
   //   email: 'test@test.com', 
   //   givenName: 'Robert', 
-  //   familyName: 'Smith'
+  //   familyName: 'Smith',
   //   resetUrl: 'https://google.com'});
 
   sendUsernameRetrieval: function({userId, email, givenName, familyName, userNameArr}) {
-    const usernamesString = userNameArr.join(', ');
+    const usernamesString = userNameArr.join('<br>');
     const msg = {
       to: email,
       from: organizationNoReplyEmail,
@@ -162,10 +162,16 @@ module.exports = {
       substitutions: {
         first_name: givenName,
         last_name: familyName,
-        usernames: usernamesString,
+        username_string: usernamesString,
       },
     };
     return sendgridMail.send(msg);
   }
+  // module.exports.sendUsernameRetrieval({
+  //   email: 'test@test.com', 
+  //   givenName: 'Robert', 
+  //   familyName: 'Smith',
+  //     userNameArr: ['username', 'other_username'],
+  // });
 
 };
