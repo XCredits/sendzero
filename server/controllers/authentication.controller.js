@@ -87,10 +87,12 @@ function register(req, res) {
   }
   // Sanitize
   username = username.toLowerCase();
+  console.log('username');
 
   // check that there is not an existing user with this username
   return User.findOne({username: username})
       .then(existingUser => {
+        console.log('Got into the DB');
         if (existingUser){
           return res.status(409).send({message: 'Username already taken.'})
         }
@@ -254,17 +256,20 @@ function requestResetPassword(req, res) {
               (Date.now() + Number(process.env.JWT_TEMPORARY_LINK_TOKEN_EXPIRY))/1000),// 1 hour
         };
         const jwtString = jwt.sign(jwtObj, process.env.JWT_KEY);
-        const emailLink = process.env.URL_ORIGIN + 
+        const resetUrl = process.env.URL_ORIGIN + 
             '/password-reset?username=' + user.username + // the username here is only display purposes on the front-end
             '&auth=' + jwtString;
-        console.log(emailLink);
-        console.log('Email service not set up!!!!!!!!!!!!!!!!!!!!!!');
         // When the user clicks on the link, the app pulls the JWT from the link
         // and stores it in the component
+        return emailService.sendRegisterWelcome({
+              givenName, familyName, email, resetUrl
+            })
+            .catch((err)=>{
+              res.status(500).send({message:'Could not send email.'});
+            });
       })
       .catch((err) => {
-        console.log(err);
-        res.status(500).send({message:'Error accessing user database.'})
+        res.status(500).send({message:'Error accessing user database.'});
       });
 }
 
@@ -363,7 +368,6 @@ function createAndSendRefreshAndSessionJwt(user, req, res) {
   session.lastObserved = new Date(Date.now());
   return session.save()
       .then((session)=>{
-        console.log('saved session');
         const token = setJwtCookie({
             res,
             userId: user._id, 
