@@ -1,6 +1,6 @@
 <mat-drawer-container>
   <!-- Side nav -->
-  <mat-drawer #sideNavDrawer mode="push" opened="false" class="lwa-dark-theme">
+  <mat-drawer #sideNavDrawer [mode]="drawerMode" [opened]="drawerOpened" class="lwa-dark-theme">
     <mat-toolbar class="logo-toolbar">
       <!-- Below line was added to prevent the mat-drawer form highlighting the logo with an orange box -->
       <a routerLink="/" (click)="hideSideNavAfterClick()"></a>
