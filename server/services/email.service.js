@@ -33,139 +33,139 @@ const usernameRetrievalTemplateId = '';
 
 module.exports = {
 
-/**
- * Add the user to the mailing list in the email service provider
- */
-addUserToMailingList: function({userId, email, givenName, familyName}) {
-  const data = [
-    {
-      "email": email,
-      "first_name": givenName,
-      "last_name": familyName,
-      "id": userId, // optional, if not a registered user
-    },
-  ];
-  var request = {
-    body: data,
-    method: 'POST',
-    url: '/v3/contactdb/recipients',
-  };
-  return sendgridClient.request(request)
-      .then(([response, body]) => {
-        if (body.errors.length === 0) {
-          // console.log(response.body.persisted_recipients[0]);
-          return response.body.persisted_recipients[0];
-        }
-        throw new Error('Problem adding to email list.');
-      })
-},
-// Testing
-// addUserToMailingList({
-//   email: 'test@test.com', 
-//   givenName: 'Robert', 
-//   familyName: 'Smith'});
+  /**
+   * Add the user to the mailing list in the email service provider
+   */
+  addUserToMailingList: function({userId, email, givenName, familyName}) {
+    const data = [
+      {
+        "email": email,
+        "first_name": givenName,
+        "last_name": familyName,
+        "id": userId, // optional, if not a registered user
+      },
+    ];
+    var request = {
+      body: data,
+      method: 'POST',
+      url: '/v3/contactdb/recipients',
+    };
+    return sendgridClient.request(request)
+        .then(([response, body]) => {
+          if (body.errors.length === 0) {
+            // console.log(response.body.persisted_recipients[0]);
+            return response.body.persisted_recipients[0];
+          }
+          throw new Error('Problem adding to email list.');
+        })
+  },
+  // Testing
+  // addUserToMailingList({
+  //   email: 'test@test.com', 
+  //   givenName: 'Robert', 
+  //   familyName: 'Smith'});
 
 
-/**
- * Remove the user from the mailing list in the email service provider
- * In this case, userId should be the 'persisted_recipients' id created by 
- * the SendGrid process above.
- */
-removeUserFromMailingList: function({userId}) {
-  var request = {
-    body: [userId],
-    method: 'DELETE',
-    url: '/v3/contactdb/recipients',
-  };
-  return sendgridClient.request(request)
-      .then(([response, body]) => {
-        if (response.statusCode === 204) {
-          return true;
-        }
-        throw new Error('Problem removing user.');
-      })
-},
-// Testing
-// removeUserFromMailingList({userId: 'dGVzdEB0ZXN0LmNvbQ=='});
+  /**
+   * Remove the user from the mailing list in the email service provider
+   * In this case, userId should be the 'persisted_recipients' id created by 
+   * the SendGrid process above.
+   */
+  removeUserFromMailingList: function({userId}) {
+    var request = {
+      body: [userId],
+      method: 'DELETE',
+      url: '/v3/contactdb/recipients',
+    };
+    return sendgridClient.request(request)
+        .then(([response, body]) => {
+          if (response.statusCode === 204) {
+            return true;
+          }
+          throw new Error('Problem removing user.');
+        })
+  },
+  // Testing
+  // removeUserFromMailingList({userId: 'dGVzdEB0ZXN0LmNvbQ=='});
 
-/**
- * In this function, we are calling on the email service to retrieve instances 
- * of the user pressing unsubscribe. We are doing this to compare to the user 
- * list in our own databases, to remove individuals who have unsubscribed.
- */
-retrieveUnsubscribes: function({start, end}) {
-  
-},
+  /**
+   * In this function, we are calling on the email service to retrieve instances 
+   * of the user pressing unsubscribe. We are doing this to compare to the user 
+   * list in our own databases, to remove individuals who have unsubscribed.
+   */
+  retrieveUnsubscribes: function({start, end}) {
+    
+  },
 
-/**
- * 
- * Instructions on sending transactional emails
- * https://github.com/sendgrid/sendgrid-nodejs/blob/master/use-cases/transactional-templates.md
- */
+  /**
+   * 
+   * Instructions on sending transactional emails
+   * https://github.com/sendgrid/sendgrid-nodejs/blob/master/use-cases/transactional-templates.md
+   */
 
-sendRegisterWelcome: function({userId, email, givenName, familyName}) {
-  const msg = {
-    to: email,
-    from: organizationEmail,
-    subject: 'Welcome to ' + organizationName + (givenName? ', ' + givenName : ''),
-    templateId: registerWelcomeTemplateId,
-    substitutions: {
-      first_name: givenName,
-      last_name: familyName,
-    },
-  };
-  return sendgridMail.send(msg);
-},
+  sendRegisterWelcome: function({userId, email, givenName, familyName}) {
+    const msg = {
+      to: email,
+      from: organizationEmail,
+      subject: 'Welcome to ' + organizationName + (givenName? ', ' + givenName : ''),
+      templateId: registerWelcomeTemplateId,
+      substitutions: {
+        first_name: givenName,
+        last_name: familyName,
+      },
+    };
+    return sendgridMail.send(msg);
+  },
 
-sendMailingListWelcome: function({userId, email, givenName, familyName}) {
-  const msg = {
-    to: email,
-    from: organizationEmail,
-    subject: 'Welcome to ' + organizationName + (givenName? ', ' + givenName : ''),
-    templateId: mailingListWelcomeTemplateId,
-    substitutions: {
-      first_name: givenName,
-      last_name: familyName,
-    },
-  };
-  return sendgridMail.send(msg);
-},
+  sendMailingListWelcome: function({userId, email, givenName, familyName}) {
+    const msg = {
+      to: email,
+      from: organizationEmail,
+      subject: 'Welcome to ' + organizationName + (givenName? ', ' + givenName : ''),
+      templateId: mailingListWelcomeTemplateId,
+      substitutions: {
+        first_name: givenName,
+        last_name: familyName,
+      },
+    };
+    return sendgridMail.send(msg);
+  },
 
-sendPasswordReset: function({userId, email, givenName, familyName, resetUrl}) {
-  const msg = {
-    to: email,
-    from: organizationNoReplyEmail,
-    subject: 'Password reset for ' + organizationName + (givenName? ', ' + givenName : ''),
-    templateId: passwordResetTemplateId,
-    substitutions: {
-      first_name: givenName,
-      last_name: familyName,
-      reset_url: resetUrl,
-    },
-  };
-  return sendgridMail.send(msg);
-},
-// Testing
-// sendPasswordReset({
-//   email: 'test@test.com', 
-//   givenName: 'Robert', 
-//   familyName: 'Smith'
-//   resetUrl: 'https://google.com'});
+  sendPasswordReset: function({userId, email, givenName, familyName, resetUrl}) {
+    const msg = {
+      to: email,
+      from: organizationNoReplyEmail,
+      subject: 'Password reset for ' + organizationName + (givenName? ', ' + givenName : ''),
+      templateId: passwordResetTemplateId,
+      substitutions: {
+        first_name: givenName,
+        last_name: familyName,
+        reset_url: resetUrl,
+      },
+    };
+    return sendgridMail.send(msg);
+  },
+  // Testing
+  // sendPasswordReset({
+  //   email: 'test@test.com', 
+  //   givenName: 'Robert', 
+  //   familyName: 'Smith'
+  //   resetUrl: 'https://google.com'});
 
-sendUsernameRetrieval: function({userId, email, givenName, familyName, userNameArr}) {
-  const usernamesString = userNameArr.join(', ');
-  const msg = {
-    to: email,
-    from: organizationNoReplyEmail,
-    subject: 'Username for ' + organizationName + (givenName? ', ' + givenName : ''),
-    templateId: usernameRetrievalTemplateId,
-    substitutions: {
-      first_name: givenName,
-      last_name: familyName,
-      usernames: usernamesString,
-    },
-  };
-  return sendgridMail.send(msg);
-}
+  sendUsernameRetrieval: function({userId, email, givenName, familyName, userNameArr}) {
+    const usernamesString = userNameArr.join(', ');
+    const msg = {
+      to: email,
+      from: organizationNoReplyEmail,
+      subject: 'Username for ' + organizationName + (givenName? ', ' + givenName : ''),
+      templateId: usernameRetrievalTemplateId,
+      substitutions: {
+        first_name: givenName,
+        last_name: familyName,
+        usernames: usernamesString,
+      },
+    };
+    return sendgridMail.send(msg);
+  }
 
 };
