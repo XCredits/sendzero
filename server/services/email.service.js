@@ -53,7 +53,6 @@ module.exports = {
     return sendgridClient.request(request)
         .then(([response, body]) => {
           if (body.errors.length === 0) {
-            // console.log(response.body.persisted_recipients[0]);
             return response.body.persisted_recipients[0];
           }
           throw new Error('Problem adding to email list.');
@@ -131,7 +130,8 @@ module.exports = {
     return sendgridMail.send(msg);
   },
 
-  sendPasswordReset: function({userId, email, givenName, familyName, resetUrl}) {
+  sendPasswordReset: function({userId, email, givenName, familyName, username,
+      resetUrl}) {
     const msg = {
       to: email,
       from: organizationNoReplyEmail,
@@ -152,12 +152,12 @@ module.exports = {
   //   familyName: 'Smith',
   //   resetUrl: 'https://google.com'});
 
-  sendUsernameRetrieval: function({userId, email, givenName, familyName, userNameArr}) {
+  sendUsernameRetrieval: function({givenName, familyName, email, userNameArr}) {
     const usernamesString = userNameArr.join('<br>');
     const msg = {
       to: email,
       from: organizationNoReplyEmail,
-      subject: 'Username for ' + organizationName + (givenName? ', ' + givenName : ''),
+      subject: 'Username for ' + organizationName + ', ' + email,
       templateId: usernameRetrievalTemplateId,
       substitutions: {
         first_name: givenName,
@@ -171,7 +171,7 @@ module.exports = {
   //   email: 'test@test.com', 
   //   givenName: 'Robert', 
   //   familyName: 'Smith',
-  //     userNameArr: ['username', 'other_username'],
+  //   userNameArr: ['username', 'other_username'],
   // });
 
 };
