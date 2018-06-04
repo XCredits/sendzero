@@ -5,18 +5,10 @@
 // https://github.com/sendgrid/sendgrid-nodejs/blob/master/packages/client/USAGE.md
 const sendgridMail = require('@sendgrid/mail');
 const sendgridClient = require('@sendgrid/client');
+const config = require('../config/sendgrid');
 sendgridMail.setApiKey(process.env.SENDGRID_API_KEY);
 sendgridClient.setApiKey(process.env.SENDGRID_API_KEY);
 sendgridMail.setSubstitutionWrappers('{{', '}}');
-
-const organizationName = 'XCredits';
-const organizationEmail = 'teamx@xcredits.com';
-const organizationNoReplyEmail = 'noreply@xcredits.com';
-const organizationFromName = 'Team XCredits';
-const registerWelcomeTemplateId = '325bd7af-8542-4d59-bd32-2469cf13b495';
-const mailingListWelcomeTemplateId = '325bd7af-8542-4d59-bd32-2469cf13b495';
-const passwordResetTemplateId = '8cdb141c-7574-410e-bd36-47f8ef857f6c';
-const usernameRetrievalTemplateId = '3123a907-b810-486b-9682-843166f5741a';
 
 // #SENDGRID_VERIFICATION START
 // const msg = {
@@ -105,9 +97,9 @@ module.exports = {
   sendRegisterWelcome: function({userId, email, givenName, familyName}) {
     const msg = {
       to: email,
-      from: organizationEmail,
-      subject: 'Welcome to ' + organizationName + (givenName? ', ' + givenName : ''),
-      templateId: registerWelcomeTemplateId,
+      from: config.organization.email,
+      subject: 'Welcome to ' + config.organization.name + (givenName? ', ' + givenName : ''),
+      templateId: config.template.registerWelcome,
       substitutions: {
         first_name: givenName,
         last_name: familyName,
@@ -119,9 +111,9 @@ module.exports = {
   sendMailingListWelcome: function({userId, email, givenName, familyName}) {
     const msg = {
       to: email,
-      from: organizationEmail,
-      subject: 'Welcome to ' + organizationName + (givenName? ', ' + givenName : ''),
-      templateId: mailingListWelcomeTemplateId,
+      from: config.organization.email,
+      subject: 'Welcome to ' + config.organization.name + (givenName? ', ' + givenName : ''),
+      templateId: config.template.mailingListWelcome,
       substitutions: {
         first_name: givenName,
         last_name: familyName,
@@ -134,9 +126,9 @@ module.exports = {
       resetUrl}) {
     const msg = {
       to: email,
-      from: organizationNoReplyEmail,
-      subject: 'Password reset for ' + organizationName + (givenName? ', ' + givenName : ''),
-      templateId: passwordResetTemplateId,
+      from: config.organization.noReplyEmail,
+      subject: 'Password reset for ' + config.organization.name + (givenName? ', ' + givenName : ''),
+      templateId: config.template.passwordReset,
       substitutions: {
         first_name: givenName,
         last_name: familyName,
@@ -156,9 +148,9 @@ module.exports = {
     const usernamesString = userNameArr.join('<br>');
     const msg = {
       to: email,
-      from: organizationNoReplyEmail,
-      subject: 'Username for ' + organizationName + ', ' + email,
-      templateId: usernameRetrievalTemplateId,
+      from: config.organization.noReplyEmail,
+      subject: 'Username for ' + config.organization.name + ', ' + email,
+      templateId: config.template.usernameRetrieval,
       substitutions: {
         first_name: givenName,
         last_name: familyName,
