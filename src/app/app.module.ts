@@ -65,6 +65,7 @@ import { AboutComponent } from './about/about.component';
 import { LoginComponent } from './login/login.component';
 import { ForgotPasswordComponent } from './forgot-password/forgot-password.component';
 import { ResetPasswordComponent } from './reset-password/reset-password.component';
+import { ChangePasswordComponent } from './change-password/change-password.component';
 import { ForgotUsernameComponent } from './forgot-username/forgot-username.component';
 import { RegisterComponent } from './register/register.component';
 import { MailingListComponent } from './mailing-list/mailing-list.component';
@@ -90,6 +91,7 @@ import { PrivacyComponent } from './privacy/privacy.component';
     LoginComponent,
     ForgotPasswordComponent,
     ResetPasswordComponent,
+    ChangePasswordComponent,
     ForgotUsernameComponent,
     RegisterComponent,
     MailingListComponent,

@@ -203,29 +203,25 @@ function userDetails(req, res) {
 
 function changePassword(req, res) {
   const password = req.body.password;
-  const newPassword = req.body.newPassword;
   // Validate
   if (typeof password !== 'string' ||
-      typeof newPassword !== 'string' ||
-      typeof req.jwt.username !== 'string' ||
-      !validator.isLength(newPassword, 8)
+      !validator.isLength(password, 8)
     ){
     return res.status(422).json({message: 'Request failed validation'});
   }
 
-  // Attach the user name to the body
-  req.body.username = req.jwt.username;
-  // Check password
-  passport.authenticate('local', function(err, user, info){
-    // Create new password hash
-    user.createPasswordHash(newPassword);
-    user.save(()=>{
-          return res.send({message:'Password successfully changed'});
-        })
-        .catch(()=>{
-          return res.status(500).send({message:'Password change failed'});
-        });
-  }) (req, res);
+  return User.findOne({_id: req.userId})
+      .then(user => {
+        // Create new password hash
+        user.createPasswordHash(password);
+        return user.save(()=>{
+              return res.send({message:'Password successfully changed'});
+            })
+            .catch((err)=>{
+              console.log(err);
+              return res.status(500).send({message:'Password change failed'});
+            });
+  });
 }
 
 function requestResetPassword(req, res) {
