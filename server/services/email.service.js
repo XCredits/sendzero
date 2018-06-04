@@ -5,15 +5,10 @@
 // https://github.com/sendgrid/sendgrid-nodejs/blob/master/packages/client/USAGE.md
 const sendgridMail = require('@sendgrid/mail');
 const sendgridClient = require('@sendgrid/client');
+const config = require('../config/sendgrid');
 sendgridMail.setApiKey(process.env.SENDGRID_API_KEY);
 sendgridClient.setApiKey(process.env.SENDGRID_API_KEY);
 sendgridMail.setSubstitutionWrappers('{{', '}}');
-
-const organizationName = 'XCredits';
-const organizationEmail = 'teamx@xcredits.com';
-const organizationFromName = 'Team XCredits';
-const registerWelcomeTemplateId = '325bd7af-8542-4d59-bd32-2469cf13b495';
-
 
 // #SENDGRID_VERIFICATION START
 // const msg = {
@@ -30,100 +25,145 @@ const registerWelcomeTemplateId = '325bd7af-8542-4d59-bd32-2469cf13b495';
 
 module.exports = {
 
-/**
- * Add the user to the mailing list in the email service provider
- */
-addUserToMailingList: function({userId, email, givenName, familyName}) {
-  const data = [
-    {
-      "email": email,
-      "first_name": givenName,
-      "last_name": familyName,
-      "id": userId, // optional, if not a registered user
-    },
-  ];
-  var request = {
-    body: data,
-    method: 'POST',
-    url: '/v3/contactdb/recipients',
-  };
-  return sendgridClient.request(request)
-      .then(([response, body]) => {
-        if (body.errors.length === 0) {
-          // console.log(response.body.persisted_recipients[0]);
-          return response.body.persisted_recipients[0];
-        }
-        throw new Error('Problem adding to email list.');
-      })
-},
-// Testing
-// addUserToMailingList({
-//   email: 'test@test.com', 
-//   givenName: 'Robert', 
-//   familyName: 'Smith'});
+  /**
+   * Add the user to the mailing list in the email service provider
+   */
+  addUserToMailingList: function({userId, email, givenName, familyName}) {
+    const data = [
+      {
+        "email": email,
+        "first_name": givenName,
+        "last_name": familyName,
+        "id": userId, // optional, if not a registered user
+      },
+    ];
+    var request = {
+      body: data,
+      method: 'POST',
+      url: '/v3/contactdb/recipients',
+    };
+    return sendgridClient.request(request)
+        .then(([response, body]) => {
+          if (body.errors.length === 0) {
+            return response.body.persisted_recipients[0];
+          }
+          throw new Error('Problem adding to email list.');
+        })
+  },
+  // Testing
+  // module.exports.addUserToMailingList({
+  //   email: 'test@test.com', 
+  //   givenName: 'Robert', 
+  //   familyName: 'Smith'});
 
 
-/**
- * Remove the user from the mailing list in the email service provider
- * In this case, userId should be the 'persisted_recipients' id created by 
- * the SendGrid process above.
- */
-removeUserFromMailingList: function({userId}) {
-  var request = {
-    body: [userId],
-    method: 'DELETE',
-    url: '/v3/contactdb/recipients',
-  };
-  return sendgridClient.request(request)
-      .then(([response, body]) => {
-        if (response.statusCode === 204) {
-          return true;
-        }
-        throw new Error('Problem removing user.');
-      })
-},
-// Testing
-// removeUserFromMailingList({userId: 'dGVzdEB0ZXN0LmNvbQ=='});
+  /**
+   * Remove the user from the mailing list in the email service provider
+   * In this case, userId should be the 'persisted_recipients' id created by 
+   * the SendGrid process above.
+   */
+  removeUserFromMailingList: function({userId}) {
+    var request = {
+      body: [userId],
+      method: 'DELETE',
+      url: '/v3/contactdb/recipients',
+    };
+    return sendgridClient.request(request)
+        .then(([response, body]) => {
+          if (response.statusCode === 204) {
+            return true;
+          }
+          throw new Error('Problem removing user.');
+        })
+  },
+  // Testing
+  // module.exports.removeUserFromMailingList({userId: 'dGVzdEB0ZXN0LmNvbQ=='});
 
-/**
- * In this function, we are calling on the email service to retrieve instances 
- * of the user pressing unsubscribe. We are doing this to compare to the user 
- * list in our own databases, to remove individuals who have unsubscribed.
- */
-retrieveUnsubscribes: function({start, end}) {
-  
-},
+  /**
+   * In this function, we are calling on the email service to retrieve instances 
+   * of the user pressing unsubscribe. We are doing this to compare to the user 
+   * list in our own databases, to remove individuals who have unsubscribed.
+   */
+  retrieveUnsubscribes: function({start, end}) {
+    
+  },
 
-/**
- * 
- * Instructions on sending transactional emails
- * https://github.com/sendgrid/sendgrid-nodejs/blob/master/use-cases/transactional-templates.md
- */
+  /**
+   * 
+   * Instructions on sending transactional emails
+   * https://github.com/sendgrid/sendgrid-nodejs/blob/master/use-cases/transactional-templates.md
+   */
 
-sendRegisterWelcome: function({userId, email, givenName, familyName}) {
-  const msg = {
-    to: email,
-    from: organizationEmail,
-    subject: 'Welcome to ' + organizationName + (givenName? ', ' + givenName : ''),
-    templateId: registerWelcomeTemplateId,
-    substitutions: {
-      first_name: givenName,
-      last_name: familyName,
-    },
-  };
-  return sendgridMail.send(msg);
-},
+  sendRegisterWelcome: function({userId, email, givenName, familyName}) {
+    const msg = {
+      to: email,
+      from: config.organization.email,
+      subject: 'Welcome to ' + config.organization.name + (givenName? ', ' + givenName : ''),
+      templateId: config.template.registerWelcome,
+      substitutions: {
+        first_name: givenName,
+        last_name: familyName,
+      },
+    };
+    return sendgridMail.send(msg);
+  },
 
-sendMailingListWelcome: function({userId, email, givenName, familyName}) {
-  
-},
+  sendMailingListWelcome: function({userId, email, givenName, familyName}) {
+    const msg = {
+      to: email,
+      from: config.organization.email,
+      subject: 'Welcome to ' + config.organization.name + (givenName? ', ' + givenName : ''),
+      templateId: config.template.mailingListWelcome,
+      substitutions: {
+        first_name: givenName,
+        last_name: familyName,
+      },
+    };
+    return sendgridMail.send(msg);
+  },
 
-sendPasswordReset: function({userId, email, givenName, familyName, resetLink}) {
-  
-},
+  sendPasswordReset: function({userId, email, givenName, familyName, username,
+      resetUrl}) {
+    const msg = {
+      to: email,
+      from: config.organization.noReplyEmail,
+      subject: 'Password reset for ' + config.organization.name + (givenName? ', ' + givenName : ''),
+      templateId: config.template.passwordReset,
+      substitutions: {
+        first_name: givenName,
+        last_name: familyName,
+        reset_url: resetUrl,
+      },
+    };
+    return sendgridMail.send(msg);
+  },
+  // Testing
+  // module.exports.sendPasswordReset({
+  //   email: 'test@test.com', 
+  //   givenName: 'Robert', 
+  //   familyName: 'Smith',
+  //   resetUrl: 'https://google.com'});
 
-sendUsernameRetrieval: function({userId, email, givenName, familyName, userNameArr}) {
-  
-}
+  sendUsernameRetrieval: function({givenName, familyName, email, userNameArr}) {
+    const usernamesString = userNameArr.join('<br>');
+    const msg = {
+      to: email,
+      from: config.organization.noReplyEmail,
+      subject: 'Username for ' + config.organization.name + ', ' + email,
+      templateId: config.template.usernameRetrieval,
+      substitutions: {
+        first_name: givenName,
+        last_name: familyName,
+        username_string: usernamesString,
+      },
+    };
+    return sendgridMail.send(msg);
+  }
+  // module.exports.sendUsernameRetrieval({
+  //   email: 'test@test.com', 
+  //   givenName: 'Robert', 
+  //   familyName: 'Smith',
+  //   userNameArr: ['username', 'other_username'],
+  // });
 
 };
