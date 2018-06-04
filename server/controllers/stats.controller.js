@@ -34,7 +34,7 @@ function mailingListCount(req, res) {
 // /api/admin/user-register-stats'
 function mailingListStatsReport(req, res) {
   // Validation
-  // ...
+  // not necessary as not using req.body
 
   MailingListStats.find({}, {time:1, count:1})
       .then(results => {
@@ -52,7 +52,7 @@ function mailingListStatsReport(req, res) {
 // /api/admin/user-register-count
 function userRegisterCount(req, res) {
   // Validation
-  // ...
+  // not necessary as not using req.body
 
   return User.count()
         .then(count => {
@@ -63,7 +63,7 @@ function userRegisterCount(req, res) {
 // /api/admin/mailing-list-stats'
 function userRegisterStatsReport(req, res) {
   // Validation
-  // ...
+  // not necessary as not using req.body
   
   UserStats.find({}, {time:1, count:1})
       .then(results => {
