@@ -257,7 +257,7 @@ function requestResetPassword(req, res) {
         };
         const jwtString = jwt.sign(jwtObj, process.env.JWT_KEY);
         const resetUrl = process.env.URL_ORIGIN + 
-            '/password-reset?username=' + user.username + // the username here is only display purposes on the front-end
+            '/reset-password?username=' + user.username + // the username here is only display purposes on the front-end
             '&auth=' + jwtString;
         // When the user clicks on the link, the app pulls the JWT from the link
         // and stores it in the component

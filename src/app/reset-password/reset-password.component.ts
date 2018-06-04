@@ -25,10 +25,11 @@ export class ResetPasswordComponent implements OnInit {
       activatedRoute.queryParamMap
           .subscribe(paramMap => {
             this.username = paramMap.get('username');
-            this.jwt = paramMap.get('jwt');
+            this.jwt = paramMap.get('auth');
             try {
               this.jwtDecoded = jwtDecode(this.jwt);
-            } catch {
+            } catch (err) {
+              console.log(err);
               return this.formErrorMessage = 'Link does not work (authorisation string not valid).';
             }
           });
