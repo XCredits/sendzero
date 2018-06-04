@@ -3,7 +3,7 @@ module.exports = {
     name: 'XCredits',
     email: 'teamx@xcredits.com',
     noReplyEmail: 'noreply@xcredits.com',
-    fromName: 'Team XCredits',
+    fromName: 'TeamX',
   },
   template: {
     registerWelcome: '325bd7af-8542-4d59-bd32-2469cf13b495',
