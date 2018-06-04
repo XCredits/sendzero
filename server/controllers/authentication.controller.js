@@ -43,6 +43,7 @@ var validator = require('validator');
 const User = require('../models/user.model.js');
 const UserStats = require('../models/user-stats.model.js');
 const statsService = require('../services/stats.service.js');
+const emailService = require('../services/email.service.js');
 const Session = require('../models/session.model.js');
 const jwt = require('jsonwebtoken');
 const auth = require('../config/jwt-auth.js');
@@ -101,13 +102,33 @@ function register(req, res) {
         user.createPasswordHash(password);
         return user.save()
             .then(() => {
+              // The below promises are structured to report failure but not
+              // block on failure
               return createAndSendRefreshAndSessionJwt(user, req, res)
                   .then(()=>{
-                    console.log('incrementing');
-                    return statsService.increment(UserStats);
+                    return statsService.increment(UserStats)
+                        .catch((err)=>{
+                          console.log('Error in the stats service');
+                        })
                   })
-                  .catch((err)=>{
-                    console.log('Error in the stats service');
+                  .then(()=>{
+                    return emailService.addUserToMailingList({
+                          givenName, familyName, email, userId: user._id,
+                        })
+                        .catch((err)=>{
+                          console.log('Error in the mailing list service');
+                        });
+                  })
+                  .then(()=>{
+                    return emailService.sendRegisterWelcome({
+                          givenName, familyName, email,
+                        })
+                        .catch((err)=>{
+                          console.log('Error in the send email service');
+                        });
+                  })
+                  .catch((err) =>{
+                    console.log('Error in createAndSendRefreshAndSessionJwt');
                   });
             })
             .catch(dbError => {
@@ -115,12 +136,13 @@ function register(req, res) {
               if (process.env.NODE_ENV !== 'production') {
                 // DO NOT console.log or return Mongoose catch errors to the front-end in production, especially for user objects. They contain secret information. e.g. if you try to create a user with a username that already exists, it will return the operation that you are trying to do, which includes the password hash.
                 err = dbError;
+                console.log(dbError);
               }
               return res.status(500).send({
                   message: 'Error in creating user during registration: ' + err});
             });
       })
-      .catch(()=>{
+      .catch((err)=>{
         res.status(500).send({message:'Error accessing database while checking for existing users'});
       });
 }
@@ -154,7 +176,6 @@ function login(req, res) {
 function refreshJwt(req, res) {
   // The refresh token is verfied by auth.jwtRefreshToken
   // Pull the user data from the refresh JWT
-  console.log('Getting into refresher');
   const token = setJwtCookie({
     res,
     userId: req.jwtRefreshToken.sub, 
@@ -233,17 +254,25 @@ function requestResetPassword(req, res) {
               (Date.now() + Number(process.env.JWT_TEMPORARY_LINK_TOKEN_EXPIRY))/1000),// 1 hour
         };
         const jwtString = jwt.sign(jwtObj, process.env.JWT_KEY);
-        const emailLink = process.env.URL_ORIGIN + 
+        const resetUrl = process.env.URL_ORIGIN + 
             '/password-reset?username=' + user.username + // the username here is only display purposes on the front-end
             '&auth=' + jwtString;
-        console.log(emailLink);
-        console.log('Email service not set up!!!!!!!!!!!!!!!!!!!!!!');
         // When the user clicks on the link, the app pulls the JWT from the link
         // and stores it in the component
+        return emailService.sendPasswordReset({
+              givenName: user.givenName, 
+              familyName: user.familyName, 
+              email: user.email,
+              username: user.username,
+              userId: user._id,
+              resetUrl,
+            })
+            .catch((err)=>{
+              res.status(500).send({message:'Could not send email.'});
+            });
       })
       .catch((err) => {
-        console.log(err);
-        res.status(500).send({message:'Error accessing user database.'})
+        res.status(500).send({message:'Error accessing user database.'});
       });
 }
 
@@ -279,25 +308,29 @@ function forgotUsername(req, res) {
   }
 
   // find all users by email
-  return User.find({email: email}).select('username')
+  return User.find({email: email}).select('username givenName familyName')
       .then(users => {
           // Success object must be identical, to avoid people discovering emails in the system
           const successObject = {message: 'Email sent if users found in database.'}
-          res.send(successObject); // Note that if errors in send in emails occur, the front end will not see them
-          if (!users) {
+          if (!users || users.length === 0) {
+            res.send(successObject); // Note that if errors in send in emails occur, the front end will not see them
             return;
           }
-          const usernames = users.map(user => user.username);
-          
-          console.log(usernames);
-          console.log('Email service not set up!!!!!!!!!!!!!!!!!!!!!!');
-          // send all user names to email   
-          // process.env.URL_ORIGIN
-          // return emailService.send({emailAddress: req.body.email, data: usernames})
-          //     .catch(() => {
-          //     });
+          const userNameArr = users.map(user => user.username);
+          return emailService.sendUsernameRetrieval({
+                givenName: users[0].givenName, // just use the name of the first account
+                familyName: users[0].familyName,
+                email: email,
+                userNameArr: userNameArr,
+              })
+              .then(() => {
+                res.send(successObject); // Note that if errors in send in emails occur, the front end will not see them
+              })
+              .catch((err)=>{
+                res.status(500).send({message:'Could not send email.'});
+              });
       })
-      .catch(() => {
+      .catch((err) => {
         res.status(500).send({message:'Error accessing user database.'})
       });
   
@@ -342,7 +375,6 @@ function createAndSendRefreshAndSessionJwt(user, req, res) {
   session.lastObserved = new Date(Date.now());
   return session.save()
       .then((session)=>{
-        console.log('saved session');
         const token = setJwtCookie({
             res,
             userId: user._id, 
