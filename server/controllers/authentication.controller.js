@@ -73,6 +73,7 @@ function register(req, res) {
   const familyName = req.body.familyName;
   var username = req.body.username;
   const password = req.body.password;
+
   // Validate
   if (typeof email !== 'string' ||
       typeof givenName !== 'string' ||
@@ -85,6 +86,7 @@ function register(req, res) {
     ){
     return res.status(422).json({message: 'Request failed validation'});
   }
+
   // Sanitize
   username = username.toLowerCase();
 
@@ -192,7 +194,7 @@ function refreshJwt(req, res) {
 }
 
 function userDetails(req, res) {
-  // Validate not necessary at this point (no req.body use)
+  // Validate not necessary at this point (no req.body use, and checked in jwt-auth)
   return User.findOne({_id: req.userId})
       .then(user => {
         res.send(user.frontendData());

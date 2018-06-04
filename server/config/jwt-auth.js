@@ -1,3 +1,4 @@
+var validator = require('validator');
 var jwt = require('jsonwebtoken');
 var Session = require('../models/session.model.js');
 
@@ -30,6 +31,10 @@ module.exports = {
         return res.status(401)
           .json({message:"JWT authenthication error: XSRF does not match"});
       }
+    }
+    if (typeof payload.sub !== 'string' ||
+        typeof payload.username !== 'string'){
+      return res.status(422).json({message: 'Request failed JWT validation'});
     }
     req.jwt = payload;
     req.userId = payload.sub;
@@ -70,6 +75,15 @@ module.exports = {
           .json({message:"JWT Refresh Token authenthication error: XSRF does not match"});
       }
     }
+
+    // Validation
+    if (typeof payload.jti !== 'string' ||
+        typeof payload.sub !== 'string' ||
+        typeof payload.username !== 'string'
+        ){
+      return res.status(422).json({message: 'Request failed JWT validation'});
+    }
+
     return Session.findOne({_id: payload.jti})
         .then(session=>{
           if (!session) {
@@ -100,6 +114,11 @@ module.exports = {
       return res.status(401)
         .send({message:"JWT temporary link authenthication error: JWT is not verified"});
     }
+
+    if (typeof payload.sub !== 'string'){
+      return res.status(422).json({message: 'Request failed JWT validation'});
+    }
+
     req.userId = payload.sub;
     next();
   },
