@@ -11,7 +11,6 @@ export const environment = {
   // Comment out Google Analytics below to prevent analytics from running
   googleAnalyticsTrackingId: 'UA-120389053-1',
 
-
   // Comment out any of the below to prevent them being shown
   social: {
     facebook: 'https://www.facebook.com/lazywebapp',
