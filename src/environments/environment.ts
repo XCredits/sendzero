@@ -17,5 +17,6 @@ export const environment = {
     medium: 'https://medium.com/oganisationname',
     telegram: 'https://t.me/oganisationname',
     youtube: 'https://www.youtube.com/channel/oganisationname',
+    reddit: 'https://www.reddit.com/r/xcredits',
   }
 };
