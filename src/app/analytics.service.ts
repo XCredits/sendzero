@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { environment } from '../environments/environment';
 
 @Injectable({
   providedIn: 'root'
@@ -19,7 +20,12 @@ export class AnalyticsService {
     this.gtag = window['gtag'];
     // Initialise the gtag
     this.gtag('js', new Date());
-    this.gtag('config', 'UA-120389053-1');
+    // this.gtag('config', 'UA-120389053-1');
+  }
+
+  logPageView(pagePath, pageTitle) {
+    // this.gtag('config', 'UA-120389053-1');
+    this.gtag('config', 'UA-120389053-1', {'page_path': pagePath});
   }
 
 }

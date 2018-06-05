@@ -119,9 +119,15 @@ export class AppComponent implements OnChanges {
 
     router.events.pipe(
       filter(e => e instanceof NavigationEnd))
-      .forEach(e => {
+      .forEach((e: NavigationEnd) => {
         this.title = route.root.firstChild.snapshot.data['title'];
-        // analytics.logPageView();
+
+        // Analytics
+        // Test if the page has Changed
+
+        // The below line removes the query parameters so that information is
+        // not passed to the Analytics provider
+        analytics.logPageView(e.url.split('?')[0], this.title);
       });
 
     userService.userObservable
