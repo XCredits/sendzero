@@ -7,6 +7,7 @@ import { LocalStorageModule } from 'angular-2-local-storage';
 import { AppComponent } from './app.component';
 import { UserService } from './user.service';
 import { StatsService } from './stats.service';
+import { AnalyticsService } from './analytics.service';
 import { AuthGuard } from './auth.guard';
 import { AdminGuard } from './admin.guard';
 
@@ -257,7 +258,7 @@ import { PrivacyComponent } from './privacy/privacy.component';
     ServiceWorkerModule.register('/ngsw-worker.js',
         {enabled: environment.production})
   ],
-  providers: [UserService, StatsService],
+  providers: [UserService, StatsService, AnalyticsService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

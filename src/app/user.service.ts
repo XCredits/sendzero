@@ -233,6 +233,10 @@ export class UserService {
         });
   }
 
+  isLoggedIn() {
+    return !!this.user;
+  }
+
   private clearAllUserData() {
     // Clean up old data
     this.user = undefined;

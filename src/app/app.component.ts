@@ -4,6 +4,7 @@ import { Component, ViewChild, OnChanges } from '@angular/core';
 // Imports needed for router import for title
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import { UserService } from './user.service';
+import { AnalyticsService } from './analytics.service';
 
 @Component({
   selector: 'app-root',
@@ -103,9 +104,10 @@ export class AppComponent implements OnChanges {
   }
 
   constructor(
-      router: Router,
-      route: ActivatedRoute,
-      userService: UserService
+      private router: Router,
+      private route: ActivatedRoute,
+      private userService: UserService,
+      private analytics: AnalyticsService,
     ) {
     // Set side bar mode
     this.screenWidth = window.innerWidth;
@@ -117,8 +119,15 @@ export class AppComponent implements OnChanges {
 
     router.events.pipe(
       filter(e => e instanceof NavigationEnd))
-      .forEach(e => {
+      .forEach((e: NavigationEnd) => {
         this.title = route.root.firstChild.snapshot.data['title'];
+
+        // Analytics
+        // Test if the page has Changed
+
+        // The below line removes the query parameters so that information is
+        // not passed to the Analytics provider
+        analytics.pageView(e.url.split('?')[0], this.title);
       });
 
     userService.userObservable
