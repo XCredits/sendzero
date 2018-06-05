@@ -10,7 +10,8 @@ export class AnalyticsService {
   constructor() {
     // Load the google analytics script.
     const node = document.createElement('script');
-    node.src = 'https://www.googletagmanager.com/gtag/js?id=UA-120389053-1';
+    node.src = 'https://www.googletagmanager.com/gtag/js?id=' +
+        environment.googleAnalyticsTrackingId;
     node.type = 'text/javascript';
     node.async = true;
     node.charset = 'utf-8';
@@ -23,7 +24,7 @@ export class AnalyticsService {
   }
 
   logPageView(pagePath, pageTitle) {
-    this.gtag('config', 'UA-120389053-1',
+    this.gtag('config', environment.googleAnalyticsTrackingId,
         {'page_path': pagePath, 'page_title': pageTitle});
   }
 
