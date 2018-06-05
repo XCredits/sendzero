@@ -127,7 +127,7 @@ export class AppComponent implements OnChanges {
 
         // The below line removes the query parameters so that information is
         // not passed to the Analytics provider
-        analytics.logPageView(e.url.split('?')[0], this.title);
+        analytics.pageView(e.url.split('?')[0], this.title);
       });
 
     userService.userObservable
