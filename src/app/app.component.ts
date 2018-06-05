@@ -71,6 +71,7 @@ export class AppComponent implements OnChanges {
       routerLink: '/settings',
       icon: 'settings',
       title: 'Settings',
+      isLoggedInRoute: true,
     },
     {
       routerLink: '/admin',

@@ -154,6 +154,7 @@ import { FooterComponent } from './footer/footer.component';
         path: 'settings',
         component: SettingsComponent,
         data: { title: 'Settings' },
+        canActivate: [AuthGuard],
       },
       {
         path: 'about',
