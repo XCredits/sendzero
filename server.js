@@ -8,6 +8,7 @@ const path = require('path');
 const http = require('http');
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
+const socialController = require('./server/controllers/social.controller');
 
 app.use(bodyParser.urlencoded({ extended: true })); // extended gives full JSON
 app.use(bodyParser.json());
@@ -19,6 +20,8 @@ app.use(express.static(path.join(__dirname, 'dist')));
 
 const port = process.env.PORT || '3000';
 app.set('port', port);
+
+app.use(socialController);
 
 routes(app);
 

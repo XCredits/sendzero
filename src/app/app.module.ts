@@ -78,6 +78,7 @@ import { MailingListChartComponent } from './mailing-list-chart/mailing-list-cha
 import { UserRegisterChartComponent } from './user-register-chart/user-register-chart.component';
 import { TermsComponent } from './terms/terms.component';
 import { PrivacyComponent } from './privacy/privacy.component';
+import { FooterComponent } from './footer/footer.component';
 
 @NgModule({
   declarations: [
@@ -104,6 +105,7 @@ import { PrivacyComponent } from './privacy/privacy.component';
     UserRegisterChartComponent,
     TermsComponent,
     PrivacyComponent,
+    FooterComponent,
   ],
   imports: [
     BrowserModule,
