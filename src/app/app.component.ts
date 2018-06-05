@@ -104,10 +104,10 @@ export class AppComponent implements OnChanges {
   }
 
   constructor(
-      router: Router,
-      route: ActivatedRoute,
-      userService: UserService,
-      analytics: AnalyticsService,
+      private router: Router,
+      private route: ActivatedRoute,
+      private userService: UserService,
+      private analytics: AnalyticsService,
     ) {
     // Set side bar mode
     this.screenWidth = window.innerWidth;

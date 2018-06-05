@@ -38,7 +38,7 @@ export class AnalyticsService {
   }
 
   mailingList() {
-    this.gtag('event', 'mailing_list'); // standard event
+    this.gtag('event', 'join_mailing_list');
   }
 
   customEvent(action: string,

@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
 import {Router, ActivatedRoute, Params} from '@angular/router';
 import { UserService } from '../user.service';
+import { AnalyticsService } from '../analytics.service';
 
 @Component({
   selector: 'app-login',
@@ -19,7 +20,8 @@ export class LoginComponent implements OnInit {
 
   constructor( private http: HttpClient,
     private userService: UserService,
-    private activatedRoute: ActivatedRoute ) {
+    private activatedRoute: ActivatedRoute,
+    private analytics: AnalyticsService ) {
 
       // The following is to ensure that when a user is redirected for the
       // purposes of logging in that they are still redirected to the correct
@@ -52,6 +54,7 @@ export class LoginComponent implements OnInit {
           this.waiting = false;
           this.userService.authenticationResult(data);
           this.userService.successNavigate(this.redirectUrl);
+          this.analytics.login();
         },
         errorResponse => {
           this.waiting = false;
