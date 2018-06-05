@@ -1,8 +1,23 @@
 $footerBackgroundColor:rgb(30,30,30);
 
+.panel {
+  background-size: cover;
+  padding: 24px;
+  @media (max-width: 767px) {
+    padding: 0px;
+  }
+}
+
 .footer {
   @extend .panel;
   background-color: $footerBackgroundColor;
+}
+
+.panel-right {
+  display: -webkit-flex;
+  display: flex;
+  -webkit-align-items: center;
+  align-items: center;
 }
 
 // Social buttons

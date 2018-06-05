@@ -16,7 +16,7 @@ export const environment = {
   social: {
     facebook: 'https://www.facebook.com/lazywebapp',
     twitter: 'https://twitter.com/lazywebapp',
-    linkedIn: 'https://www.linkedin.com/company/lazywebapp/',
+    linkedin: 'https://www.linkedin.com/company/lazywebapp/',
     medium: 'https://medium.com/lazywebapp',
     telegram: 'https://t.me/lazywebapp',
     youtube: 'https://www.youtube.com/channel/lazywebapp',
