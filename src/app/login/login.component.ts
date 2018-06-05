@@ -58,7 +58,12 @@ export class LoginComponent implements OnInit {
         },
         errorResponse => {
           this.waiting = false;
-          this.formErrorMessage = 'There was a problem submitting the form.';
+          // 401
+          if (errorResponse.status === 401) {
+            this.formErrorMessage = 'Username or password incorrect.';
+          } else {
+            this.formErrorMessage = 'There was a problem submitting the form.';
+          }
         });
   };
 }
