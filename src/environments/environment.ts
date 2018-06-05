@@ -9,7 +9,7 @@ export const environment = {
   siteName: 'LazyWebApp',
 
   // Comment out Google Analytics below to prevent analytics from running
-  googleAnalytics: 'UA-120389053-1',
+  googleAnalyticsTrackingId: 'UA-120389053-1',
 
 
   // Comment out any of the below to prevent them being shown

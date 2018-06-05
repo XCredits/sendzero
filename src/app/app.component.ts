@@ -104,10 +104,10 @@ export class AppComponent implements OnChanges {
   }
 
   constructor(
-      router: Router,
-      route: ActivatedRoute,
-      userService: UserService,
-      analytics: AnalyticsService,
+      private router: Router,
+      private route: ActivatedRoute,
+      private userService: UserService,
+      private analytics: AnalyticsService,
     ) {
     // Set side bar mode
     this.screenWidth = window.innerWidth;
@@ -127,7 +127,7 @@ export class AppComponent implements OnChanges {
 
         // The below line removes the query parameters so that information is
         // not passed to the Analytics provider
-        analytics.logPageView(e.url.split('?')[0], this.title);
+        analytics.pageView(e.url.split('?')[0], this.title);
       });
 
     userService.userObservable

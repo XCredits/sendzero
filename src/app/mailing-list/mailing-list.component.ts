@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { MatSnackBar } from '@angular/material';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
+import { AnalyticsService } from '../analytics.service';
 
 @Component({
   selector: 'app-mailing-list',
@@ -16,6 +17,7 @@ export class MailingListComponent implements OnInit {
   constructor(
     private http: HttpClient,
     private snackBar: MatSnackBar,
+    private analytics: AnalyticsService
   ) { }
 
   ngOnInit() {
@@ -41,9 +43,10 @@ export class MailingListComponent implements OnInit {
         .subscribe(
         data => {
           this.waiting = false;
-          this.snackBar.open('Successfully registered', 'Dismiss', {
+          this.snackBar.open('Successfully subscribed to the mailing list', 'Dismiss', {
             duration: 5000
           });
+          this.analytics.mailingList();
         },
         errorResponse => {
           this.waiting = false;
