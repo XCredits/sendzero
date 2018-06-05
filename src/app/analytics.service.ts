@@ -28,4 +28,18 @@ export class AnalyticsService {
         {'page_path': pagePath, 'page_title': pageTitle});
   }
 
+  // Log in gtag('event', 'login', { method : 'email' }); // standard event
+  // Register gtag('event', 'sign_up', { method : 'email' }); // standard event
+  // Mailing List gtag('event', 'mailing_list');
+  // Email lead gtag('event', 'email_click', );
+  // utm_source=news4&utm_medium=email&utm_campaign=spring-summer
+
+  // Custom event
+  // eventAction,
+  // 'event_category': <category>,
+  // 'event_label': <label>,
+  // 'value': <value>
+
+  // Events: https://developers.google.com/analytics/devguides/collection/gtagjs/events
+
 }
