@@ -358,10 +358,6 @@ function createAndSendRefreshAndSessionJwt(user, req, res) {
 
   // Create cross-site request forgery token
   var xsrf = crypto.randomBytes(8).toString('hex');
-  // Setting XSRF-TOKEN cookie means that Angular will automatically attach the 
-  // XSRF token to the X-XSRF-TOKEN header. 
-  // Read more: https://stormpath.com/blog/angular-xsrf
-  res.cookie('XSRF-TOKEN', xsrf, {secure: !process.env.IS_LOCAL});
 
   const refreshTokenExpiry = Math.floor(
       (Date.now() + Number(process.env.JWT_REFRESH_TOKEN_EXPIRY))/1000);
@@ -373,6 +369,13 @@ function createAndSendRefreshAndSessionJwt(user, req, res) {
   session.lastObserved = new Date(Date.now());
   return session.save()
       .then((session)=>{
+        // Setting XSRF-TOKEN cookie means that Angular will automatically attach the 
+        // XSRF token to the X-XSRF-TOKEN header. 
+        // Read more: https://stormpath.com/blog/angular-xsrf
+        res.cookie('XSRF-TOKEN', xsrf, {
+          secure: !process.env.IS_LOCAL, 
+          maxAge: 20 * 365 * 24 * 60 * 60 * 1000, // 20 year expiry
+        });
         const token = setJwtCookie({
             res,
             userId: user._id, 
@@ -416,6 +419,7 @@ function setJwtCookie({res, userId, username, isAdmin, xsrf, sessionId}) {
   res.cookie('JWT', jwtString, {
       httpOnly: true,
       secure: !process.env.IS_LOCAL,
+      maxAge: process.env.JWT_EXPIRY,
     });
   return {jwtString, jwtObj};
 }
@@ -435,6 +439,7 @@ function setJwtRefreshTokenCookie(
   res.cookie('JWT_REFRESH_TOKEN', jwtString, {
       httpOnly: true,
       secure: !process.env.IS_LOCAL,
+      maxAge: process.env.JWT_REFRESH_TOKEN_EXPIRY,
     });
   return {jwtString, jwtObj};
 }
