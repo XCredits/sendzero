@@ -121,7 +121,7 @@ export class AppComponent implements OnChanges {
       filter(e => e instanceof NavigationEnd))
       .forEach(e => {
         this.title = route.root.firstChild.snapshot.data['title'];
-        analytics.logPageView();
+        // analytics.logPageView();
       });
 
     userService.userObservable

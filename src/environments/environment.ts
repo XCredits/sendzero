@@ -8,6 +8,8 @@ export const environment = {
 
   siteName: 'LazyWebApp',
 
+  googleAnalytics: 'UA-120389053-1',
+
   social: {
     facebook: 'https://www.facebook.com/oganisationname',
     twitter: 'https://twitter.com/oganisationname',
