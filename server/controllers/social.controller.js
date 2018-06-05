@@ -1,15 +1,23 @@
+// The social controller intercepts scrapers and serves new URLs
+
+const socialLinks = require('./social-links.controller');
 
 const socialDefaults = {
-  url: process.env.siteUrl,
-  title: process.env.siteName,
+  url: process.env.SITE_URL,
+  title: process.env.SITE_NAME,
   description: '',
   image: '/assets/img/social-default.jpg',
 };
 
-
-
 module.exports = function(req, res, next) {
-  return res.send(html(socialDefaults));
+  const ua =req.headers['user-agent'];
+  if (ua.includes('FacebookExternalHit') ||
+      ua.includes('Facebot') ||
+      ua.includes('LinkedInBot') ||
+      ua.includes('Twitterbot') ){
+    const customLink = socialLinks(req.path);
+    return res.send(html(customLink ? customLink : socialDefaults));
+  }
   next();
 };
 
@@ -17,14 +25,15 @@ function html(v) {
   return `
     <html>
       <head>
-        <meta property="og:url" content="http://www.nytimes.com/2015/02/19/arts/international/when-great-minds-dont-think-alike.html" />
+        <meta property="og:url" content="${v.url}" />
         <meta property="og:type" content="article" />
-        <meta property="og:title" content="When Great Minds Don’t Think Alike" />
-        <meta property="og:description" content="How much does culture influence creative thinking?" />
-        <meta property="og:image" content="http://static01.nyt.com/images/2015/02/19/arts/international/19iht-btnumbers19A/19iht-btnumbers19A-facebookJumbo-v2.jpg" />
+        <meta property="og:title" content="${v.title}" />
+        <meta property="og:description" content="${v.description}" />
+        <meta property="og:image" content="${v.image}" />
       </head>
       <body>
-        Hello
+        <h1>${v.title}</h1>
+        <p>${v.description}</p>
         <img src="${v.image}">
       </body>
       
