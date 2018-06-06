@@ -109,6 +109,8 @@ import { FooterComponent } from './footer/footer.component';
     TermsComponent,
     PrivacyComponent,
     FooterComponent,
+    ConnectionDialogComponent,
+    ReceiveFileDialogComponent,
   ],
   imports: [
     BrowserModule,
