@@ -75,11 +75,11 @@ module.exports = function(app) {
  */
 function register(req, res) {
   // Extract req.body
-  let email = req.body.email;
-  let givenName = req.body.givenName;
-  let familyName = req.body.familyName;
+  const email = req.body.email;
+  const givenName = req.body.givenName;
+  const familyName = req.body.familyName;
+  const password = req.body.password;
   let username = req.body.username;
-  let password = req.body.password;
 
   // Validate
   if (typeof email !== 'string' ||
