@@ -12,4 +12,4 @@ exports.increment = function(DbModel) {
         }
         return null;
       });
-}
+};
