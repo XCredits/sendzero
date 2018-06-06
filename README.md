@@ -110,9 +110,22 @@ gcloud app deploy
 Deployed service [default] to [https://test-project-197703.appspot.com]
 ~~~
 
+# Instructions for setting up SendGrid emails
+1) Go to
+  [this page](https://app.sendgrid.com/guide/integrate/langs/nodejs),
+  do NOT follow the instructions.
 
+2) Add the SendGrid API key to the .env file
 
+3) Click "I've integrated the code above." and Click "Verifiy integration".
 
+4) Comment out the `#SENDGRID_VERIFICATION` section of the at the top of the
+  `email.service.js` file.
+
+5) Start the server in development mode in order to send an email and verify 
+  that the installation works.
+
+6) COMMENT OUT THE `#SENDGRID_VERIFICATION` again!
 
 # How this app was created
 ## Install Angular

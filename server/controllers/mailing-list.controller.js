@@ -1,50 +1,46 @@
-const { check, validationResult } = require('express-validator/check');
+const validator = require('validator');
 const MailingList = require('../models/mailing-list.model.js');
-var Promise = require("bluebird");
+const MailingListStats = require('../models/mailing-list-stats.model.js');
+const statsService = require('../services/stats.service.js');
+// const Promise = require('bluebird');
+// const auth = require('../config/jwt-auth.js');
 
-module.exports = function (app) {
-  app.post('/api/join-mailing-list', 
-    viewRequest,
-    //validateJoinMailingList,
-    viewRequest, 
-    joinMailingList, 
-    viewRequest);
-}
+module.exports = function(app) {
+  app.post('/api/join-mailing-list', joinMailingList);
+};
 
-function viewRequest(req, res, next){
-  console.log("Got in");
-  next();
-}
-
-// /api/join-mailing-list
-function validateJoinMailingList(){
-  // This function returns an array of validation statements
-  return [check('email').isEmail().withMessage('email not valid'), 
-      // check('givenName').isLength({ min: 5 }),
-      ];
-}
-
+/**
+ * join a mailing list
+ * @param {*} req request object
+ * @param {*} res response object
+ * @return {*}
+ */
 function joinMailingList(req, res) {
-  console.log("Successfully called backend route");
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-      return res.status(422).json({ errors: errors.mapped() });
+  let email = req.body.email;
+  const givenName = req.body.givenName;
+  const familyName = req.body.familyName;
+  // Validation
+  if (typeof email !== 'string' ||
+      typeof givenName !== 'string' ||
+      typeof familyName !== 'string' ||
+      !validator.isEmail(email)
+    ) {
+    return res.status(422).json({message: 'Request failed validation'});
   }
-  console.log('Passed validation');
+
   let mailingListUser = new MailingList();
-  mailingListUser.email = req.body.email;
-  mailingListUser.givenName = req.body.givenName;
-  mailingListUser.familyName = req.body.familyName;
-  console.log('Attempt to save');
+  mailingListUser.email = email;
+  mailingListUser.givenName = givenName;
+  mailingListUser.familyName = familyName;
   return mailingListUser.save()
       .then((result) => {
-        console.log('Successful call');
-        res.status(200).send({ message: "Success" });
+        res.status(200).send({message: 'Success'});
+        return statsService.increment(MailingListStats);
       })
       .catch((error) => {
         console.log('Error');
         console.log(error.message);
-        return res.status(500).json({ message: error.message });
+        return res.status(500).json({message: error.message});
       });
 }
 

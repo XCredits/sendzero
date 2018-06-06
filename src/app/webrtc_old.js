@@ -1,4 +1,4 @@
-
+/* eslint-disable */
 // -----------Front End Code Below-------------------------------------------
 
 let mediaConstraints = {
