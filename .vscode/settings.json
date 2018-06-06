@@ -1,5 +1,4 @@
 {
-  "editor.autoClosingBrackets": false,
   "editor.tabSize": 2,
   "editor.rulers": [0, 80],
   "files.eol": "\n",
