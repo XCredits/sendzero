@@ -12,7 +12,7 @@ const Peer = require('simple-peer');
 const SimpleSignalClient = require('simple-signal-client');
 // Simple peer splits files greater than ~64k, so we make our lives easier
 // by splitting up files ino 60k chunks
-const CHUNK_SIZE = 30000;
+const CHUNK_SIZE = 60000;
 let SERVER_URL;
 if (String(window.location.hostname) === 'localhost') {
   SERVER_URL = 'http://localhost:3000';
@@ -117,11 +117,12 @@ export class SendZeroService {
     // interceptions.
     // If the parsing fails, we show an error.
     try {
+      // console.log(dataString);
       // We first obtain the size of the message.
       const msgSize = parseInt(dataString.slice(0, 5), 10);
       // We only parse the stringified object now.
-      const messageOrDataString = dataString.slice(5, 5 + msgSize);
-      const receivedData = JSON.parse(messageOrDataString);
+      const messageString = dataString.slice(5, 5 + msgSize);
+      const receivedData = JSON.parse(messageString);
       // Various cases
       // 1. We receive a message saying we can continue sending file (after
       // we've sent file metadata through)
@@ -163,7 +164,8 @@ export class SendZeroService {
         this.ref.tick();
       } else if (receivedData.type === 'METADATA') {
         // Reassign (deep copy) rather than fileMetadata = receivedFileMetaData
-        const fileMetadata = JSON.parse(messageOrDataString);
+        const fileMetadata = JSON.parse(messageString);
+        console.log(fileMetadata);
         // Prepare for a new file but initializing variables like id, name, etc.
         // TODO: Move this to dialog component
         this.peers[receivedData.from]
@@ -173,8 +175,6 @@ export class SendZeroService {
               name: fileMetadata.fileName,
               size: fileMetadata.fileSize,
               type: fileMetadata.fileType,
-              // Initialize a string
-              fileString: '',
               receivedChunks: 0,
             });
         this.ref.tick();
@@ -199,8 +199,10 @@ export class SendZeroService {
         // string back to an array.
         // @ts-ignore
         const chunk = dataString.slice(5 + msgSize);
+        console.log(chunk.length);
         if (file.receivedChunks === 0) {
-          file.fileString += chunk;
+          file.fileArray.set(chunk);
+          file.fileArrayOffset = CHUNK_SIZE;
           file.receivedChunks++;
           this.ref.tick();
           // If we had a file < CHUNK_SIZE, we only got one chunk, so exit now.
@@ -208,12 +210,16 @@ export class SendZeroService {
             this.makeBlob(receivedData.from, file.id);
           }
         } else if (file.receivedChunks < file.maxFileChunks - 1) {
-          file.fileString += chunk;
+          file.fileArray.set(chunk, file.fileArrayOffset);
+          file.fileArrayOffset += CHUNK_SIZE;
           file.receivedChunks++;
           // This is because Angular doesn't detect changes in callbacks.
           this.ref.tick();
         } else {
-          file.fileString += chunk;
+          console.log(file.fileArrayOffset);
+          console.log(chunk.length);
+          console.log(file.fileArray);
+          file.fileArray.set(chunk, file.fileArrayOffset);
           file.receivedChunks++;
           this.ref.tick();
           this.makeBlob(receivedData.from, file.id);
@@ -241,9 +247,7 @@ export class SendZeroService {
             .send(padWithZeroes(toSendString.length, 5) + toSendString);
     const file = this.peers[peerId].files.find(f => f.id === fileId);
     // Create blob out of array parsed from fileString.
-    // @ts-ignore
-    const blob = new Blob([new TextEncoder('utf-8').encode(file.fileString)],
-        {type: file.type});
+    const blob = new Blob([file.fileArray], {type: file.type});
     const url = window.URL.createObjectURL(blob);
     file.unsafeUrl = url;
     const safeUrl = this.sanitizer.bypassSecurityTrustResourceUrl(url);
@@ -337,21 +341,20 @@ export class SendZeroService {
     // We also want to send every "chunk" wrapped in an object with metadata,
     // and since we can't send objects, we first have to stringify them.
     // @ts-ignore
-    const fileString = new TextDecoder('utf-8')
-        .decode(new Uint8Array(file.fileArray));
-    const fileByteLength = fileString.length;
+    const fileData = new Uint8Array(file.fileArray);
+    const fileByteLength = fileData.byteLength;
     const numberOfChunks = Math.ceil(fileByteLength / CHUNK_SIZE);
     // Pre allocate arrays as assigning chunks is faster than
     // pushing chunks into an array
     file.chunks = Array(numberOfChunks);
     // Assign chunks
     for (let i = 0; i < numberOfChunks - 1; i++) {
-      const chunk = fileString.slice(CHUNK_SIZE * i, CHUNK_SIZE * (i + 1));
+      const chunk = fileData.slice(CHUNK_SIZE * i, CHUNK_SIZE * (i + 1));
       file.chunks[i] = chunk;
     }
     // Assign final chunk
     file.chunks[numberOfChunks - 1] =
-        (fileString.slice(CHUNK_SIZE * (numberOfChunks - 1)));
+        (fileData.slice(CHUNK_SIZE * (numberOfChunks - 1)));
 
     // Set up and send metadata for the file
     const metadata = {
@@ -407,18 +410,24 @@ export class SendZeroService {
       // quite small.
       const sizeString = padWithZeroes(chunkDataString.length, 5);
       // Now make the whole string to send
-      const toSendString = sizeString + chunkDataString + chunk;
+      const messageString = sizeString + chunkDataString;
+      // @ts-ignore
+      const messageArray = new TextEncoder('utf-8').encode(messageString);
+      const toSendArray
+          = new Uint8Array(chunk.length + messageArray.byteLength);
+      toSendArray.set(messageArray);
+      toSendArray.set(chunk, messageArray.byteLength);
       // We use write instead of send as send closes the connection on big
       // files.
-      console.log(toSendString.length);
-      this.peers[peerId].peer.write(toSendString);
+      console.log(toSendArray);
+      this.peers[peerId].peer.write(toSendArray);
     }
     this.ref.tick();
   }
 
   public connectToPeer(): void {
     this.prompt = 'Connecting...';
-    this.signalClient.connect(this.peerToConnectTo.trim(), {objectMode: true});
+    this.signalClient.connect(this.peerToConnectTo.trim());
   }
 
   public getId(): string {
@@ -439,7 +448,7 @@ export class SendZeroService {
 
     dialogRef.afterClosed().subscribe(result => {
       if (result === true) {
-        request.accept({objectMode: true});
+        request.accept();
       } else {
         this.socket.emit('request declined', request);
       }
@@ -472,6 +481,9 @@ export class SendZeroService {
         // Set up maxFileChunks for expected file - we do this for the progress
         // element
         file.maxFileChunks = metadata.numberOfChunks;
+        // Initialize fileArray to receive data
+        file.fileArray = new Uint8Array(file.size);
+        file.fileArrayOffset = 0;
       } else {
         const toSend = {
           type: 'MESSAGE',
