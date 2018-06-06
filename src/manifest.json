@@ -1,6 +1,6 @@
 {
-  "short_name": "Lazy Web App",
-  "name": "Lazy Web App - The Long Name",
+  "short_name": "LazyWebApp",
+  "name": "LazyWebApp - The Long Name",
   "icons": [
     {
       "src": "assets/img/icons/icon-48.png",
