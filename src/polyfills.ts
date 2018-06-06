@@ -78,3 +78,6 @@ import 'zone.js/dist/zone';  // Included with Angular CLI.
  * APPLICATION IMPORTS
  */
 import 'hammerjs/hammer';
+// Add global to window, assigning the value of window itself.
+// This is to fix an issue with Angular 6 and socket-io
+(window as any).global = window;
