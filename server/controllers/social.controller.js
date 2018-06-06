@@ -3,7 +3,7 @@
 const socialLinks = require('./social-links.controller');
 
 const socialDefaults = {
-  url: process.env.SITE_URL,
+  url: process.env.URL_ORIGIN,
   title: process.env.SITE_NAME,
   description: '',
   image: '/assets/img/social-default.jpg',
