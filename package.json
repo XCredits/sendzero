@@ -1,7 +1,7 @@
 {
   "name": "lazy-web-app",
-  "version": "0.0.0",
-  "license": "MIT",
+  "version": "0.1.0",
+  "license": "",
   "scripts": {
     "ng": "ng",
     "start": "node server.js",
