@@ -1,23 +1,24 @@
-var mongoose = require('mongoose');
-var Promise = require("bluebird");
-mongoose.Promise = global.Promise;
-var Schema = mongoose.Schema;
-var bcrypt = require('bcrypt');
+const mongoose = require('mongoose');
+mongoose.Promise = require('bluebird');
+const Schema = mongoose.Schema;
+const bcrypt = require('bcrypt');
 
-var UserSchema = new Schema({
+let UserSchema = new Schema({
     givenName: {type: String},
     familyName: {type: String},
     username: {type: String, unique: true, required: true},
     email: {type: String},
     emailConfirmed: {type: Boolean, default: false},
     timeRegistered: {type: Date, default: Date.now},
-    passwordHash: String,
-    saltRounds: Number // stored in case we increase the salt rounds in the future
+    passwordHash: {type: String, required: true},
+    saltRounds: Number, // stored in case we increase the salt rounds in the future
+    isAdmin: {type: Boolean, default: false},
+    profileImage: {type: String},
   }
 );
 
-UserSchema.index({ username: 1 });
-UserSchema.index({ email: 1 });
+UserSchema.index({username: 1});
+UserSchema.index({email: 1});
 
 
 UserSchema.methods.createPasswordHash = function(password) {
@@ -30,12 +31,12 @@ UserSchema.methods.createPasswordHash = function(password) {
 };
 
 UserSchema.methods.checkPassword = function(password) {
-  var passwordHash = bcrypt.hashSync(password, this.saltRounds);
   return bcrypt.compareSync(password, this.passwordHash);
 };
 
 /**
  * removes secret data we don't want to send to the front-end
+ * @return {*}
  */
 UserSchema.methods.frontendData = function() {
   return {
@@ -46,6 +47,8 @@ UserSchema.methods.frontendData = function() {
     email: this.email,
     emailConfirmed: this.emailConfirmed,
     timeRegistered: this.timeRegistered,
+    isAdmin: this.isAdmin,
+    profileImage: this.profileImage,
   };
 };
 

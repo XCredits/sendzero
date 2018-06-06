@@ -1,54 +1,83 @@
-import { Component, ViewChild } from '@angular/core';
+
+import {filter} from 'rxjs/operators';
+import { Component, ViewChild, OnChanges } from '@angular/core';
 // Imports needed for router import for title
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
-import 'rxjs/add/operator/filter';
-import { AfterViewInit, OnInit } from '@angular/core';
+import { UserService } from './user.service';
+import { AnalyticsService } from './analytics.service';
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss']
 })
-export class AppComponent implements AfterViewInit {
+export class AppComponent implements OnChanges {
   @ViewChild('sideNavDrawer') sideNavDrawer;
   screenWidth: number;
-  mobileWidth = false;
+  mobileWidth = false; // boolean
   title: string;
+  user: User;
+  isLoggedIn: boolean;
+  userIsAdmin: boolean;
+  drawerMode: string;
+  drawerOpened: boolean;
+
+
   // Edit the area below to create main nav links
-  // There should be
-  primaryNavLinks: { routerLink: string, icon: string, text: string }[] = [
+
+  // Primary nav links are shown in both the side and the bottom navs
+  primaryNavLinks: NavLink[] = [
     {
       routerLink: '/home',
       icon: 'home',
-      text: 'Home',
+      title: 'Home',
     },
     {
       routerLink: '/feed',
       icon: 'chat',
-      text: 'Feed',
+      title: 'Feed',
     },
     {
       routerLink: '/contacts',
       icon: 'person',
-      text: 'Contacts',
+      title: 'Contacts',
     },
     {
       routerLink: '/about',
       icon: 'view_carousel',
-      text: 'About',
+      title: 'About',
     },
   ];
 
-  secondaryNavLinks: { routerLink: string, icon: string, text: string }[] = [
+  // Secondary nav links are only shown in the side bar
+  secondaryNavLinks: NavLink[] = [
+    {
+      routerLink: '/profile',
+      icon: 'person',
+      title: 'Profile',
+      isLoggedInRoute: true,
+    },
+    {
+      routerLink: '/mailing-list',
+      icon: 'email',
+      title: 'Mailing list',
+    },
     {
       routerLink: '/help',
       icon: 'help',
-      text: 'Help',
+      title: 'Help',
     },
     {
       routerLink: '/settings',
       icon: 'settings',
-      text: 'Settings',
+      title: 'Settings',
+      isLoggedInRoute: true,
+    },
+    {
+      routerLink: '/admin',
+      icon: 'verified_user',
+      title: 'Admin',
+      isAdminRoute: true,
     },
   ];
 
@@ -64,19 +93,23 @@ export class AppComponent implements AfterViewInit {
   }
 
   setSideBar() {
-    console.log(this.sideNavDrawer);
     if (this.screenWidth < 768) {
-      this.sideNavDrawer.mode = 'push'; // push or over
-      this.sideNavDrawer.opened = false;
+      this.drawerMode = 'push'; // push or over
+      this.drawerOpened = false;
       this.mobileWidth = true;
     } else {
-      this.sideNavDrawer.mode = 'side';
-      this.sideNavDrawer.opened = true;
+      this.drawerMode = 'side';
+      this.drawerOpened = true;
       this.mobileWidth = false;
     }
   }
 
-  constructor(router: Router, route: ActivatedRoute) {
+  constructor(
+      private router: Router,
+      private route: ActivatedRoute,
+      private userService: UserService,
+      private analytics: AnalyticsService,
+    ) {
     // Set side bar mode
     this.screenWidth = window.innerWidth;
     window.onresize = () => {
@@ -84,15 +117,50 @@ export class AppComponent implements AfterViewInit {
       this.setSideBar();
     };
 
-    //
-    router.events
-      .filter(e => e instanceof NavigationEnd)
-      .forEach(e => {
+
+    router.events.pipe(
+      filter(e => e instanceof NavigationEnd))
+      .forEach((e: NavigationEnd) => {
         this.title = route.root.firstChild.snapshot.data['title'];
+
+        // Analytics
+        // Test if the page has Changed
+
+        // The below line removes the query parameters so that information is
+        // not passed to the Analytics provider
+        analytics.pageView(e.url.split('?')[0], this.title);
       });
+
+    userService.userObservable
+      .subscribe(user => {
+        this.user = user;
+        this.isLoggedIn = !!user;
+        this.userIsAdmin = user ? this.user.isAdmin : false;
+      });
+
+    this.setSideBar(); // set the sidebar values
   }
 
-  ngAfterViewInit() {
+  // set sidebar after every change
+  ngOnChanges() {
     this.setSideBar();
   }
+}
+
+interface NavLink {
+  routerLink: string;
+  icon: string;
+  title: string;
+  isAdminRoute?: boolean;
+  isLoggedInRoute?: boolean;
+}
+
+interface User {
+  id: string;
+  username: string;
+  givenName: string;
+  familyName: string;
+  email: string;
+  isLoggedIn: boolean;
+  isAdmin: boolean;
 }

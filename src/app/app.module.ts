@@ -3,9 +3,15 @@ import { NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { HttpClientModule} from '@angular/common/http'; // Deprecation https://angular.io/api/http/HttpModule
 import { RouterModule } from '@angular/router';
+import { LocalStorageModule } from 'angular-2-local-storage';
 import { AppComponent } from './app.component';
+import { UserService } from './user.service';
+import { SendZeroService, ConnectionDialogComponent, ReceiveFileDialogComponent } from './send-zero.service';
+import { StatsService } from './stats.service';
+import { AnalyticsService } from './analytics.service';
+import { AuthGuard } from './auth.guard';
+import { AdminGuard } from './admin.guard';
 
-//
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 // import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
 import { AngularFontAwesomeModule } from 'angular-font-awesome';
@@ -61,12 +67,21 @@ import { FeedComponent } from './feed/feed.component';
 import { ContactsComponent } from './contacts/contacts.component';
 import { AboutComponent } from './about/about.component';
 import { LoginComponent } from './login/login.component';
+import { ForgotPasswordComponent } from './forgot-password/forgot-password.component';
+import { ResetPasswordComponent } from './reset-password/reset-password.component';
+import { ChangePasswordComponent } from './change-password/change-password.component';
+import { ForgotUsernameComponent } from './forgot-username/forgot-username.component';
 import { RegisterComponent } from './register/register.component';
 import { MailingListComponent } from './mailing-list/mailing-list.component';
-
-// Services
-import { SendZeroService, ConnectionDialogComponent, ReceiveFileDialogComponent } from './send-zero.service';
-
+import { ProfileComponent } from './profile/profile.component';
+import { UserDropdownComponent } from './user-dropdown/user-dropdown.component';
+import { AdminComponent } from './admin/admin.component';
+import { UnauthorizedComponent } from './unauthorized/unauthorized.component';
+import { MailingListChartComponent } from './mailing-list-chart/mailing-list-chart.component';
+import { UserRegisterChartComponent } from './user-register-chart/user-register-chart.component';
+import { TermsComponent } from './terms/terms.component';
+import { PrivacyComponent } from './privacy/privacy.component';
+import { FooterComponent } from './footer/footer.component';
 
 @NgModule({
   declarations: [
@@ -79,16 +94,33 @@ import { SendZeroService, ConnectionDialogComponent, ReceiveFileDialogComponent 
     ContactsComponent,
     AboutComponent,
     LoginComponent,
+    ForgotPasswordComponent,
+    ResetPasswordComponent,
+    ChangePasswordComponent,
+    ForgotUsernameComponent,
     RegisterComponent,
     MailingListComponent,
-    ConnectionDialogComponent,
-    ReceiveFileDialogComponent
+    ProfileComponent,
+    UserDropdownComponent,
+    AdminComponent,
+    UnauthorizedComponent,
+    MailingListChartComponent,
+    UserRegisterChartComponent,
+    TermsComponent,
+    PrivacyComponent,
+    FooterComponent,
   ],
   imports: [
     BrowserModule,
     FormsModule,
-    ReactiveFormsModule ,
+    ReactiveFormsModule,
     HttpClientModule,
+
+    LocalStorageModule.withConfig({
+        prefix: 'app',
+        storageType: 'localStorage'
+    }),
+
     RouterModule.forRoot([
       {
         path: 'home',
@@ -111,9 +143,21 @@ import { SendZeroService, ConnectionDialogComponent, ReceiveFileDialogComponent 
         data: { title: 'Help' },
       },
       {
+        path: 'profile',
+        component: ProfileComponent,
+        data: { title: 'Profile' },
+        canActivate: [AuthGuard],
+      },
+      {
+        path: 'mailing-list',
+        component: MailingListComponent,
+        data: { title: 'Mailing list' },
+      },
+      {
         path: 'settings',
         component: SettingsComponent,
         data: { title: 'Settings' },
+        canActivate: [AuthGuard],
       },
       {
         path: 'about',
@@ -126,9 +170,45 @@ import { SendZeroService, ConnectionDialogComponent, ReceiveFileDialogComponent 
         data: { title: 'Login' },
       },
       {
+        path: 'forgot-password',
+        component: ForgotPasswordComponent,
+        data: { title: 'Forgot Password' },
+      },
+      {
+        path: 'reset-password',
+        component: ResetPasswordComponent,
+        data: { title: 'Reset Password' },
+      },
+      {
+        path: 'forgot-username',
+        component: ForgotUsernameComponent,
+        data: { title: 'Forgot Username' },
+      },
+      {
         path: 'register',
         component: RegisterComponent,
         data: { title: 'Register' },
+      },
+      {
+        path: 'admin',
+        component: AdminComponent,
+        data: { title: 'Admin' },
+        canActivate: [AdminGuard],
+      },
+      {
+        path: 'terms',
+        component: TermsComponent,
+        data: { title: 'Terms' },
+      },
+      {
+        path: 'privacy',
+        component: PrivacyComponent,
+        data: { title: 'Privacy' },
+      },
+      {
+        path: 'unauthorized',
+        component: UnauthorizedComponent,
+        data: { title: 'Unauthorized' },
       },
       { // Default route
         path: '',
@@ -192,6 +272,9 @@ import { SendZeroService, ConnectionDialogComponent, ReceiveFileDialogComponent 
   ],
   providers: [
     SendZeroService,
+    UserService,
+    StatsService,
+    AnalyticsService,
   ],
   bootstrap: [AppComponent]
 })

@@ -1,6 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
+import {Router, ActivatedRoute, Params} from '@angular/router';
+import { UserService } from '../user.service';
+import { AnalyticsService } from '../analytics.service';
 
 @Component({
   selector: 'app-login',
@@ -8,28 +11,59 @@ import { FormGroup, FormControl, Validators } from '@angular/forms';
   styleUrls: ['./login.component.scss']
 })
 export class LoginComponent implements OnInit {
-  loginForm: FormGroup;
+  form: FormGroup;
+  submitSuccess = false;
+  waiting = false;
+  formErrorMessage: string;
+  loginRegisterSwitchQueryParams: Params;
+  redirectUrl: string;
 
-  constructor( private http: HttpClient ) { }
+  constructor( private http: HttpClient,
+    private userService: UserService,
+    private activatedRoute: ActivatedRoute,
+    private analytics: AnalyticsService ) {
+
+      // The following is to ensure that when a user is redirected for the
+      // purposes of logging in that they are still redirected to the correct
+      // on register success.
+      this.activatedRoute.queryParams.subscribe((params: Params) => {
+        this.loginRegisterSwitchQueryParams = params;
+        this.redirectUrl = params.redirect;
+      });
+    }
 
   ngOnInit() {
-    this.loginForm = new FormGroup ({
+    this.form = new FormGroup ({
       username: new FormControl('', [<any>Validators.required]),
       password: new FormControl('', [<any>Validators.required]),
     });
   }
 
-  loginSubmit = function (formData) {
-    if (this.loginForm.invalid) {
+  submit = function (formData) {
+    if (this.form.invalid) {
       return;
     }
+    // Clear state from previous submissions
+    this.formErrorMessage = undefined;
+    this.waiting = true;
     this.http.post('/api/user/login', {
         'username': formData.username,
         'password': formData.password,
         })
         .subscribe(data => {
-          console.log('received message');
-          // redirect to intended location
+          this.waiting = false;
+          this.userService.authenticationResult(data);
+          this.userService.successNavigate(this.redirectUrl);
+          this.analytics.login();
+        },
+        errorResponse => {
+          this.waiting = false;
+          // 401
+          if (errorResponse.status === 401) {
+            this.formErrorMessage = 'Username or password incorrect.';
+          } else {
+            this.formErrorMessage = 'There was a problem submitting the form.';
+          }
         });
   };
 }
