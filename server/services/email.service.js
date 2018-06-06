@@ -27,17 +27,19 @@ module.exports = {
 
   /**
    * Add the user to the mailing list in the email service provider
+   * @param {*} param0
+   * @return {*}
    */
   addUserToMailingList: function({userId, email, givenName, familyName}) {
     const data = [
       {
-        "email": email,
-        "first_name": givenName,
-        "last_name": familyName,
-        "id": userId, // optional, if not a registered user
+        'email': email,
+        'first_name': givenName,
+        'last_name': familyName,
+        'id': userId, // optional, if not a registered user
       },
     ];
-    var request = {
+    let request = {
       body: data,
       method: 'POST',
       url: '/v3/contactdb/recipients',
@@ -48,22 +50,24 @@ module.exports = {
             return response.body.persisted_recipients[0];
           }
           throw new Error('Problem adding to email list.');
-        })
+        });
   },
   // Testing
   // module.exports.addUserToMailingList({
-  //   email: 'test@test.com', 
-  //   givenName: 'Robert', 
+  //   email: 'test@test.com',
+  //   givenName: 'Robert',
   //   familyName: 'Smith'});
 
 
   /**
    * Remove the user from the mailing list in the email service provider
-   * In this case, userId should be the 'persisted_recipients' id created by 
+   * In this case, userId should be the 'persisted_recipients' id created by
    * the SendGrid process above.
+   * @param {*} param0
+   * @return {*}
    */
   removeUserFromMailingList: function({userId}) {
-    var request = {
+    let request = {
       body: [userId],
       method: 'DELETE',
       url: '/v3/contactdb/recipients',
@@ -74,22 +78,22 @@ module.exports = {
             return true;
           }
           throw new Error('Problem removing user.');
-        })
+        });
   },
   // Testing
   // module.exports.removeUserFromMailingList({userId: 'dGVzdEB0ZXN0LmNvbQ=='});
 
   /**
-   * In this function, we are calling on the email service to retrieve instances 
-   * of the user pressing unsubscribe. We are doing this to compare to the user 
+   * In this function, we are calling on the email service to retrieve
+   * instances of the user pressing unsubscribe.
+   * We are doing this to compare to the user
    * list in our own databases, to remove individuals who have unsubscribed.
    */
   retrieveUnsubscribes: function({start, end}) {
-    
   },
 
   /**
-   * 
+   *
    * Instructions on sending transactional emails
    * https://github.com/sendgrid/sendgrid-nodejs/blob/master/use-cases/transactional-templates.md
    */
@@ -139,8 +143,8 @@ module.exports = {
   },
   // Testing
   // module.exports.sendPasswordReset({
-  //   email: 'test@test.com', 
-  //   givenName: 'Robert', 
+  //   email: 'test@test.com',
+  //   givenName: 'Robert',
   //   familyName: 'Smith',
   //   resetUrl: 'https://google.com'});
 
@@ -158,10 +162,10 @@ module.exports = {
       },
     };
     return sendgridMail.send(msg);
-  }
+  },
   // module.exports.sendUsernameRetrieval({
-  //   email: 'test@test.com', 
-  //   givenName: 'Robert', 
+  //   email: 'test@test.com',
+  //   givenName: 'Robert',
   //   familyName: 'Smith',
   //   userNameArr: ['username', 'other_username'],
   // });
