@@ -8,7 +8,7 @@ import { ResolveEnd } from '@angular/router/src/events';
 // TODO: find out why import doesn't work
 const shortid = require('shortid');
 const io = require('socket.io-client');
-const Peer = require('simple-peer');
+// const Peer = require('simple-peer');
 const SimpleSignalClient = require('simple-signal-client');
 // Simple peer splits files greater than ~64k, so we make our lives easier
 // by splitting up files ino 60k chunks
