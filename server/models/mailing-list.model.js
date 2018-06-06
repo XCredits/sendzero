@@ -1,8 +1,8 @@
 const mongoose = require('mongoose');
-mongoose.Promise = require("bluebird");
-var Schema = mongoose.Schema;
+mongoose.Promise = require('bluebird');
+const Schema = mongoose.Schema;
 
-var MailingListSchema = new Schema({
+let MailingListSchema = new Schema({
     givenName: {type: String},
     familyName: {type: String},
     email: {type: String, required: true},
@@ -12,9 +12,9 @@ var MailingListSchema = new Schema({
   }
 );
 
-MailingListSchema.index({ userId: 1 });
-MailingListSchema.index({ timeSubscribe: 1 });
-MailingListSchema.index({ email: 1 });
+MailingListSchema.index({userId: 1});
+MailingListSchema.index({timeSubscribe: 1});
+MailingListSchema.index({email: 1});
 
 
 module.exports = mongoose.model('MailingList', MailingListSchema);

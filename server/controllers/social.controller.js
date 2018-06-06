@@ -14,13 +14,18 @@ module.exports = function(req, res, next) {
   if (ua.includes('FacebookExternalHit') ||
       ua.includes('Facebot') ||
       ua.includes('LinkedInBot') ||
-      ua.includes('Twitterbot') ){
+      ua.includes('Twitterbot') ) {
     const customLink = socialLinks(req.path);
     return res.send(html(customLink ? customLink : socialDefaults));
   }
   next();
 };
 
+/**
+ * generates html
+ * @param {*} v
+ * @return {*}
+ */
 function html(v) {
   return `
     <html>
@@ -39,4 +44,4 @@ function html(v) {
       
     </html>
   `;
-}
+};

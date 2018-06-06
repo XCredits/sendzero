@@ -1,8 +1,8 @@
-const mailingListController = 
+const mailingListController =
     require('./controllers/mailing-list.controller.js');
-const authenticationController = 
+const authenticationController =
     require('./controllers/authentication.controller.js');
-const statsController = 
+const statsController =
     require('./controllers/stats.controller.js');
 
 module.exports = function(app) {
@@ -10,6 +10,4 @@ module.exports = function(app) {
   authenticationController(app);
   statsController(app);
 };
-
-
 

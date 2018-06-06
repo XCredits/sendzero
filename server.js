@@ -10,7 +10,7 @@ const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 const socialController = require('./server/controllers/social.controller');
 
-app.use(bodyParser.urlencoded({ extended: true })); // extended gives full JSON
+app.use(bodyParser.urlencoded({extended: true})); // extended gives full JSON
 app.use(bodyParser.json());
 app.use(cookieParser());
 
@@ -30,11 +30,11 @@ app.get('*', function(req, res) {
 });
 
 app.post('*', function(req, res) {
-  res.status(404).json({message: "Route not found."});
+  res.status(404).json({message: 'Route not found.'});
 });
 
 const server = http.createServer(app);
 
-server.listen(port, function () {
+server.listen(port, function() {
   console.log(`Running on localhost:${port}`);
 });

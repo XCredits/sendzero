@@ -34,8 +34,6 @@ const customPath = {
 };
 
 
-
-
-module.exports = function (path) {
+module.exports = function(path) {
   return customPath[path];
 };

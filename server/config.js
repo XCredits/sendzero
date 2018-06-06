@@ -11,7 +11,7 @@ if (!process.env.GOOGLE_CLOUD_PROJECT) {
 // Default to development
 process.env.NODE_ENV = 'development';
 
-if (!process.env.IS_LOCAL && 
+if (!process.env.IS_LOCAL &&
     process.env.GOOGLE_CLOUD_PROJECT.endsWith('-prod')) {
   process.env.NODE_ENV = 'production';
 }
