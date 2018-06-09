@@ -1,116 +1,146 @@
 # Instructions for running this server locally
+
 1) Install [NodeJS](https://nodejs.org/)
 
 2) Install AngularCLI
-~~~
+
+~~~bash
 npm install @angular/cli@latest -g
 ~~~
 
 3) Install nodemon
-~~~
+
+~~~bash
 npm install -g nodemon
 ~~~
 
 4) Download or clone this repository
 
 5) Open the NodeJS Terminal. Run 
-~~~
+
+~~~bash
 npm install
 ~~~
+
  to add the needed files into the node_modules folder
 
 6) Start the MongoDB server
+
 [Install MongoDB](https://www.mongodb.com/download-center?jmp=nav#community).
 Create the folder
-~~~
+
+~~~bash
 C:\data\db\
 ~~~
 
-Navigate to 
-~~~
+Navigate to
+
+~~~bash
 cd "C:\Program Files\MongoDB\Server\3.4\bin"
 ~~~
+
 Run
-~~~
+
+~~~bash
 mongod.exe
-~~~ 
-to start the MongoDB server.
-Run
 ~~~
+
+to start the MongoDB server.
+
+Run
+
+~~~bash
 mongo.exe
 ~~~
+
 to connect to the server.
-Run 
-~~~
+
+Run
+
+~~~bash
 use lazywebapp
 db.createUser ({user:'lazywebapp',pwd:'password', roles:[{role:'dbAdmin', db:'lazywebapp'}]})
 ~~~
 
-7) Run 
-~~~
+7) Run
+
+~~~bash
 ng build
 ~~~
+
 to compile the Angular front-end components into the `dist` folder
 
-8) Run 
-~~~
+8) Run
+
+~~~bash
 node server.js
 ~~~
 
 9) Open [localhost:3000](http://localhost:3000/) in your browser. You should see a basic Angular app displayed. You are now running a local server. 
 
 ## Using simple running
+
 Alternatively, skip steps 7-9 and instead run the following command to have the Angular built and server restarted when code changes
-~~~
+
+~~~bash
 npm run dev
 ~~~
 
-
 # Instructions for running this server on Google App Engine
+
 After doing the above:
 
-9) [Set up Google Cloud Platform](https://cloud.google.com/)
+1) [Set up Google Cloud Platform](https://cloud.google.com/)
 
-10) Create a new project
+2) Create a new project
 
 ![Create a project](/readme/img/gcp12.png)
 
-11) Name the project
+3) Name the project
 
 ![Name the project](/readme/img/gcp3.png)
 
-12) Make sure the project is selected
+4) Make sure the project is selected
 
 ![Select the project](/readme/img/gcp4.png)
 
-13) Install the [Google Cloud SDK](https://cloud.google.com/sdk/)
+5) Install the [Google Cloud SDK](https://cloud.google.com/sdk/)
 
-14) Run the following command and create a new configuration. It can have any name. 
-~~~
+6) Run the following command and create a new configuration. It can have any name.
+
+~~~bash
 gcloud init
 ~~~
 
-15) Log in to your Google account
+7) Log in to your Google account
 
-16) Select the project that you created above
+8) Select the project that you created above
 
-17) Select the region
+9) Select the region
 
-18) Choose a region that the server will be hosted in
+10) Choose a region that the server will be hosted in
 
-19) Run the following command
+~~~bash
+gcloud config set compute/region us-central1
 ~~~
+
+11) Run the following commands
+
+~~~bash
+ng build --prod
 gcloud app deploy
 ~~~
 
-20) Wait for the app to deploy. 
+12) Wait for the app to deploy.
 
-21) Visit the address that is displayed when the deploy command finishes.
-~~~
+13) Visit the address that is displayed when the deploy command finishes.
+
+~~~bash
 Deployed service [default] to [https://test-project-197703.appspot.com]
 ~~~
 
 # Instructions for setting up SendGrid emails
+
 1) Go to
   [this page](https://app.sendgrid.com/guide/integrate/langs/nodejs),
   do NOT follow the instructions.
@@ -261,7 +291,7 @@ Put the following at the top of app.component.html
 <mat-toolbar color="primary">
   <span>{{ title }}</span>
   <span class="navbar-spacer"></span>
-  <button mat-icon-button routerLink="/contacts">
+  <button mat-icon-button routerLink="/release-schedule">
     <mat-icon>person</mat-icon>
   </button>
 </mat-toolbar>
