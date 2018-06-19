@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ViewChild, ChangeDetectorRef } from '@angular/core';
 import { DomSanitizer } from '@angular/platform-browser';
 import { Router, ActivatedRoute } from '@angular/router';
 import { Observable } from 'rxjs/Observable';
@@ -6,6 +6,7 @@ import { Subscription } from 'rxjs/Subscription';
 import { SendZeroService } from '../send-zero.service';
 import { FormGroup, FormControl } from '@angular/forms';
 import { OnDestroy } from '@angular/core/src/metadata/lifecycle_hooks';
+import { UploadEvent, UploadFile, FileSystemFileEntry } from 'ngx-file-drop';
 
 @Component({
   selector: 'app-home',
@@ -20,9 +21,12 @@ export class HomeComponent implements OnInit, OnDestroy {
   peerToConnectTo: string;
   fileForm: FormGroup;
   sub: Subscription;
-
   // To use Object.keys() in the template
   JSObject: Object = Object;
+  @ViewChild('fileInput') fileInput;
+
+  // Untyped defs
+  file;
 
   constructor(private ref: ChangeDetectorRef,
               private sanitizer: DomSanitizer,
@@ -30,18 +34,18 @@ export class HomeComponent implements OnInit, OnDestroy {
               private route: ActivatedRoute,
               private router: Router) {
     this.title = 'SendZero Alpha';
-    this.fileForm = new FormGroup({
-      selectFile: new FormControl(),
-    });
+    // this.fileForm = new FormGroup({
+    //   selectFile: new FormControl(),
+    // });
     const self = this;
   }
 
   sendFile(): void {
-    const fileInput = this.fileForm.get('selectFile').value;
-    if (!fileInput || !fileInput.files[0]) {
+    // const fileInput = this.fileForm.get('selectFile').value;
+    if (!this.file) {
      return;
     }
-    this.sendZeroService.sendFile(fileInput.files[0]);
+    this.sendZeroService.sendFile(this.file);
   }
 
   ngOnInit(): void {
@@ -52,6 +56,28 @@ export class HomeComponent implements OnInit, OnDestroy {
           this.sendZeroService.setConnectToPeerId(peerId);
         }
     });
+  }
+
+  // TODO: Set prompts
+  fileDropped(event: UploadEvent): void {
+    if (event.files.length > 1) {
+      console.log('Please choose one file at a time!');
+    }
+    if (!event.files[0].fileEntry.isFile) {
+      console.log('Please choose a file!');
+    }
+    const fileEntry = event.files[0].fileEntry as FileSystemFileEntry;
+    fileEntry.file((file: File) => {
+      this.file = file;
+    });
+  }
+
+  fileChanged(event): void {
+    this.file = event.target.files[0];
+  }
+
+  openFileInput(): void {
+    this.fileInput.nativeElement.click();
   }
 
   ngOnDestroy(): void {

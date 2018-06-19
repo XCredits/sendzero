@@ -3,8 +3,6 @@ import { Injectable, Component, Inject } from '@angular/core';
 import { OnInit, ApplicationRef } from '@angular/core';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import {MatDialog, MatDialogRef, MAT_DIALOG_DATA} from '@angular/material';
-import { THIS_EXPR } from '@angular/compiler/src/output/output_ast';
-import { ResolveEnd } from '@angular/router/src/events';
 // TODO: find out why import doesn't work
 const shortid = require('shortid');
 const io = require('socket.io-client');
@@ -29,7 +27,7 @@ export class SendZeroService {
   public connectionPrompt: string;
   public disableConnectButton: boolean;
   public disableSendButton: boolean;
-  public selectedPeer: string;
+  public selectedPeer = '0';
 
   // Untyped definitions
   private socket: any;
@@ -101,6 +99,8 @@ export class SendZeroService {
 
   private handlePeerConnect(peer: any): void {
     this.peers[peer.id].prompt = 'Now connected to peer! Select a file to send!';
+    this.selectedPeer = peer.id;
+    this.peerToConnectTo = '';
     this.ref.tick();
   }
 
