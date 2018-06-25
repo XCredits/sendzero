@@ -1,8 +1,9 @@
 declare var require: any;
-import { Injectable, Component, Inject } from '@angular/core';
+import { Injectable, Component, Inject, ViewChild } from '@angular/core';
 import { OnInit, ApplicationRef } from '@angular/core';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
-import {MatDialog, MatDialogRef, MAT_DIALOG_DATA} from '@angular/material';
+import {MatDialog, MatDialogRef, MAT_DIALOG_DATA, MatTable} from '@angular/material';
+import { BehaviorSubject } from 'rxjs';
 // TODO: find out why import doesn't work
 const shortid = require('shortid');
 const io = require('socket.io-client');
@@ -27,13 +28,13 @@ export class SendZeroService {
   public connectionPrompt: string;
   public disableConnectButton: boolean;
   public disableSendButton: boolean;
-  public selectedPeer = '0';
 
   // Untyped definitions
   private socket: any;
   private signalClient: any;
   // Maybe interface this
   private peers: any;
+  public peerSubject = new BehaviorSubject(this.peers);
 
   constructor(private ref: ApplicationRef,
               private sanitizer: DomSanitizer,
@@ -99,8 +100,8 @@ export class SendZeroService {
 
   private handlePeerConnect(peer: any): void {
     this.peers[peer.id].prompt = 'Now connected to peer! Select a file to send!';
-    this.selectedPeer = peer.id;
     this.peerToConnectTo = '';
+    this.peerSubject.next(this.peers);
     this.ref.tick();
   }
 
@@ -165,7 +166,6 @@ export class SendZeroService {
       } else if (receivedData.type === 'METADATA') {
         // Reassign (deep copy) rather than fileMetadata = receivedFileMetaData
         const fileMetadata = JSON.parse(messageString);
-        console.log(fileMetadata);
         // Prepare for a new file but initializing variables like id, name, etc.
         // TODO: Move this to dialog component
         this.peers[receivedData.from]
@@ -199,7 +199,6 @@ export class SendZeroService {
         // string back to an array.
         // @ts-ignore
         const chunk = dataString.slice(5 + msgSize);
-        console.log(chunk.length);
         if (file.receivedChunks === 0) {
           file.fileArray.set(chunk);
           file.fileArrayOffset = CHUNK_SIZE;
@@ -216,9 +215,6 @@ export class SendZeroService {
           // This is because Angular doesn't detect changes in callbacks.
           this.ref.tick();
         } else {
-          console.log(file.fileArrayOffset);
-          console.log(chunk.length);
-          console.log(file.fileArray);
           file.fileArray.set(chunk, file.fileArrayOffset);
           file.receivedChunks++;
           this.ref.tick();
@@ -274,9 +270,9 @@ export class SendZeroService {
     console.log(err);
   }
 
-  public sendFile(file: File): void {
+  public sendFile(file: File, peer: string): void {
     const fileId = shortid.generate();
-    const peerId = this.selectedPeer;
+    const peerId = peer;
     this.peers[peerId].prompt = 'Now processing file!';
     this.peers[peerId].files.push({
       id: fileId,
@@ -419,7 +415,6 @@ export class SendZeroService {
       toSendArray.set(chunk, messageArray.byteLength);
       // We use write instead of send as send closes the connection on big
       // files.
-      console.log(toSendArray);
       this.peers[peerId].peer.write(toSendArray);
     }
     this.ref.tick();
@@ -431,7 +426,6 @@ export class SendZeroService {
   }
 
   public getId(): string {
-    console.log(this.id);
     return this.id;
   }
 

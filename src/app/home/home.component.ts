@@ -7,6 +7,9 @@ import { SendZeroService } from '../send-zero.service';
 import { FormGroup, FormControl } from '@angular/forms';
 import { OnDestroy } from '@angular/core/src/metadata/lifecycle_hooks';
 import { UploadEvent, UploadFile, FileSystemFileEntry } from 'ngx-file-drop';
+import { MatTable } from '@angular/material';
+import { isEmpty } from 'lodash';
+import { SelectionModel } from '@angular/cdk/collections';
 
 @Component({
   selector: 'app-home',
@@ -24,9 +27,15 @@ export class HomeComponent implements OnInit, OnDestroy {
   // To use Object.keys() in the template
   JSObject: Object = Object;
   @ViewChild('fileInput') fileInput;
+  @ViewChild(MatTable) table: MatTable<any>;
+  columnsToDisplay: string[] = ['select', 'peerId', 'status', 'files'];
+  selection: SelectionModel<any>;
+  sendError = '';
+  fileError = '';
 
   // Untyped defs
   file;
+  peers;
 
   constructor(private ref: ChangeDetectorRef,
               private sanitizer: DomSanitizer,
@@ -38,14 +47,24 @@ export class HomeComponent implements OnInit, OnDestroy {
     //   selectFile: new FormControl(),
     // });
     const self = this;
+    const initialSelection = [];
+    const allowMultiSelect = false;
+    this.selection =
+      new SelectionModel<any>(allowMultiSelect, initialSelection);
   }
 
   sendFile(): void {
     // const fileInput = this.fileForm.get('selectFile').value;
     if (!this.file) {
-     return;
+      this.sendError = 'Please select a file first!';
+      return;
     }
-    this.sendZeroService.sendFile(this.file);
+    if (!this.selection.selected[0]) {
+      this.sendError = 'Please select a peer first!';
+      return;
+    }
+    this.sendError = '';
+    this.sendZeroService.sendFile(this.file, this.selection.selected[0]);
   }
 
   ngOnInit(): void {
@@ -56,16 +75,25 @@ export class HomeComponent implements OnInit, OnDestroy {
           this.sendZeroService.setConnectToPeerId(peerId);
         }
     });
+    this.sendZeroService.peerSubject.subscribe((data) => {
+        this.peers = data;
+        if (this.table) {
+          this.table.renderRows();
+        }
+    });
   }
 
   // TODO: Set prompts
   fileDropped(event: UploadEvent): void {
     if (event.files.length > 1) {
-      console.log('Please choose one file at a time!');
+      this.fileError = 'Please choose one file at a time!';
+      return;
     }
     if (!event.files[0].fileEntry.isFile) {
-      console.log('Please choose a file!');
+      this.fileError = 'Please choose a file! We do not support directories.';
+      return;
     }
+    this.fileError = '';
     const fileEntry = event.files[0].fileEntry as FileSystemFileEntry;
     fileEntry.file((file: File) => {
       this.file = file;
@@ -73,6 +101,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   }
 
   fileChanged(event): void {
+    this.fileError = '';
     this.file = event.target.files[0];
   }
 
