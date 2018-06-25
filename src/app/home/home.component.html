@@ -19,7 +19,7 @@
       <input matInput placeholder="Peer ID" type="text" name="peerId" id="peerId" [(ngModel)]="sendZeroService.peerToConnectTo">
     </mat-form-field>
     &nbsp;
-    <button mat-raised-button required color="primary" (click)="connectToPeer()" id="connectButton" name="connectButton" class="connectButton" [disabled]="sendZeroService.disableConnectButton || sendZeroService.peerId === '' ">
+    <button mat-raised-button required color="primary" (click)="connectToPeer()" id="connectButton" name="connectButton" class="connectButton" [disabled]="sendZeroService.disableConnectButton">
       Connect
     </button>
   </div>
