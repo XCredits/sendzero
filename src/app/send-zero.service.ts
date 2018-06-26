@@ -60,6 +60,10 @@ export class SendZeroService {
         this.prompt = 'The user declined your request!';
       }
     });
+    this.socket.on('peer disconnected', (peerId) => {
+      delete this.peers[peerId];
+      this.prompt = 'User ' + peerId + ' has disconnected!';
+    });
 
     // Set up signal client
     this.signalClient = new SimpleSignalClient(this.socket);
@@ -100,6 +104,7 @@ export class SendZeroService {
     this.prompt = 'Successfully connected to ' + peer.id;
     // Set up peer handling functions
     peer.on('connect', () => this.handlePeerConnect.bind(this)(peer));
+    peer.on('close', this.handlePeerClose.bind(this));
     peer.on('data', this.handlePeerReceiveData.bind(this));
     peer.on('error', this.handlePeerError.bind(this));
   }
@@ -109,6 +114,10 @@ export class SendZeroService {
     this.peerToConnectTo = '';
     this.peerSubject.next(this.peers);
     this.ref.tick();
+  }
+
+  private handlePeerClose(): void {
+    console.log('Connection closed');
   }
 
   // Data always comes in as Uint8Array
