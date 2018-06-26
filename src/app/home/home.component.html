@@ -65,7 +65,7 @@
     </table>
   </div>
   <br>
-  <div *ngIf="JSObject.keys(peers).length !== 0" class="filePicker">
+  <div *ngIf="JSObject.keys(peers).length !== 0 && !sendZeroService.disableFileSending" class="filePicker">
     <file-drop style="cursor: pointer; text-align: center" (click)="openFileInput()" headertext="{{file ? file.name + '&emsp;' +  (file.size | byteFormat) : 'Drag file here!'}}" (onFileDrop)="fileDropped($event)">
         <!-- <span>optional content (don't set headertext then)</span> -->
     </file-drop>

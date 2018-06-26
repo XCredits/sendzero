@@ -28,6 +28,7 @@ export class SendZeroService {
   public connectionPrompt: string;
   public disableConnectButton: boolean;
   public disableSendButton: boolean;
+  public disableFileSending = false;
 
   // Untyped definitions
   private socket: any;
@@ -60,12 +61,24 @@ export class SendZeroService {
     this.socket = io(SERVER_URL, {transports: ['websocket']});
     this.socket.on('request declined', (request) => {
       if (request.id === this.id) {
-        this.prompt = 'The user declined your request!';
+        this.snackBar.open('The user declined your request!', 'Dismiss', {
+          duration: 5000,
+          verticalPosition: 'top',
+          horizontalPosition: 'right',
+        });
       }
+      delete this.peers[request.declinedBy];
+      this.ref.tick();
     });
     this.socket.on('peer disconnected', (peerId) => {
-      delete this.peers[peerId];
-      this.prompt = 'User ' + peerId + ' has disconnected!';
+      if (Object.keys(this.peers).includes(peerId)) {
+        delete this.peers[peerId];
+        this.snackBar.open('User ' + peerId + ' has disconnected!', 'Dismiss', {
+          duration: 5000,
+          verticalPosition: 'top',
+          horizontalPosition: 'right',
+        });
+      }
     });
 
     // Set up signal client
@@ -78,12 +91,7 @@ export class SendZeroService {
   }
 
   private handleSignalClientReadyState(): void {
-    this.prompt = 'Ready to connect!';
-    // this.snackBar.open('Ready to connect', 'Dismiss', {
-    //   duration: 5000,
-    //   verticalPosition: 'top',
-    //   horizontalPosition: 'right',
-    // });
+    this.prompt = 'Ready to connect to other computers! Enter a peer\'s ID below to connect to them.';
     this.id = this.signalClient.id;
     this.connectionPrompt = 'Users can connect to you by following this link: ' + window.location.origin + '/home?id=' + this.id;
     this.ref.tick();
@@ -104,7 +112,12 @@ export class SendZeroService {
       files: [],
       prompt: 'Connected to peer!'
     };
-    this.prompt = 'Successfully connected to ' + peer.id;
+    this.snackBar.open('Successfully connected to ' + peer.id, 'Dismiss', {
+      duration: 5000,
+      verticalPosition: 'top',
+      horizontalPosition: 'right',
+    });
+    this.disableFileSending = false;
     // Set up peer handling functions
     peer.on('connect', () => this.handlePeerConnect.bind(this)(peer));
     peer.on('close', this.handlePeerClose.bind(this));
@@ -240,7 +253,11 @@ export class SendZeroService {
       }
     } catch (e) {
       console.log(e);
-      this.prompt = 'Things broke! Please try again or get in touch with us!';
+      this.snackBar.open('Something went wrong! Please try again or get in touch with us!', 'Dismiss', {
+        duration: 5000,
+        verticalPosition: 'top',
+        horizontalPosition: 'right',
+      });
     }
   }
 
@@ -283,7 +300,11 @@ export class SendZeroService {
 
   // TODO: Error handling.
   private handlePeerError(err: any): void {
-    this.prompt = 'Something went wrong! Please try connecting again.';
+    this.snackBar.open('Something went wrong! Please try again or get in touch with us!', 'Dismiss', {
+      duration: 5000,
+      verticalPosition: 'top',
+      horizontalPosition: 'right',
+    });
     console.log(err);
   }
 
@@ -387,7 +408,11 @@ export class SendZeroService {
     // TODO: Make sure things can't be circular because JSON.Parse/stringify
     // will break
     if (jsonString.length > 99999) {
-      this.prompt = 'File metadata too big, consider renaming.';
+      this.snackBar.open('File metadata is too big, consider renaming.', 'Dismiss', {
+        duration: 5000,
+        verticalPosition: 'top',
+        horizontalPosition: 'right',
+      });
       this.ref.tick();
       return;
     }
@@ -438,7 +463,16 @@ export class SendZeroService {
   }
 
   public connectToPeer(): void {
-    this.prompt = 'Connecting...';
+    const peerId = this.peerToConnectTo.trim();
+    this.peers[peerId] = {
+      prompt: 'Trying to connect to peer. '
+          + 'If you\'re unable to connect after a few minutes, '
+          + 'please check that you have entered the ID correctly.'
+    };
+    if (Object.keys(this.peers).length === 1) {
+      this.disableFileSending = true;
+      this.ref.tick();
+    }
     this.signalClient.connect(this.peerToConnectTo.trim());
   }
 

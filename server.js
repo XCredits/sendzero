@@ -63,6 +63,7 @@ const signalServer = require('simple-signal-server')(io); // eslint-disable-line
 
 io.on('connection', (socket) => {
   socket.on('request declined', (request) => {
+    request.declinedBy = socket.id;
     io.sockets.connected[request.id].emit('request declined', request);
   });
   signalServer.on('disconnect', (disconnectedSocket) => {
