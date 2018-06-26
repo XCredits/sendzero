@@ -2,7 +2,7 @@ declare var require: any;
 import { Injectable, Component, Inject, ViewChild } from '@angular/core';
 import { OnInit, ApplicationRef } from '@angular/core';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
-import {MatDialog, MatDialogRef, MAT_DIALOG_DATA, MatTable} from '@angular/material';
+import {MatDialog, MatDialogRef, MAT_DIALOG_DATA, MatTable, MatSnackBar } from '@angular/material';
 import { BehaviorSubject } from 'rxjs';
 // TODO: find out why import doesn't work
 const shortid = require('shortid');
@@ -38,7 +38,8 @@ export class SendZeroService {
 
   constructor(private ref: ApplicationRef,
               private sanitizer: DomSanitizer,
-              public dialog: MatDialog) {
+              public dialog: MatDialog,
+              public snackBar: MatSnackBar) {
     this.id = '';
     this.prompt = 'Please wait...';
     this.disableConnectButton = true;
@@ -71,6 +72,11 @@ export class SendZeroService {
 
   private handleSignalClientReadyState(): void {
     this.prompt = 'Ready to connect!';
+    // this.snackBar.open('Ready to connect', 'Dismiss', {
+    //   duration: 5000,
+    //   verticalPosition: 'top',
+    //   horizontalPosition: 'right',
+    // });
     this.id = this.signalClient.id;
     this.connectionPrompt = 'Users can connect to you by following this link: ' + window.location.origin + '/home?id=' + this.id;
     this.ref.tick();
