@@ -52,6 +52,9 @@ export class SendZeroService {
     // The value is another object that contains the peer object, file(s) info,
     // etc.
     this.peers = {};
+    // We only send the object once as BehaviourSubject will get triggered
+    // every time the object changes
+    this.peerSubject.next(this.peers);
 
     // Set up socket
     this.socket = io(SERVER_URL, {transports: ['websocket']});
@@ -112,7 +115,6 @@ export class SendZeroService {
   private handlePeerConnect(peer: any): void {
     this.peers[peer.id].prompt = 'Now connected to peer! Select a file to send!';
     this.peerToConnectTo = '';
-    this.peerSubject.next(this.peers);
     this.ref.tick();
   }
 

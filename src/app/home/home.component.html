@@ -23,7 +23,7 @@
       Connect
     </button>
   </div>
-  <div *ngIf="peers">
+  <div *ngIf="JSObject.keys(peers).length !== 0">
     <table mat-table [dataSource]="JSObject.keys(peers)" class="mat-elevation-z8">
       <ng-container matColumnDef="select">
         <th mat-header-cell *matHeaderCellDef> Select to send file </th>
@@ -65,7 +65,7 @@
     </table>
   </div>
   <br>
-  <div *ngIf="peers" class="filePicker">
+  <div *ngIf="JSObject.keys(peers).length !== 0" class="filePicker">
     <file-drop style="cursor: pointer; text-align: center" (click)="openFileInput()" headertext="{{file ? file.name + '&emsp;' +  (file.size | byteFormat) : 'Drag file here!'}}" (onFileDrop)="fileDropped($event)">
         <!-- <span>optional content (don't set headertext then)</span> -->
     </file-drop>
