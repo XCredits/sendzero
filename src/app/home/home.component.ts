@@ -24,8 +24,6 @@ export class HomeComponent implements OnInit, OnDestroy {
   peerToConnectTo: string;
   fileForm: FormGroup;
   sub: Subscription;
-  // To use Object.keys() in the template
-  JSObject: Object = Object;
   @ViewChild('fileInput') fileInput;
   @ViewChild(MatTable) table: MatTable<any>;
   columnsToDisplay: string[] = ['select', 'peerId', 'status', 'files'];
@@ -36,6 +34,8 @@ export class HomeComponent implements OnInit, OnDestroy {
   // Untyped defs
   file;
   peers;
+  // To use Object.keys() in the template
+  JSObject: any = Object;
 
   constructor(private ref: ChangeDetectorRef,
               private sanitizer: DomSanitizer,
