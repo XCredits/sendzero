@@ -58,8 +58,8 @@ to connect to the server.
 Run
 
 ~~~bash
-use lazywebapp
-db.createUser ({user:'lazywebapp',pwd:'password', roles:[{role:'dbAdmin', db:'lazywebapp'}]})
+use sendzero
+db.createUser ({user:'sendzero',pwd:'password', roles:[{role:'dbAdmin', db:'sendzero'}]})
 ~~~
 
 7) Run
@@ -488,7 +488,7 @@ ngu-app-shell --module src/app/app.module.ts --url /loading --insert-module src/
 
 # NOTE: the below information was created as part of the 'ng build' process 
 
-# LazyWebApp
+# SendZero
 
 This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 1.7.3.
 

@@ -1,6 +1,6 @@
 import { AppPage } from './app.po';
 
-describe('lazy-web-app App', () => {
+describe('sendzero App', () => {
   let page: AppPage;
 
   beforeEach(() => {
