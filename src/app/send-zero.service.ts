@@ -1,8 +1,9 @@
 declare var require: any;
-import { Injectable, Component, Inject } from '@angular/core';
+import { Injectable, Component, Inject, ViewChild } from '@angular/core';
 import { OnInit, ApplicationRef } from '@angular/core';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
-import {MatDialog, MatDialogRef, MAT_DIALOG_DATA} from '@angular/material';
+import {MatDialog, MatDialogRef, MAT_DIALOG_DATA, MatTable, MatSnackBar } from '@angular/material';
+import { BehaviorSubject } from 'rxjs';
 // TODO: find out why import doesn't work
 const shortid = require('shortid');
 const io = require('socket.io-client');
@@ -27,17 +28,19 @@ export class SendZeroService {
   public connectionPrompt: string;
   public disableConnectButton: boolean;
   public disableSendButton: boolean;
-  public selectedPeer = '0';
+  public disableFileSending = false;
 
   // Untyped definitions
   private socket: any;
   private signalClient: any;
   // Maybe interface this
   private peers: any;
+  public peerSubject = new BehaviorSubject(this.peers);
 
   constructor(private ref: ApplicationRef,
               private sanitizer: DomSanitizer,
-              public dialog: MatDialog) {
+              public dialog: MatDialog,
+              public snackBar: MatSnackBar) {
     this.id = '';
     this.prompt = 'Please wait...';
     this.disableConnectButton = true;
@@ -50,12 +53,31 @@ export class SendZeroService {
     // The value is another object that contains the peer object, file(s) info,
     // etc.
     this.peers = {};
+    // We only send the object once as BehaviourSubject will get triggered
+    // every time the object changes
+    this.peerSubject.next(this.peers);
 
     // Set up socket
     this.socket = io(SERVER_URL, {transports: ['websocket']});
     this.socket.on('request declined', (request) => {
       if (request.id === this.id) {
-        this.prompt = 'The user declined your request!';
+        this.snackBar.open('The user declined your request!', 'Dismiss', {
+          duration: 5000,
+          verticalPosition: 'top',
+          horizontalPosition: 'right',
+        });
+      }
+      delete this.peers[request.declinedBy];
+      this.ref.tick();
+    });
+    this.socket.on('peer disconnected', (peerId) => {
+      if (Object.keys(this.peers).includes(peerId)) {
+        delete this.peers[peerId];
+        this.snackBar.open('User ' + peerId + ' has disconnected!', 'Dismiss', {
+          duration: 5000,
+          verticalPosition: 'top',
+          horizontalPosition: 'right',
+        });
       }
     });
 
@@ -69,7 +91,7 @@ export class SendZeroService {
   }
 
   private handleSignalClientReadyState(): void {
-    this.prompt = 'Ready to connect!';
+    this.prompt = 'Ready to connect to other computers! Enter a peer\'s ID below to connect to them.';
     this.id = this.signalClient.id;
     this.connectionPrompt = 'Users can connect to you by following this link: ' + window.location.origin + '/home?id=' + this.id;
     this.ref.tick();
@@ -90,18 +112,27 @@ export class SendZeroService {
       files: [],
       prompt: 'Connected to peer!'
     };
-    this.prompt = 'Successfully connected to ' + peer.id;
+    this.snackBar.open('Successfully connected to ' + peer.id, 'Dismiss', {
+      duration: 5000,
+      verticalPosition: 'top',
+      horizontalPosition: 'right',
+    });
+    this.disableFileSending = false;
     // Set up peer handling functions
     peer.on('connect', () => this.handlePeerConnect.bind(this)(peer));
+    peer.on('close', this.handlePeerClose.bind(this));
     peer.on('data', this.handlePeerReceiveData.bind(this));
     peer.on('error', this.handlePeerError.bind(this));
   }
 
   private handlePeerConnect(peer: any): void {
     this.peers[peer.id].prompt = 'Now connected to peer! Select a file to send!';
-    this.selectedPeer = peer.id;
     this.peerToConnectTo = '';
     this.ref.tick();
+  }
+
+  private handlePeerClose(): void {
+    console.log('Connection closed');
   }
 
   // Data always comes in as Uint8Array
@@ -165,7 +196,6 @@ export class SendZeroService {
       } else if (receivedData.type === 'METADATA') {
         // Reassign (deep copy) rather than fileMetadata = receivedFileMetaData
         const fileMetadata = JSON.parse(messageString);
-        console.log(fileMetadata);
         // Prepare for a new file but initializing variables like id, name, etc.
         // TODO: Move this to dialog component
         this.peers[receivedData.from]
@@ -199,7 +229,6 @@ export class SendZeroService {
         // string back to an array.
         // @ts-ignore
         const chunk = dataString.slice(5 + msgSize);
-        console.log(chunk.length);
         if (file.receivedChunks === 0) {
           file.fileArray.set(chunk);
           file.fileArrayOffset = CHUNK_SIZE;
@@ -216,9 +245,6 @@ export class SendZeroService {
           // This is because Angular doesn't detect changes in callbacks.
           this.ref.tick();
         } else {
-          console.log(file.fileArrayOffset);
-          console.log(chunk.length);
-          console.log(file.fileArray);
           file.fileArray.set(chunk, file.fileArrayOffset);
           file.receivedChunks++;
           this.ref.tick();
@@ -227,7 +253,11 @@ export class SendZeroService {
       }
     } catch (e) {
       console.log(e);
-      this.prompt = 'Things broke! Please try again or get in touch with us!';
+      this.snackBar.open('Something went wrong! Please try again or get in touch with us!', 'Dismiss', {
+        duration: 5000,
+        verticalPosition: 'top',
+        horizontalPosition: 'right',
+      });
     }
   }
 
@@ -270,13 +300,17 @@ export class SendZeroService {
 
   // TODO: Error handling.
   private handlePeerError(err: any): void {
-    this.prompt = 'Something went wrong! Please try connecting again.';
+    this.snackBar.open('Something went wrong! Please try again or get in touch with us!', 'Dismiss', {
+      duration: 5000,
+      verticalPosition: 'top',
+      horizontalPosition: 'right',
+    });
     console.log(err);
   }
 
-  public sendFile(file: File): void {
+  public sendFile(file: File, peer: string): void {
     const fileId = shortid.generate();
-    const peerId = this.selectedPeer;
+    const peerId = peer;
     this.peers[peerId].prompt = 'Now processing file!';
     this.peers[peerId].files.push({
       id: fileId,
@@ -374,7 +408,11 @@ export class SendZeroService {
     // TODO: Make sure things can't be circular because JSON.Parse/stringify
     // will break
     if (jsonString.length > 99999) {
-      this.prompt = 'File metadata too big, consider renaming.';
+      this.snackBar.open('File metadata is too big, consider renaming.', 'Dismiss', {
+        duration: 5000,
+        verticalPosition: 'top',
+        horizontalPosition: 'right',
+      });
       this.ref.tick();
       return;
     }
@@ -419,26 +457,32 @@ export class SendZeroService {
       toSendArray.set(chunk, messageArray.byteLength);
       // We use write instead of send as send closes the connection on big
       // files.
-      console.log(toSendArray);
       this.peers[peerId].peer.write(toSendArray);
     }
     this.ref.tick();
   }
 
   public connectToPeer(): void {
-    this.prompt = 'Connecting...';
+    const peerId = this.peerToConnectTo.trim();
+    this.peers[peerId] = {
+      prompt: 'Trying to connect to peer. '
+          + 'If you\'re unable to connect after a few minutes, '
+          + 'please check that you have entered the ID correctly.'
+    };
+    if (Object.keys(this.peers).length === 1) {
+      this.disableFileSending = true;
+      this.ref.tick();
+    }
     this.signalClient.connect(this.peerToConnectTo.trim());
   }
 
   public getId(): string {
-    console.log(this.id);
     return this.id;
   }
 
   // In case we get id from URL
   public setConnectToPeerId(id: string): void {
     this.peerToConnectTo = id;
-    this.ref.tick();
   }
 
   private openConnectionDialog(request: any): void {

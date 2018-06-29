@@ -1,5 +1,5 @@
 {
-  "name": "lazy-web-app",
+  "name": "sendzero",
   "version": "0.1.0",
   "license": "",
   "scripts": {
@@ -23,7 +23,7 @@
     "@angular/core": "6.0.1",
     "@angular/forms": "6.0.1",
     "@angular/http": "6.0.1",
-    "@angular/material": "^6.0.1",
+    "@angular/material": "^6.3.0",
     "@angular/platform-browser": "6.0.1",
     "@angular/platform-browser-dynamic": "6.0.1",
     "@angular/platform-server": "6.0.1",

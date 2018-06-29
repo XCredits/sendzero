@@ -1,9 +1,9 @@
 .id {
-  width: 190px;
+  width: auto;
 }
 
 .peerid {
-  width: 190px;
+  width: auto;
 }
 
 .receiveBox {
@@ -19,6 +19,12 @@
 }
 
 .peerList {
+  text-align: center;
+  margin: 0 auto;
+  width: 80%;
+}
+
+table {
   text-align: center;
   margin: 0 auto;
   width: 80%;

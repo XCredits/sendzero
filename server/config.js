@@ -8,12 +8,12 @@ if (!process.env.GOOGLE_CLOUD_PROJECT) {
   process.env.IS_LOCAL = 'TRUE';
 }
 
-// Default to development
-process.env.NODE_ENV = 'development';
+// Default to production
+process.env.NODE_ENV = 'production';
 
 if (!process.env.IS_LOCAL &&
-    process.env.GOOGLE_CLOUD_PROJECT.endsWith('-prod')) {
-  process.env.NODE_ENV = 'production';
+    process.env.GOOGLE_CLOUD_PROJECT.endsWith('-dev')) {
+  process.env.NODE_ENV = 'development';
 }
 
 if (process.env.IS_LOCAL) {

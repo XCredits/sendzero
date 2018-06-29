@@ -63,9 +63,14 @@ const signalServer = require('simple-signal-server')(io); // eslint-disable-line
 
 io.on('connection', (socket) => {
   socket.on('request declined', (request) => {
+    request.declinedBy = socket.id;
     io.sockets.connected[request.id].emit('request declined', request);
   });
+  signalServer.on('disconnect', (disconnectedSocket) => {
+    socket.emit('peer disconnected', disconnectedSocket.id);
+  });
 });
+
 
 server.listen(port, function() {
   console.log(`Running on localhost:${port}`);

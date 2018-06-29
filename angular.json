@@ -3,7 +3,7 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "lazy-web-app": {
+    "sendzero": {
       "root": "",
       "sourceRoot": "src",
       "projectType": "application",
@@ -51,18 +51,18 @@
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
           "options": {
-            "browserTarget": "lazy-web-app:build"
+            "browserTarget": "sendzero:build"
           },
           "configurations": {
             "production": {
-              "browserTarget": "lazy-web-app:build:production"
+              "browserTarget": "sendzero:build:production"
             }
           }
         },
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "browserTarget": "lazy-web-app:build"
+            "browserTarget": "sendzero:build"
           }
         },
         "test": {
@@ -98,7 +98,7 @@
         }
       }
     },
-    "lazy-web-app-e2e": {
+    "sendzero-e2e": {
       "root": "",
       "sourceRoot": "",
       "projectType": "application",
@@ -107,7 +107,7 @@
           "builder": "@angular-devkit/build-angular:protractor",
           "options": {
             "protractorConfig": "./protractor.conf.js",
-            "devServerTarget": "lazy-web-app:serve"
+            "devServerTarget": "sendzero:serve"
           }
         },
         "lint": {
@@ -124,7 +124,7 @@
       }
     }
   },
-  "defaultProject": "lazy-web-app",
+  "defaultProject": "sendzero",
   "schematics": {
     "@schematics/angular:component": {
       "prefix": "app",
