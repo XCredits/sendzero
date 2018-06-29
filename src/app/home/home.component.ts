@@ -4,6 +4,7 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { Observable } from 'rxjs/Observable';
 import { Subscription } from 'rxjs/Subscription';
 import { SendZeroService } from '../send-zero.service';
+import { UserService } from '../user.service';
 import { FormGroup, FormControl } from '@angular/forms';
 import { OnDestroy } from '@angular/core/src/metadata/lifecycle_hooks';
 import { UploadEvent, UploadFile, FileSystemFileEntry } from 'ngx-file-drop';
@@ -30,6 +31,8 @@ export class HomeComponent implements OnInit, OnDestroy {
   selection: SelectionModel<any>;
   sendError = '';
   fileError = '';
+  user: User;
+  isLoggedIn: boolean;
 
   // Untyped defs
   file;
@@ -40,6 +43,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   constructor(private ref: ChangeDetectorRef,
               private sanitizer: DomSanitizer,
               public sendZeroService: SendZeroService,
+              private userService: UserService,
               private route: ActivatedRoute,
               private router: Router) {
     this.title = 'SendZero Alpha';
@@ -81,6 +85,11 @@ export class HomeComponent implements OnInit, OnDestroy {
           this.table.renderRows();
         }
     });
+    this.userService.userObservable
+        .subscribe(user => {
+          this.user = user;
+          this.isLoggedIn = !!this.user;
+        });
   }
 
   // TODO: Set prompts
@@ -118,3 +127,15 @@ export class HomeComponent implements OnInit, OnDestroy {
   }
 
 }
+
+
+interface User {
+  id: string;
+  username: string;
+  givenName: string;
+  familyName: string;
+  email: string;
+  isLoggedIn: boolean;
+  isAdmin: boolean;
+}
+
