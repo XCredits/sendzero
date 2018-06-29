@@ -4,6 +4,7 @@ import { OnInit, ApplicationRef } from '@angular/core';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import {MatDialog, MatDialogRef, MAT_DIALOG_DATA, MatTable, MatSnackBar } from '@angular/material';
 import { BehaviorSubject } from 'rxjs';
+// import { UserService } from './user.service';
 // TODO: find out why import doesn't work
 const shortid = require('shortid');
 const io = require('socket.io-client');
@@ -29,6 +30,10 @@ export class SendZeroService {
   public disableConnectButton: boolean;
   public disableSendButton: boolean;
   public disableFileSending = false;
+  public humanId: number;
+  // public user: User;
+  // public isLoggedIn: boolean;
+
 
   // Untyped definitions
   private socket: any;
@@ -44,6 +49,7 @@ export class SendZeroService {
     this.id = '';
     this.prompt = 'Please wait...';
     this.disableConnectButton = true;
+    this.humanId = Math.floor(99 * Math.random()) + 1;
    }
 
   public init(): void {
