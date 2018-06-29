@@ -5,5 +5,7 @@ module.exports = {
     },
     "rules": {
         "max-len": ["warn"],
+        "require-jsdoc": ["warn"],
+        "valid-jsdoc": ["warn"],
     }
 };
