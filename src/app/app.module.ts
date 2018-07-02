@@ -6,9 +6,9 @@ import { RouterModule } from '@angular/router';
 import { LocalStorageModule } from 'angular-2-local-storage';
 import { AppComponent } from './app.component';
 import { UserService } from './user.service';
+import { SignalService } from './signal.service';
 import { SendZeroService, ConnectionDialogComponent, ReceiveFileDialogComponent } from './send-zero.service';
 import { StatsService } from './stats.service';
-import { SignalService } from './signal.service';
 import { AnalyticsService } from './analytics.service';
 import { AuthGuard } from './auth.guard';
 import { AdminGuard } from './admin.guard';
@@ -276,11 +276,11 @@ import { FooterComponent } from './footer/footer.component';
     ReceiveFileDialogComponent
   ],
   providers: [
+    SignalService,
     SendZeroService,
     UserService,
     StatsService,
     AnalyticsService,
-    SignalService,
   ],
   bootstrap: [AppComponent]
 })

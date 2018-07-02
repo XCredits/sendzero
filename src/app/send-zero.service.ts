@@ -4,12 +4,15 @@ import { OnInit, ApplicationRef } from '@angular/core';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import {MatDialog, MatDialogRef, MAT_DIALOG_DATA, MatTable, MatSnackBar } from '@angular/material';
 import { BehaviorSubject } from 'rxjs';
+import { SignalService } from './signal.service';
+import { isEmpty } from 'lodash';
 // import { UserService } from './user.service';
 // TODO: find out why import doesn't work
 const shortid = require('shortid');
 const io = require('socket.io-client');
 // const Peer = require('simple-peer');
-const SimpleSignalClient = require('simple-signal-client');
+// const SimpleSignalClient = require('simple-signal-client');
+
 // Simple peer splits files greater than ~64k, so we make our lives easier
 // by splitting up files ino 60k chunks
 const CHUNK_SIZE = 60000;
@@ -17,8 +20,6 @@ let SERVER_URL;
 if (String(window.location.hostname) === 'localhost') {
   SERVER_URL = 'http://localhost:3000';
 }
-
-
 
 @Injectable()
 export class SendZeroService {
@@ -37,12 +38,12 @@ export class SendZeroService {
 
   // Untyped definitions
   private socket: any;
-  private signalClient: any;
   // Maybe interface this
   private peers: any;
   public peerSubject = new BehaviorSubject(this.peers);
 
   constructor(private ref: ApplicationRef,
+              private signalService: SignalService,
               private sanitizer: DomSanitizer,
               public dialog: MatDialog,
               public snackBar: MatSnackBar) {
@@ -88,17 +89,37 @@ export class SendZeroService {
     });
 
     // Set up signal client
-    this.signalClient = new SimpleSignalClient(this.socket);
+    // this.signalClient = new SimpleSignalClient(this.socket);
+    this.signalService.init(this.socket);
 
     // Set up signal client's handler functions
-    this.signalClient.on('ready', this.handleSignalClientReadyState.bind(this));
-    this.signalClient.on('request', this.handleSignalClientRequest.bind(this));
-    this.signalClient.on('peer', this.handleSignalClientPeer.bind(this));
+    // this.signalService.on('ready', this.handleSignalClientReadyState.bind(this));
+    this.signalService.signal.subscribe(data => {
+      if (isEmpty(data)) {
+        return;
+      }
+
+      switch (data.event) {
+        case 'ready':
+          this.handleSignalClientReadyState.bind(this)();
+          break;
+        case 'request':
+          this.handleSignalClientRequest.bind(this)(data.request);
+          break;
+        case 'peer':
+          this.handleSignalClientPeer.bind(this)(data.peer);
+          break;
+        default:
+          break;
+      }
+    });
+    // this.signalService.on('request', this.handleSignalClientRequest.bind(this));
+    // this.signalService.on('peer', this.handleSignalClientPeer.bind(this));
   }
 
   private handleSignalClientReadyState(): void {
     this.prompt = 'Ready to connect to other computers! Enter a peer\'s ID below to connect to them.';
-    this.id = this.signalClient.id;
+    this.id = this.signalService.id;
     this.connectionPrompt = 'Users can connect to you by following this link: ' + window.location.origin + '/home?id=' + this.id;
     this.ref.tick();
     this.disableConnectButton = false;
@@ -479,7 +500,7 @@ export class SendZeroService {
       this.disableFileSending = true;
       this.ref.tick();
     }
-    this.signalClient.connect(this.peerToConnectTo.trim());
+    this.signalService.connect(this.peerToConnectTo.trim());
   }
 
   public getId(): string {

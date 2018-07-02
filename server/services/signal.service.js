@@ -57,10 +57,8 @@ class Signal extends EventEmitter {
   /**
    *
    * @param {*} socket
-   * @param {*} metadata
-   * @todo get rid of metadata
    */
-  _onDiscover(socket, metadata) {
+  _onDiscover(socket) {
     let self = this;
 
     socket.emit('signal-discover', {
