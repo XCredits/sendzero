@@ -68,7 +68,7 @@ export class SendZeroService {
     this.socket = io(SERVER_URL, {transports: ['websocket']});
 
     // Set up signal client
-    this.signalService.init(this.socket);
+    this.signalService.init(this.socket, this.humanId);
 
     // Set up signal client's handler functions
     this.signalService.signal.subscribe(data => {

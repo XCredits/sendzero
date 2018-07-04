@@ -23,16 +23,20 @@ export class SignalService {
     this.signal = new BehaviorSubject(null);
   }
 
-  init(socket) {
+  init(socket, humanId) {
     this.socket = socket;
 
     // Find your own socket id
     socket.on('connect', function() {
-      socket.emit('signal-discover');
+      socket.emit('signal-discover', {
+        humanId,
+      });
     });
 
     if (socket.connected) {
-      socket.emit('signal-discover');
+      socket.emit('signal-discover', {
+        humanId,
+      });
     }
 
     this.socket.on('signal-discover', this._onDiscover.bind(this));
@@ -52,16 +56,16 @@ export class SignalService {
   _onOffer(data: any) {
     const self = this;
 
-    if (self._requests[data.trackingNumber]) {
-      if (self._peers[data.trackingNumber]) {
-        self._peers[data.trackingNumber].signal(data.signal);
+    if (self._requests[data.trackingId]) {
+      if (self._peers[data.trackingId]) {
+        self._peers[data.trackingId].signal(data.signal);
       } else {
-        self._requests[data.trackingNumber].push(data.signal);
+        self._requests[data.trackingId].push(data.signal);
       }
       return;
     }
 
-    self._requests[data.trackingNumber] = [data.signal];
+    self._requests[data.trackingId] = [data.signal];
 
     self.signal.next({
       event: 'request',
@@ -144,24 +148,24 @@ export class SignalService {
     }
   }
 
-  connect(id: any) {
+  connect(humanId: any) {
     const self = this;
 
     const opts = {
       initiator: true,
     };
 
-    const trackingNumber = shortid.generate();
+    const trackingId = humanId;
 
     // @ts-ignore
     const peer = new SimplePeer(opts);
-    self._peers[trackingNumber] = peer;
+    self._peers[trackingId] = peer;
 
     peer.on('signal', function(signal) {
       self.socket.emit('signal-offer', {
         signal: signal,
-        trackingNumber: trackingNumber,
-        target: id,
+        trackingId: trackingId,
+        // target: id,
       });
     });
   }

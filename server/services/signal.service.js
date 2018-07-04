@@ -1,4 +1,5 @@
 const EventEmitter = require('events');
+const _ = require('lodash');
 
 /**
  * placeholder
@@ -48,6 +49,7 @@ class Signal extends EventEmitter {
   _onDisconnect(socket) {
     let self = this;
     delete self._sockets[socket.id];
+    delete self.peers[_.findIndex(self.peers, (v) => v.socketId === socket.id)];
 
     self.emit('disconnect', socket);
   }
@@ -56,7 +58,7 @@ class Signal extends EventEmitter {
    *
    * @param {*} socket
    */
-  _onDiscover(socket) {
+  _onDiscover(socket, data) {
     let self = this;
 
     socket.emit('signal-discover', {
@@ -65,7 +67,10 @@ class Signal extends EventEmitter {
 
     // self.emit('discover', {});
 
-    self.peers.push(socket.id);
+    self.peers.push({
+      socketId: socket.id,
+      humanId: data.humanId,
+    });
   }
 
   /**
@@ -76,13 +81,18 @@ class Signal extends EventEmitter {
   _onOffer(socket, data) {
     let self = this;
 
-    if (!self._sockets[data.target]) {
+    let key = _.findIndex(this.peers, (v) => v.humanId === data.trackingId);
+    if (!key) {
       // TODO: emit no such user found
+      return;
     }
+    let socketId = this.peers[key].socketId;
 
-    self._sockets[data.target].emit('signal-offer', {
+
+
+    self._sockets[socketId].emit('signal-offer', {
       id: socket.id,
-      trackingNumber: data.trackingNumber,
+      trackingId: data.trackingId,
       signal: data.signal,
     });
 
