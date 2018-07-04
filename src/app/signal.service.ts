@@ -1,6 +1,7 @@
 declare var require: any;
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
+import { findKey as _findKey } from 'lodash';
 
 const shortid = require('shortid');
 
@@ -37,6 +38,8 @@ export class SignalService {
     this.socket.on('signal-discover', this._onDiscover.bind(this));
     this.socket.on('signal-offer', this._onOffer.bind(this));
     this.socket.on('signal-answer', this._onAnswer.bind(this));
+    this.socket.on('request declined', this._onDeclinedRequest.bind(this));
+    this.socket.on('peer disconnected', this._onPeerDisconnect.bind(this));
   }
 
   _onDiscover(data: any) {
@@ -116,6 +119,29 @@ export class SignalService {
     }
 
     peer.signal(data.signal);
+  }
+
+  _onDeclinedRequest(request: any) {
+    const self = this;
+    if (request.id === this.id) {
+      self.signal.next({
+        event: 'request declined',
+        declinedBy: request.declinedBy,
+      });
+    }
+  }
+
+  _onPeerDisconnect(peerId: string) {
+    const self = this;
+    console.log(peerId);
+    let key;
+    if (key = _findKey(this._peers, (v) => v.id === peerId)) {
+      delete self._peers[key];
+      self.signal.next({
+        event: 'peer disconnected',
+        disconnectedPeer: peerId,
+      });
+    }
   }
 
   connect(id: any) {

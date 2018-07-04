@@ -66,34 +66,11 @@ export class SendZeroService {
 
     // Set up socket
     this.socket = io(SERVER_URL, {transports: ['websocket']});
-    this.socket.on('request declined', (request) => {
-      if (request.id === this.id) {
-        this.snackBar.open('The user declined your request!', 'Dismiss', {
-          duration: 5000,
-          verticalPosition: 'top',
-          horizontalPosition: 'right',
-        });
-      }
-      delete this.peers[request.declinedBy];
-      this.ref.tick();
-    });
-    this.socket.on('peer disconnected', (peerId) => {
-      if (Object.keys(this.peers).includes(peerId)) {
-        delete this.peers[peerId];
-        this.snackBar.open('User ' + peerId + ' has disconnected!', 'Dismiss', {
-          duration: 5000,
-          verticalPosition: 'top',
-          horizontalPosition: 'right',
-        });
-      }
-    });
 
     // Set up signal client
-    // this.signalClient = new SimpleSignalClient(this.socket);
     this.signalService.init(this.socket);
 
     // Set up signal client's handler functions
-    // this.signalService.on('ready', this.handleSignalClientReadyState.bind(this));
     this.signalService.signal.subscribe(data => {
       if (isEmpty(data)) {
         return;
@@ -109,12 +86,16 @@ export class SendZeroService {
         case 'peer':
           this.handleSignalClientPeer.bind(this)(data.peer);
           break;
+        case 'request declined':
+          this.handleDeclinedRequest.bind(this)(data.declinedBy);
+          break;
+        case 'peer disconnected':
+          this.handleDisconnectedPeer.bind(this)(data.disconnectedPeer);
+          break;
         default:
           break;
       }
     });
-    // this.signalService.on('request', this.handleSignalClientRequest.bind(this));
-    // this.signalService.on('peer', this.handleSignalClientPeer.bind(this));
   }
 
   private handleSignalClientReadyState(): void {
@@ -150,6 +131,27 @@ export class SendZeroService {
     peer.on('close', this.handlePeerClose.bind(this));
     peer.on('data', this.handlePeerReceiveData.bind(this));
     peer.on('error', this.handlePeerError.bind(this));
+  }
+
+  private handleDeclinedRequest(declinedBy: any) {
+    this.snackBar.open('The user declined your request!', 'Dismiss', {
+      duration: 5000,
+      verticalPosition: 'top',
+      horizontalPosition: 'right',
+    });
+    delete this.peers[declinedBy];
+  }
+
+  private handleDisconnectedPeer(disconnectedPeer: any) {
+    const peerId = disconnectedPeer;
+    if (Object.keys(this.peers).includes(peerId)) {
+      delete this.peers[peerId];
+      this.snackBar.open('User ' + peerId + ' has disconnected!', 'Dismiss', {
+        duration: 5000,
+        verticalPosition: 'top',
+        horizontalPosition: 'right',
+      });
+    }
   }
 
   private handlePeerConnect(peer: any): void {
@@ -199,6 +201,11 @@ export class SendZeroService {
         // We should now clear all file related variables in our state.
         this.peers[receivedData.from].prompt
             = 'Peer did not accept the file! Please try again.';
+        this.snackBar.open('Peer did not accept the file!', 'Dismiss', {
+          duration: 5000,
+          verticalPosition: 'top',
+          horizontalPosition: 'right',
+        });
         this.disableSendButton = false;
         this.ref.tick();
         // We now remove file from list of files for the peer that rejected us
