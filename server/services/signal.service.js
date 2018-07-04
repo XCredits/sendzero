@@ -86,10 +86,8 @@ class Signal extends EventEmitter {
       // TODO: emit no such user found
       return;
     }
+
     let socketId = this.peers[key].socketId;
-
-
-
     self._sockets[socketId].emit('signal-offer', {
       id: socket.id,
       trackingId: data.trackingId,
