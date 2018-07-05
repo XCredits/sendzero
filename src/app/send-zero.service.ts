@@ -111,7 +111,7 @@ export class SendZeroService {
   }
 
   private handleSignalClientReadyState(): void {
-    this.prompt = 'Ready to connect to other computers! Enter a peer\'s ID below to connect to them.';
+    this.prompt = 'You can connect to a peer by entering their ID below.';
     this.id = this.signalService.id;
     this.connectionPrompt = 'Users can connect to you by following this link: ' + window.location.origin + '/home?id=' + this.humanId;
     this.ref.tick();

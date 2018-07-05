@@ -1,9 +1,9 @@
 .id {
-  width: auto;
+  width: 225px;
 }
 
 .peerid {
-  width: auto;
+  width: 225px;
 }
 
 .receiveBox {
@@ -12,20 +12,18 @@
   width: 300px;
 }
 
-.filePicker {
-  text-align: center;
-  margin: 0 auto;
-  width: 80%;
+.connect {
+  margin-left: 2%;
 }
 
-.peerList {
-  text-align: center;
-  margin: 0 auto;
+.send {
+  margin-left: 2%
+}
+
+.filePicker {
   width: 80%;
 }
 
 table {
-  text-align: center;
-  margin: 0 auto;
   width: 80%;
 }

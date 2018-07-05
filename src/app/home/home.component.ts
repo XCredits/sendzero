@@ -46,7 +46,7 @@ export class HomeComponent implements OnInit, OnDestroy {
               private userService: UserService,
               private route: ActivatedRoute,
               private router: Router) {
-    this.title = 'SendZero Alpha';
+    this.title = 'SendZero';
     // this.fileForm = new FormGroup({
     //   selectFile: new FormControl(),
     // });
