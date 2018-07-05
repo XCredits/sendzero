@@ -4,6 +4,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { HttpClientModule} from '@angular/common/http'; // Deprecation https://angular.io/api/http/HttpModule
 import { RouterModule } from '@angular/router';
 import { LocalStorageModule } from 'angular-2-local-storage';
+import { QRCodeModule } from 'angularx-qrcode'; // QRcode
 import { AppComponent } from './app.component';
 import { UserService } from './user.service';
 import { SendZeroService, ConnectionDialogComponent, ReceiveFileDialogComponent } from './send-zero.service';
@@ -83,6 +84,7 @@ import { UserRegisterChartComponent } from './user-register-chart/user-register-
 import { TermsComponent } from './terms/terms.component';
 import { PrivacyComponent } from './privacy/privacy.component';
 import { FooterComponent } from './footer/footer.component';
+// import { QRCodeComponent } from './qrcode/qrcode.component';
 
 @NgModule({
   declarations: [
@@ -112,12 +114,14 @@ import { FooterComponent } from './footer/footer.component';
     FooterComponent,
     ConnectionDialogComponent,
     ReceiveFileDialogComponent,
+    // QRCodeComponent,
   ],
   imports: [
     BrowserModule,
     FormsModule,
     ReactiveFormsModule,
     HttpClientModule,
+    QRCodeModule,
 
     LocalStorageModule.withConfig({
         prefix: 'app',
@@ -130,6 +134,11 @@ import { FooterComponent } from './footer/footer.component';
         component: HomeComponent,
         data: { title: 'Home' },
       },
+      // {
+      //   path: 'qrcode',
+      //   component: QRCodeComponent,
+      //   data: { title: 'QR Code' },
+      // },
       {
         path: 'feed',
         component: FeedComponent,
