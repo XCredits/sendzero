@@ -11,6 +11,7 @@ export class SignalService {
   _peers: any;
   _requests: any;
   id: any;
+  humanId: any;
   socket: any;
   signal: BehaviorSubject<any>;
 
@@ -25,6 +26,7 @@ export class SignalService {
 
   init(socket, humanId) {
     this.socket = socket;
+    this.humanId = humanId;
 
     // Find your own socket id
     socket.on('connect', function() {
@@ -71,6 +73,7 @@ export class SignalService {
       event: 'request',
       request: {
         id: data.id,
+        humanId: data.humanId,
         accept: function() {
           const opts = {
             initiator: false,
@@ -80,7 +83,8 @@ export class SignalService {
           const peer = new SimplePeer(opts);
 
           peer.id = data.id;
-          self._peers[data.trackingNumber] = peer;
+          peer.humanId = data.humanId;
+          self._peers[data.trackingId] = peer;
           self.signal.next({
             event: 'peer',
             peer
@@ -89,16 +93,17 @@ export class SignalService {
           peer.on('signal', function(signal) {
             self.socket.emit('signal-answer', {
               signal: signal,
-              trackingNumber: data.trackingNumber,
+              trackingId: data.trackingId,
               target: data.id,
+              humanId: self.humanId,
             });
           });
 
-          self._requests[data.trackingNumber].forEach(request => {
+          self._requests[data.trackingId].forEach(request => {
             peer.signal(request);
           });
 
-          self._requests[data.trackingNumber] = [];
+          self._requests[data.trackingId] = [];
         }
       }
     });
@@ -107,15 +112,17 @@ export class SignalService {
   _onAnswer(data: any) {
     const self = this;
 
-    const peer =  self._peers[data.trackingNumber];
+    const peer =  self._peers[data.trackingId];
     if (!peer) {
       return;
     }
 
     if (peer.id) {
       peer.id = data.id;
+      peer.humanId = data.humanId;
     } else {
       peer.id = data.id;
+      peer.humanId = data.humanId;
       self.signal.next({
         event: 'peer',
         peer
@@ -155,7 +162,7 @@ export class SignalService {
       initiator: true,
     };
 
-    const trackingId = humanId;
+    const trackingId = shortid.generate();
 
     // @ts-ignore
     const peer = new SimplePeer(opts);
@@ -165,7 +172,7 @@ export class SignalService {
       self.socket.emit('signal-offer', {
         signal: signal,
         trackingId: trackingId,
-        // target: id,
+        target: parseInt(humanId, 10),
       });
     });
   }

@@ -49,14 +49,17 @@ class Signal extends EventEmitter {
   _onDisconnect(socket) {
     let self = this;
     delete self._sockets[socket.id];
+    const temp = self.peers[_.findIndex(self.peers, (v) => v.socketId === socket.id)];
     delete self.peers[_.findIndex(self.peers, (v) => v.socketId === socket.id)];
 
+    console.log(temp.humanId + ' died rip');
     self.emit('disconnect', socket);
   }
 
   /**
    *
    * @param {*} socket
+   * @param {*} data
    */
   _onDiscover(socket, data) {
     let self = this;
@@ -66,7 +69,7 @@ class Signal extends EventEmitter {
     });
 
     // self.emit('discover', {});
-
+    console.log('discovered  ' + data.humanId);
     self.peers.push({
       socketId: socket.id,
       humanId: data.humanId,
@@ -81,15 +84,20 @@ class Signal extends EventEmitter {
   _onOffer(socket, data) {
     let self = this;
 
-    let key = _.findIndex(this.peers, (v) => v.humanId === data.trackingId);
-    if (!key) {
+    console.log('target is ' + data.target);
+    console.log(this.peers);
+    let key = _.findIndex(this.peers, (v) => (v.humanId === data.target));
+    console.log(key);
+    if (key === -1) {
       // TODO: emit no such user found
+      console.log('things broke');
       return;
     }
 
     let socketId = this.peers[key].socketId;
     self._sockets[socketId].emit('signal-offer', {
       id: socket.id,
+      humanId: data.target,
       trackingId: data.trackingId,
       signal: data.signal,
     });
@@ -111,7 +119,8 @@ class Signal extends EventEmitter {
 
     self._sockets[data.target].emit('signal-answer', {
       id: socket.id,
-      trackingNumber: data.trackingNumber,
+      humanId: data.humanId,
+      trackingId: data.trackingId,
       signal: data.signal,
     });
   }
