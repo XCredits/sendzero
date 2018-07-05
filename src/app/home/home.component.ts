@@ -72,7 +72,6 @@ export class HomeComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    this.sendZeroService.init();
     this.sub = this.route.queryParams.subscribe(params => {
         const peerId = params['id'] || '';
         if (peerId.length > 0) {
