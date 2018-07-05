@@ -4,20 +4,26 @@ import { OnInit, ApplicationRef } from '@angular/core';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import {MatDialog, MatDialogRef, MAT_DIALOG_DATA, MatTable, MatSnackBar } from '@angular/material';
 import { BehaviorSubject } from 'rxjs';
+import { SignalService } from './signal.service';
+import { isEmpty } from 'lodash';
+import adjectives from './adjectives';
+import animals from './animals';
+// import { UserService } from './user.service';
 // TODO: find out why import doesn't work
 const shortid = require('shortid');
 const io = require('socket.io-client');
 // const Peer = require('simple-peer');
-const SimpleSignalClient = require('simple-signal-client');
+// const SimpleSignalClient = require('simple-signal-client');
+
 // Simple peer splits files greater than ~64k, so we make our lives easier
 // by splitting up files ino 60k chunks
 const CHUNK_SIZE = 60000;
+const ADJ_COUNT = 1102;
+const ANIMAL_COUNT = 221;
 let SERVER_URL;
 if (String(window.location.hostname) === 'localhost') {
   SERVER_URL = 'http://localhost:3000';
 }
-
-
 
 @Injectable()
 export class SendZeroService {
@@ -27,23 +33,30 @@ export class SendZeroService {
   public prompt: string;
   public connectionPrompt: string;
   public disableConnectButton: boolean;
+  public connectButtonText: string;
   public disableSendButton: boolean;
   public disableFileSending = false;
+  public humanId: string;
+  // public user: User;
+  // public isLoggedIn: boolean;
+
 
   // Untyped definitions
   private socket: any;
-  private signalClient: any;
   // Maybe interface this
   private peers: any;
   public peerSubject = new BehaviorSubject(this.peers);
 
   constructor(private ref: ApplicationRef,
+              private signalService: SignalService,
               private sanitizer: DomSanitizer,
               public dialog: MatDialog,
               public snackBar: MatSnackBar) {
     this.id = '';
     this.prompt = 'Please wait...';
     this.disableConnectButton = true;
+    this.connectButtonText = 'Connect';
+    this.humanId = this.createHumanId();
    }
 
   public init(): void {
@@ -59,41 +72,48 @@ export class SendZeroService {
 
     // Set up socket
     this.socket = io(SERVER_URL, {transports: ['websocket']});
-    this.socket.on('request declined', (request) => {
-      if (request.id === this.id) {
-        this.snackBar.open('The user declined your request!', 'Dismiss', {
-          duration: 5000,
-          verticalPosition: 'top',
-          horizontalPosition: 'right',
-        });
-      }
-      delete this.peers[request.declinedBy];
-      this.ref.tick();
-    });
-    this.socket.on('peer disconnected', (peerId) => {
-      if (Object.keys(this.peers).includes(peerId)) {
-        delete this.peers[peerId];
-        this.snackBar.open('User ' + peerId + ' has disconnected!', 'Dismiss', {
-          duration: 5000,
-          verticalPosition: 'top',
-          horizontalPosition: 'right',
-        });
-      }
-    });
 
     // Set up signal client
-    this.signalClient = new SimpleSignalClient(this.socket);
+    this.signalService.init(this.socket, this.humanId);
 
     // Set up signal client's handler functions
-    this.signalClient.on('ready', this.handleSignalClientReadyState.bind(this));
-    this.signalClient.on('request', this.handleSignalClientRequest.bind(this));
-    this.signalClient.on('peer', this.handleSignalClientPeer.bind(this));
+    this.signalService.signal.subscribe(data => {
+      if (isEmpty(data)) {
+        return;
+      }
+
+      switch (data.event) {
+        case 'ready':
+          this.handleSignalClientReadyState.bind(this)();
+          break;
+        case 'request':
+          this.handleSignalClientRequest.bind(this)(data.request);
+          break;
+        case 'peer':
+          this.handleSignalClientPeer.bind(this)(data.peer);
+          break;
+        case 'request declined':
+          this.handleDeclinedRequest.bind(this)(data.declinedBy);
+          break;
+        case 'peer disconnected':
+          this.handleDisconnectedPeer.bind(this)(data.disconnectedPeer);
+          break;
+        case 'invalid peer':
+          this.handleInvalidPeer.bind(this)();
+          break;
+        case 'found peer':
+          this.handleFindPeer.bind(this)();
+          break;
+        default:
+          break;
+      }
+    });
   }
 
   private handleSignalClientReadyState(): void {
     this.prompt = 'Ready to connect to other computers! Enter a peer\'s ID below to connect to them.';
-    this.id = this.signalClient.id;
-    this.connectionPrompt = 'Users can connect to you by following this link: ' + window.location.origin + '/home?id=' + this.id;
+    this.id = this.signalService.id;
+    this.connectionPrompt = 'Users can connect to you by following this link: ' + window.location.origin + '/home?id=' + this.humanId;
     this.ref.tick();
     this.disableConnectButton = false;
   }
@@ -109,10 +129,11 @@ export class SendZeroService {
     this.peers[peer.id] = {
       peer: peer,
       id: peer.id,
+      humanId: peer.humanId,
       files: [],
       prompt: 'Connected to peer!'
     };
-    this.snackBar.open('Successfully connected to ' + peer.id, 'Dismiss', {
+    this.snackBar.open('Successfully connected to ' + peer.humanId, 'Dismiss', {
       duration: 5000,
       verticalPosition: 'top',
       horizontalPosition: 'right',
@@ -125,8 +146,53 @@ export class SendZeroService {
     peer.on('error', this.handlePeerError.bind(this));
   }
 
+  private handleDeclinedRequest(declinedBy: any) {
+    this.snackBar.open('The user declined your request to connect!', 'Dismiss', {
+      duration: 5000,
+      verticalPosition: 'top',
+      horizontalPosition: 'right',
+    });
+    this.disableConnectButton = false;
+    this.connectButtonText = 'Connect';
+    delete this.peers[declinedBy];
+  }
+
+  private handleInvalidPeer() {
+    this.disableConnectButton = false;
+    this.connectButtonText = 'Connect';
+    this.snackBar
+        .open('Could not find '
+            + this.peerToConnectTo
+            + '. Please check the ID or contact us.',
+            'Dismiss',
+            {
+              duration: 5000,
+              verticalPosition: 'top',
+              horizontalPosition: 'right',
+            });
+  }
+
+  private handleFindPeer() {
+    this.connectButtonText = 'Found peer! Waiting for confirmation!';
+  }
+
+  private handleDisconnectedPeer(disconnectedPeer: any) {
+    const peerId = disconnectedPeer;
+    if (Object.keys(this.peers).includes(peerId)) {
+      const humanId = this.peers[peerId].humanId;
+      delete this.peers[peerId];
+      this.snackBar.open('User ' + humanId + ' has disconnected!', 'Dismiss', {
+        duration: 5000,
+        verticalPosition: 'top',
+        horizontalPosition: 'right',
+      });
+    }
+  }
+
   private handlePeerConnect(peer: any): void {
     this.peers[peer.id].prompt = 'Now connected to peer! Select a file to send!';
+    this.connectButtonText = 'Connect';
+    this.disableConnectButton = false;
     this.peerToConnectTo = '';
     this.ref.tick();
   }
@@ -172,6 +238,11 @@ export class SendZeroService {
         // We should now clear all file related variables in our state.
         this.peers[receivedData.from].prompt
             = 'Peer did not accept the file! Please try again.';
+        this.snackBar.open('Peer did not accept the file!', 'Dismiss', {
+          duration: 5000,
+          verticalPosition: 'top',
+          horizontalPosition: 'right',
+        });
         this.disableSendButton = false;
         this.ref.tick();
         // We now remove file from list of files for the peer that rejected us
@@ -208,6 +279,7 @@ export class SendZeroService {
               receivedChunks: 0,
             });
         this.ref.tick();
+        fileMetadata['humanId'] = this.peers[fileMetadata.from].humanId;
         this.openReceiveFileDialog(fileMetadata);
       } else if (receivedData.type === 'FILE') {
         // We've (hopefully) received part of a file (a chunk).
@@ -464,16 +536,21 @@ export class SendZeroService {
 
   public connectToPeer(): void {
     const peerId = this.peerToConnectTo.trim();
-    this.peers[peerId] = {
-      prompt: 'Trying to connect to peer. '
-          + 'If you\'re unable to connect after a few minutes, '
-          + 'please check that you have entered the ID correctly.'
-    };
-    if (Object.keys(this.peers).length === 1) {
-      this.disableFileSending = true;
-      this.ref.tick();
+    if (peerId.length < 1) {
+      return;
     }
-    this.signalClient.connect(this.peerToConnectTo.trim());
+    this.disableConnectButton = true;
+    this.connectButtonText = 'Looking for peer!';
+    // this.peers[peerId] = {
+    //   prompt: 'Trying to connect to peer. '
+    //       + 'If you\'re unable to connect after a few minutes, '
+    //       + 'please check that you have entered the ID correctly.'
+    // };
+    // if (Object.keys(this.peers).length === 1) {
+    //   this.disableFileSending = true;
+    //   this.ref.tick();
+    // }
+    this.signalService.connect(peerId);
   }
 
   public getId(): string {
@@ -487,7 +564,7 @@ export class SendZeroService {
 
   private openConnectionDialog(request: any): void {
     const dialogRef = this.dialog.open(ConnectionDialogComponent, {
-      data: {id: request.id},
+      data: {humanId: request.humanId},
     });
 
     dialogRef.afterClosed().subscribe(result => {
@@ -546,6 +623,28 @@ export class SendZeroService {
       }
     });
   }
+
+  private createHumanId(): string {
+    return [
+        adjectives[this.getRandom(0, ADJ_COUNT - 1)],
+        adjectives[this.getRandom(0, ADJ_COUNT - 1)],
+        animals[this.getRandom(0, ANIMAL_COUNT - 1)],
+        this.getRandom(0, 99),
+      ].join('-');
+  }
+
+  // https://stackoverflow.com/questions/18230217/javascript-generate-a-random-number-within-a-range-using-crypto-getrandomvalues
+  private getRandom(min: number, max: number): number {
+    const byteArrray = new Uint16Array(1);
+    window.crypto.getRandomValues(byteArrray);
+
+    const range = max - min + 1;
+    const max_range = 2000;
+    if (byteArrray[0] >= Math.floor(max_range / range) * range) {
+      return this.getRandom(min, max);
+    }
+    return min + (byteArrray[0] % range);
+  }
 }
 
 // Connection dialog component
@@ -553,7 +652,7 @@ export class SendZeroService {
 @Component({
   selector: 'app-connection-dialog',
   template: `
-    <h1 mat-dialog-title> User with id {{data.id}} wants to connect to your browser. Accept?</h1>
+    <h1 mat-dialog-title> <b>{{data.humanId}}</b> wants to connect to your browser. Accept?</h1>
     <mat-dialog-actions>
     <button mat-raised-button [mat-dialog-close]='true' cdkFocusInitial color='primary'>Yes</button>
     <button mat-raised-button [mat-dialog-close]='false' color='warn'>No</button>
@@ -566,7 +665,7 @@ export class ConnectionDialogComponent {
 @Component({
   selector: 'app-receive-file-dialog',
   template: `
-    <h1 mat-dialog-title> User with id {{data.from}} wants to send you a file. Accept?</h1>
+    <h1 mat-dialog-title> <b>{{data.humanId}}</b> wants to send you a file. Accept?</h1>
     <mat-dialog-content>
       File Name: {{data.fileName}}
       <br>
