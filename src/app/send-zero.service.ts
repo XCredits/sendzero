@@ -6,6 +6,8 @@ import {MatDialog, MatDialogRef, MAT_DIALOG_DATA, MatTable, MatSnackBar } from '
 import { BehaviorSubject } from 'rxjs';
 import { SignalService } from './signal.service';
 import { isEmpty } from 'lodash';
+import adjectives from './adjectives';
+import animals from './animals';
 // import { UserService } from './user.service';
 // TODO: find out why import doesn't work
 const shortid = require('shortid');
@@ -16,6 +18,8 @@ const io = require('socket.io-client');
 // Simple peer splits files greater than ~64k, so we make our lives easier
 // by splitting up files ino 60k chunks
 const CHUNK_SIZE = 60000;
+const ADJ_COUNT = 1102;
+const ANIMAL_COUNT = 221;
 let SERVER_URL;
 if (String(window.location.hostname) === 'localhost') {
   SERVER_URL = 'http://localhost:3000';
@@ -31,7 +35,7 @@ export class SendZeroService {
   public disableConnectButton: boolean;
   public disableSendButton: boolean;
   public disableFileSending = false;
-  public humanId: number;
+  public humanId: string;
   // public user: User;
   // public isLoggedIn: boolean;
 
@@ -50,7 +54,7 @@ export class SendZeroService {
     this.id = '';
     this.prompt = 'Please wait...';
     this.disableConnectButton = true;
-    this.humanId = Math.floor(99 * Math.random()) + 1;
+    this.humanId = this.createHumanId();
    }
 
   public init(): void {
@@ -101,7 +105,7 @@ export class SendZeroService {
   private handleSignalClientReadyState(): void {
     this.prompt = 'Ready to connect to other computers! Enter a peer\'s ID below to connect to them.';
     this.id = this.signalService.id;
-    this.connectionPrompt = 'Users can connect to you by following this link: ' + window.location.origin + '/home?id=' + this.id;
+    this.connectionPrompt = 'Users can connect to you by following this link: ' + window.location.origin + '/home?id=' + this.humanId;
     this.ref.tick();
     this.disableConnectButton = false;
   }
@@ -579,6 +583,28 @@ export class SendZeroService {
         this.peers[peerId].files.splice(index, 1);
       }
     });
+  }
+
+  private createHumanId(): string {
+    return [
+        adjectives[this.getRandom(0, ADJ_COUNT - 1)],
+        adjectives[this.getRandom(0, ADJ_COUNT - 1)],
+        animals[this.getRandom(0, ANIMAL_COUNT - 1)],
+        this.getRandom(0, 99),
+      ].join('-');
+  }
+
+  // https://stackoverflow.com/questions/18230217/javascript-generate-a-random-number-within-a-range-using-crypto-getrandomvalues
+  private getRandom(min: number, max: number): number {
+    const byteArrray = new Uint16Array(1);
+    window.crypto.getRandomValues(byteArrray);
+
+    const range = max - min + 1;
+    const max_range = 2000;
+    if (byteArrray[0] >= Math.floor(max_range / range) * range) {
+      return this.getRandom(min, max);
+    }
+    return min + (byteArrray[0] % range);
   }
 }
 
