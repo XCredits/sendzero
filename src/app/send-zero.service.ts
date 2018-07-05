@@ -33,6 +33,7 @@ export class SendZeroService {
   public prompt: string;
   public connectionPrompt: string;
   public disableConnectButton: boolean;
+  public connectButtonText: string;
   public disableSendButton: boolean;
   public disableFileSending = false;
   public humanId: string;
@@ -54,6 +55,7 @@ export class SendZeroService {
     this.id = '';
     this.prompt = 'Please wait...';
     this.disableConnectButton = true;
+    this.connectButtonText = 'Connect';
     this.humanId = this.createHumanId();
    }
 
@@ -95,6 +97,12 @@ export class SendZeroService {
           break;
         case 'peer disconnected':
           this.handleDisconnectedPeer.bind(this)(data.disconnectedPeer);
+          break;
+        case 'invalid peer':
+          this.handleInvalidPeer.bind(this)();
+          break;
+        case 'found peer':
+          this.handleFindPeer.bind(this)();
           break;
         default:
           break;
@@ -139,12 +147,33 @@ export class SendZeroService {
   }
 
   private handleDeclinedRequest(declinedBy: any) {
-    this.snackBar.open('The user declined your request!', 'Dismiss', {
+    this.snackBar.open('The user declined your request to connect!', 'Dismiss', {
       duration: 5000,
       verticalPosition: 'top',
       horizontalPosition: 'right',
     });
+    this.disableConnectButton = false;
+    this.connectButtonText = 'Connect';
     delete this.peers[declinedBy];
+  }
+
+  private handleInvalidPeer() {
+    this.disableConnectButton = false;
+    this.connectButtonText = 'Connect';
+    this.snackBar
+        .open('Could not find '
+            + this.peerToConnectTo
+            + '. Please check the ID or contact us.',
+            'Dismiss',
+            {
+              duration: 5000,
+              verticalPosition: 'top',
+              horizontalPosition: 'right',
+            });
+  }
+
+  private handleFindPeer() {
+    this.connectButtonText = 'Found peer! Waiting for confirmation!';
   }
 
   private handleDisconnectedPeer(disconnectedPeer: any) {
@@ -162,6 +191,8 @@ export class SendZeroService {
 
   private handlePeerConnect(peer: any): void {
     this.peers[peer.id].prompt = 'Now connected to peer! Select a file to send!';
+    this.connectButtonText = 'Connect';
+    this.disableConnectButton = false;
     this.peerToConnectTo = '';
     this.ref.tick();
   }
@@ -505,6 +536,11 @@ export class SendZeroService {
 
   public connectToPeer(): void {
     const peerId = this.peerToConnectTo.trim();
+    if (peerId.length < 1) {
+      return;
+    }
+    this.disableConnectButton = true;
+    this.connectButtonText = 'Looking for peer!';
     // this.peers[peerId] = {
     //   prompt: 'Trying to connect to peer. '
     //       + 'If you\'re unable to connect after a few minutes, '

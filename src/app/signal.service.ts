@@ -46,6 +46,8 @@ export class SignalService {
     this.socket.on('signal-answer', this._onAnswer.bind(this));
     this.socket.on('request declined', this._onDeclinedRequest.bind(this));
     this.socket.on('peer disconnected', this._onPeerDisconnect.bind(this));
+    this.socket.on('invalid peer', this._onInvalidPeer.bind(this));
+    this.socket.on('found peer', this._OnFindPeer.bind(this));
   }
 
   _onDiscover(data: any) {
@@ -152,6 +154,18 @@ export class SignalService {
         disconnectedPeer: peerId,
       });
     }
+  }
+
+  _onInvalidPeer() {
+    this.signal.next({
+      event: 'invalid peer'
+    });
+  }
+
+  _OnFindPeer() {
+    this.signal.next({
+      event: 'found peer'
+    });
   }
 
   connect(humanId: any) {

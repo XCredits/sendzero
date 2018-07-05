@@ -86,10 +86,11 @@ class Signal extends EventEmitter {
     let self = this;
     let key = _.findIndex(this.peers, (v) => (v.humanId === data.target));
     if (key === -1) {
-      // TODO: emit no such user found
-      console.log('things broke');
+      socket.emit('invalid peer');
       return;
     }
+
+    socket.emit('found peer');
 
     let socketId = this.peers[key].socketId;
     self._sockets[socketId].emit('signal-offer', {

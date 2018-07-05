@@ -20,7 +20,7 @@
     </mat-form-field>
     &nbsp;
     <button mat-raised-button required color="primary" (click)="connectToPeer()" id="connectButton" name="connectButton" class="connectButton" [disabled]="sendZeroService.disableConnectButton">
-      Connect
+      {{sendZeroService.connectButtonText}}
     </button>
   </div>
   <div *ngIf="JSObject.keys(peers).length !== 0">
