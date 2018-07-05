@@ -60,14 +60,13 @@ export class HomeComponent implements OnInit, OnDestroy {
   sendFile(): void {
     // const fileInput = this.fileForm.get('selectFile').value;
     if (!this.file) {
-      this.sendError = 'Please select a file first!';
+      this.sendZeroService.openSnackBar('Please select a file first!');
       return;
     }
     if (!this.selection.selected[0]) {
-      this.sendError = 'Please select a peer first!';
+      this.sendZeroService.openSnackBar('Please select a peer first!');
       return;
     }
-    this.sendError = '';
     this.sendZeroService.sendFile(this.file, this.selection.selected[0]);
   }
 

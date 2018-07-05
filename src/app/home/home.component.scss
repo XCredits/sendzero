@@ -9,21 +9,45 @@
 .receiveBox {
   text-align: center;
   margin: 0 auto;
-  width: 300px;
+}
+
+.fileList {
+  overflow-y: scroll;
 }
 
 .connect {
   margin-left: 2%;
+  margin-right: 2%;
 }
 
 .send {
-  margin-left: 2%
+  margin-left: 2%;
+  margin-right: 2%;
 }
 
-.filePicker {
-  width: 80%;
+// .filePicker {
+// }
+
+.peerCard {
+  text-align: center;
+  margin: 0 auto;
+  width: 96%; 
+}
+
+.cardContent {
+  text-align: center;
+}
+
+.sendFileButton {
+  text-align: center;
+  margin: 0 auto;
 }
 
 table {
-  width: 80%;
+  width: 100%;
 }
+
+mat-header-cell {
+  display:flex;
+  justify-content:flex-end;
+ }

@@ -100,6 +100,7 @@ class Signal extends EventEmitter {
             .humanId,
       trackingId: data.trackingId,
       signal: data.signal,
+      isMobile: data.isMobile,
     });
 
     // self.emit('request', {});
@@ -124,6 +125,7 @@ class Signal extends EventEmitter {
       humanId: data.humanId,
       trackingId: data.trackingId,
       signal: data.signal,
+      isMobile: data.isMobile,
     });
   }
 

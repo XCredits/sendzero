@@ -5,7 +5,7 @@
   <div>
       <h2>Send files using WebRTC!</h2>
   </div>
-  Your id is: 
+  Your ID is: 
   <mat-form-field class="id">
     <input align="center" matInput disabled type="text" name="id" id="id" [(ngModel)]="sendZeroService.humanId">
   </mat-form-field>
@@ -28,18 +28,51 @@
 </div>
 <br>
 <mat-divider></mat-divider>
-<!-- <div class="send" *ngIf="JSObject.keys(peers).length !== 0"> -->
 <br>
-<div class="send">
+<div class="send"  *ngIf="JSObject.keys(peers).length !== 0">
   <h3>2. Just send it!</h3>
+  Select a peer from the list below to send a file!
+  <br>
+  <!-- <mat-grid-list cols="3" rowHeight="2:1">
+    <mat-grid-tile *ngFor="let peerId of JSObject.keys(peers)">
+      <mat-card class="peerCard">
+        <mat-card-header>
+          <div mat-card-avatar>
+            <div *ngIf="peers[peerId].isMobile">
+              <mat-icon>smartphone</mat-icon>
+            </div>
+            <div *ngIf="!peers[peerId].isMobile">
+              <mat-icon>computer</mat-icon>
+            </div>
+          </div>
+          <mat-card-title><b>{{peers[peerId].humanId}}</b></mat-card-title>
+        </mat-card-header>
+        <mat-card-content class="cardContent">
+          {{peers[peerId].prompt}}
+          <div *ngFor="let file of peers[peerId].files" class="fileList">
+            <div class="receiveBox" id="receiveBox" *ngIf="file.maxFileChunks !== 0">
+              <mat-progress-bar *ngIf="file.fileReadyForDownload === false"    
+                  diameter="50"
+                  mode="determinate"
+                  [value]="file.receivedChunks*100/file.maxFileChunks">
+              </mat-progress-bar>
+              <div *ngIf="file.fileReadyForDownload">
+                  <a target="_blank" [href]="file.url" [download]="file.name">Click here to download file {{file.name}}</a>
+              </div>
+            </div>
+          </div>   
+        </mat-card-content>
+      </mat-card>
+    </mat-grid-tile>
+  </mat-grid-list> -->
   <table mat-table [dataSource]="JSObject.keys(peers)" class="mat-elevation-z8">
     <ng-container matColumnDef="select">
       <th mat-header-cell *matHeaderCellDef> Select to send file </th>
       <td mat-cell *matCellDef="let peerId">
-        <mat-checkbox (click)="$event.stopPropagation()"
+        <mat-radio-button (click)="$event.stopPropagation()"
                       (change)="$event ? selection.toggle(peerId) : null"
-                      [checked]="selection.isSelected(peerId)">
-        </mat-checkbox>
+                      [value]="selection.isSelected(peerId)">
+        </mat-radio-button>
       </td>
     </ng-container>
     <ng-container matColumnDef="humanId">
@@ -81,9 +114,11 @@
       {{ fileError }}
     </div>
     <br>  
-    <button mat-raised-button color="primary" id="sendFileButton" name="sendFileButton" (click)="sendFile()" [disabled]="sendZeroService.disableSendButton" class="sendFileButton">Send File</button>
-    <div *ngIf="sendError !== ''">
-        {{ sendError }}
+    <div class="sendFileButton">
+      <button mat-raised-button color="primary" id="sendFileButton" name="sendFileButton" class="sendFileButton" (click)="sendFile()" [disabled]="sendZeroService.disableSendButton">Send File</button>
     </div>
+    <!-- <div *ngIf="sendError !== ''">
+        {{ sendError }}
+    </div> -->
   </div>
 </div>
