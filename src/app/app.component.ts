@@ -1,17 +1,18 @@
 
 import {filter} from 'rxjs/operators';
-import { Component, ViewChild, OnChanges } from '@angular/core';
+import { Component, ViewChild, OnChanges, OnInit } from '@angular/core';
 // Imports needed for router import for title
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import { UserService } from './user.service';
 import { AnalyticsService } from './analytics.service';
+import { SendZeroService } from './send-zero.service';
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss']
 })
-export class AppComponent implements OnChanges {
+export class AppComponent implements OnChanges, OnInit {
   @ViewChild('sideNavDrawer') sideNavDrawer;
   screenWidth: number;
   mobileWidth = false; // boolean
@@ -109,6 +110,7 @@ export class AppComponent implements OnChanges {
       private route: ActivatedRoute,
       private userService: UserService,
       private analytics: AnalyticsService,
+      private sendZeroService: SendZeroService,
     ) {
     // Set side bar mode
     this.screenWidth = window.innerWidth;
@@ -139,6 +141,10 @@ export class AppComponent implements OnChanges {
       });
 
     this.setSideBar(); // set the sidebar values
+  }
+
+  ngOnInit() {
+    this.sendZeroService.init();
   }
 
   // set sidebar after every change
