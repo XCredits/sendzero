@@ -144,7 +144,6 @@ export class SignalService {
 
   _onPeerDisconnect(peerId: string) {
     const self = this;
-    console.log(peerId);
     let key;
     if (key = _findKey(this._peers, (v) => v.id === peerId)) {
       delete self._peers[key];
@@ -172,7 +171,7 @@ export class SignalService {
       self.socket.emit('signal-offer', {
         signal: signal,
         trackingId: trackingId,
-        target: parseInt(humanId, 10),
+        target: humanId,
       });
     });
   }
