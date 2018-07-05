@@ -37,6 +37,7 @@ export class SendZeroService {
   public disableSendButton: boolean;
   public disableFileSending = false;
   public humanId: string;
+  public isMobile: boolean;
   // public user: User;
   // public isLoggedIn: boolean;
 
@@ -62,6 +63,9 @@ export class SendZeroService {
   public init(): void {
     const self = this;
 
+    this.isMobile = !!navigator.userAgent.match(
+      /(iPhone|iPod|iPad|Android|webOS|BlackBerry|IEMobile|Opera Mini)/i);
+
     // Peers is an object keyed by the ids of the peers connected to you.
     // The value is another object that contains the peer object, file(s) info,
     // etc.
@@ -74,7 +78,7 @@ export class SendZeroService {
     this.socket = io(SERVER_URL, {transports: ['websocket']});
 
     // Set up signal client
-    this.signalService.init(this.socket, this.humanId);
+    this.signalService.init(this.socket, this.humanId, this.isMobile);
 
     // Set up signal client's handler functions
     this.signalService.signal.subscribe(data => {
@@ -111,7 +115,7 @@ export class SendZeroService {
   }
 
   private handleSignalClientReadyState(): void {
-    this.prompt = 'Ready to connect to other computers! Enter a peer\'s ID below to connect to them.';
+    this.prompt = 'You can connect to a peer by entering their ID below.';
     this.id = this.signalService.id;
     this.connectionPrompt = 'Users can connect to you by following this link: ' + window.location.origin + '/home?id=' + this.humanId;
     this.ref.tick();
@@ -131,6 +135,7 @@ export class SendZeroService {
       id: peer.id,
       humanId: peer.humanId,
       files: [],
+      isMobile: peer.isMobile,
       prompt: 'Connected to peer!'
     };
     this.snackBar.open('Successfully connected to ' + peer.humanId, 'Dismiss', {
@@ -372,11 +377,13 @@ export class SendZeroService {
 
   // TODO: Error handling.
   private handlePeerError(err: any): void {
-    this.snackBar.open('Something went wrong! Please try again or get in touch with us!', 'Dismiss', {
-      duration: 5000,
-      verticalPosition: 'top',
-      horizontalPosition: 'right',
-    });
+    if (err.code !== 'ERR_ICE_CONNECTION_FAILURE') {
+      this.snackBar.open('Something went wrong! Please try again or get in touch with us!', 'Dismiss', {
+        duration: 5000,
+        verticalPosition: 'top',
+        horizontalPosition: 'right',
+      });
+    }
     console.log(err);
   }
 
@@ -644,6 +651,14 @@ export class SendZeroService {
       return this.getRandom(min, max);
     }
     return min + (byteArrray[0] % range);
+  }
+
+  public openSnackBar(msg: string): void {
+    this.snackBar.open(msg, 'Dismiss', {
+      duration: 5000,
+      horizontalPosition: 'right',
+      verticalPosition: 'top',
+    });
   }
 }
 

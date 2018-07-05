@@ -1,31 +1,53 @@
 .id {
-  width: auto;
+  width: 225px;
 }
 
 .peerid {
-  width: auto;
+  width: 225px;
 }
 
 .receiveBox {
   text-align: center;
   margin: 0 auto;
-  width: 300px;
 }
 
-.filePicker {
-  text-align: center;
-  margin: 0 auto;
-  width: 80%;
+.fileList {
+  overflow-y: scroll;
 }
 
-.peerList {
+.connect {
+  margin-left: 2%;
+  margin-right: 2%;
+}
+
+.send {
+  margin-left: 2%;
+  margin-right: 2%;
+}
+
+// .filePicker {
+// }
+
+.peerCard {
   text-align: center;
   margin: 0 auto;
-  width: 80%;
+  width: 96%; 
+}
+
+.cardContent {
+  text-align: center;
+}
+
+.sendFileButton {
+  text-align: center;
+  margin: 0 auto;
 }
 
 table {
-  text-align: center;
-  margin: 0 auto;
-  width: 80%;
+  width: 100%;
 }
+
+mat-header-cell {
+  display:flex;
+  justify-content:flex-end;
+ }

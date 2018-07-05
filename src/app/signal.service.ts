@@ -14,6 +14,7 @@ export class SignalService {
   humanId: any;
   socket: any;
   signal: BehaviorSubject<any>;
+  isMobile: boolean;
 
   /**
    */
@@ -24,9 +25,10 @@ export class SignalService {
     this.signal = new BehaviorSubject(null);
   }
 
-  init(socket, humanId) {
+  init(socket, humanId, isMobile) {
     this.socket = socket;
     this.humanId = humanId;
+    this.isMobile = isMobile;
 
     // Find your own socket id
     socket.on('connect', function() {
@@ -86,6 +88,7 @@ export class SignalService {
 
           peer.id = data.id;
           peer.humanId = data.humanId;
+          peer.isMobile = data.isMobile;
           self._peers[data.trackingId] = peer;
           self.signal.next({
             event: 'peer',
@@ -98,6 +101,7 @@ export class SignalService {
               trackingId: data.trackingId,
               target: data.id,
               humanId: self.humanId,
+              isMobile: self.isMobile,
             });
           });
 
@@ -122,9 +126,11 @@ export class SignalService {
     if (peer.id) {
       peer.id = data.id;
       peer.humanId = data.humanId;
+      peer.isMobile = data.isMobile;
     } else {
       peer.id = data.id;
       peer.humanId = data.humanId;
+      peer.isMobile = data.isMobile;
       self.signal.next({
         event: 'peer',
         peer
@@ -186,6 +192,7 @@ export class SignalService {
         signal: signal,
         trackingId: trackingId,
         target: humanId,
+        isMobile: self.isMobile,
       });
     });
   }
