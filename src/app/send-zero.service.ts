@@ -121,10 +121,11 @@ export class SendZeroService {
     this.peers[peer.id] = {
       peer: peer,
       id: peer.id,
+      humanId: peer.humanId,
       files: [],
       prompt: 'Connected to peer!'
     };
-    this.snackBar.open('Successfully connected to ' + peer.id, 'Dismiss', {
+    this.snackBar.open('Successfully connected to ' + peer.humanId, 'Dismiss', {
       duration: 5000,
       verticalPosition: 'top',
       horizontalPosition: 'right',
@@ -149,8 +150,9 @@ export class SendZeroService {
   private handleDisconnectedPeer(disconnectedPeer: any) {
     const peerId = disconnectedPeer;
     if (Object.keys(this.peers).includes(peerId)) {
+      const humanId = this.peers[peerId].humanId;
       delete this.peers[peerId];
-      this.snackBar.open('User ' + peerId + ' has disconnected!', 'Dismiss', {
+      this.snackBar.open('User ' + humanId + ' has disconnected!', 'Dismiss', {
         duration: 5000,
         verticalPosition: 'top',
         horizontalPosition: 'right',
@@ -246,6 +248,7 @@ export class SendZeroService {
               receivedChunks: 0,
             });
         this.ref.tick();
+        fileMetadata['humanId'] = this.peers[fileMetadata.from].humanId;
         this.openReceiveFileDialog(fileMetadata);
       } else if (receivedData.type === 'FILE') {
         // We've (hopefully) received part of a file (a chunk).
@@ -502,16 +505,16 @@ export class SendZeroService {
 
   public connectToPeer(): void {
     const peerId = this.peerToConnectTo.trim();
-    this.peers[peerId] = {
-      prompt: 'Trying to connect to peer. '
-          + 'If you\'re unable to connect after a few minutes, '
-          + 'please check that you have entered the ID correctly.'
-    };
-    if (Object.keys(this.peers).length === 1) {
-      this.disableFileSending = true;
-      this.ref.tick();
-    }
-    this.signalService.connect(this.peerToConnectTo.trim());
+    // this.peers[peerId] = {
+    //   prompt: 'Trying to connect to peer. '
+    //       + 'If you\'re unable to connect after a few minutes, '
+    //       + 'please check that you have entered the ID correctly.'
+    // };
+    // if (Object.keys(this.peers).length === 1) {
+    //   this.disableFileSending = true;
+    //   this.ref.tick();
+    // }
+    this.signalService.connect(peerId);
   }
 
   public getId(): string {
@@ -525,7 +528,7 @@ export class SendZeroService {
 
   private openConnectionDialog(request: any): void {
     const dialogRef = this.dialog.open(ConnectionDialogComponent, {
-      data: {id: request.id},
+      data: {humanId: request.humanId},
     });
 
     dialogRef.afterClosed().subscribe(result => {
@@ -613,7 +616,7 @@ export class SendZeroService {
 @Component({
   selector: 'app-connection-dialog',
   template: `
-    <h1 mat-dialog-title> User with id {{data.id}} wants to connect to your browser. Accept?</h1>
+    <h1 mat-dialog-title> <b>{{data.humanId}}</b> wants to connect to your browser. Accept?</h1>
     <mat-dialog-actions>
     <button mat-raised-button [mat-dialog-close]='true' cdkFocusInitial color='primary'>Yes</button>
     <button mat-raised-button [mat-dialog-close]='false' color='warn'>No</button>
@@ -626,7 +629,7 @@ export class ConnectionDialogComponent {
 @Component({
   selector: 'app-receive-file-dialog',
   template: `
-    <h1 mat-dialog-title> User with id {{data.from}} wants to send you a file. Accept?</h1>
+    <h1 mat-dialog-title> <b>{{data.humanId}}</b> wants to send you a file. Accept?</h1>
     <mat-dialog-content>
       File Name: {{data.fileName}}
       <br>

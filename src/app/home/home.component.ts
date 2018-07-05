@@ -27,7 +27,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   sub: Subscription;
   @ViewChild('fileInput') fileInput;
   @ViewChild(MatTable) table: MatTable<any>;
-  columnsToDisplay: string[] = ['select', 'peerId', 'status', 'files'];
+  columnsToDisplay: string[] = ['select', 'humanId', 'status', 'files'];
   selection: SelectionModel<any>;
   sendError = '';
   fileError = '';
