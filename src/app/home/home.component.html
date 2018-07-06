@@ -94,7 +94,7 @@
                 [value]="file.receivedChunks*100/file.maxFileChunks">
             </mat-progress-bar>
             <div *ngIf="file.fileReadyForDownload">
-                <a target="_blank" [href]="file.url" [download]="file.name">Click here to download file {{file.name}}</a>
+                <a target="_blank" [href]="file.url" [download]="file.name">{{file.name}}</a>
             </div>
           </div>
         </div>
