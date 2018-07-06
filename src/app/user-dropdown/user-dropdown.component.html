@@ -1,7 +1,7 @@
-<button *ngIf="!isLoggedIn" mat-button routerLink="/login"
+<!-- <button *ngIf="!isLoggedIn" mat-button routerLink="/login"
     style="min-width:50px">
   <mat-icon>person</mat-icon>Login
-</button>
+</button> -->
 <button *ngIf="isLoggedIn" mat-button [matMenuTriggerFor]="userDropdownMenu"
     style="min-width:50px">
   <mat-icon>person</mat-icon>{{user?.givenName}} {{user?.familyName[0]}} 
