@@ -377,13 +377,11 @@ export class SendZeroService {
 
   // TODO: Error handling.
   private handlePeerError(err: any): void {
-    if (err.code !== 'ERR_ICE_CONNECTION_FAILURE') {
-      this.snackBar.open('Something went wrong! Please try again or get in touch with us!', 'Dismiss', {
-        duration: 5000,
-        verticalPosition: 'top',
-        horizontalPosition: 'right',
-      });
-    }
+    this.snackBar.open('Something went wrong! Please try again or get in touch with us!', 'Dismiss', {
+      duration: 5000,
+      verticalPosition: 'top',
+      horizontalPosition: 'right',
+    });
     console.log(err);
   }
 
