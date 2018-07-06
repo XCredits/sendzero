@@ -33,21 +33,21 @@ export class AppComponent implements OnChanges, OnInit {
       icon: 'home',
       title: 'Home',
     },
-    {
-      routerLink: '/feed',
-      icon: 'chat',
-      title: 'Feed',
-    },
-    {
-      routerLink: '/contacts',
-      icon: 'person',
-      title: 'Contacts',
-    },
-    {
-      routerLink: '/about',
-      icon: 'view_carousel',
-      title: 'About',
-    },
+    // {
+    //   routerLink: '/feed',
+    //   icon: 'chat',
+    //   title: 'Feed',
+    // },
+    // {
+    //   routerLink: '/contacts',
+    //   icon: 'person',
+    //   title: 'Contacts',
+    // },
+    // {
+    //   routerLink: '/about',
+    //   icon: 'view_carousel',
+    //   title: 'About',
+    // },
   ];
 
   // Secondary nav links are only shown in the side bar
@@ -58,11 +58,11 @@ export class AppComponent implements OnChanges, OnInit {
       title: 'Profile',
       isLoggedInRoute: true,
     },
-    {
-      routerLink: '/mailing-list',
-      icon: 'email',
-      title: 'Mailing list',
-    },
+    // {
+    //   routerLink: '/mailing-list',
+    //   icon: 'email',
+    //   title: 'Mailing list',
+    // },
     {
       routerLink: '/help',
       icon: 'help',
