@@ -75,7 +75,6 @@ export class HomeComponent implements OnInit, OnDestroy {
         const peerId = params['id'] || '';
         if (peerId.length > 0) {
           this.sendZeroService.setConnectToPeerId(peerId);
-          this.sendZeroService.openInitiateConnectionDialog(peerId);
         }
     });
     this.sendZeroService.peerSubject.subscribe((data) => {

@@ -569,6 +569,7 @@ export class SendZeroService {
   // In case we get id from URL
   public setConnectToPeerId(id: string): void {
     this.peerToConnectTo = id;
+    this.openInitiateConnectionDialog(id);
   }
 
   private openConnectionDialog(request: any): void {
