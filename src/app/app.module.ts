@@ -7,7 +7,8 @@ import { LocalStorageModule } from 'angular-2-local-storage';
 import { AppComponent } from './app.component';
 import { UserService } from './user.service';
 import { SignalService } from './signal.service';
-import { SendZeroService, ConnectionDialogComponent, ReceiveFileDialogComponent } from './send-zero.service';
+import { SendZeroService } from './send-zero.service';
+import { ConnectionDialogComponent, ReceiveFileDialogComponent, InitiateConnectionDialogComponent } from './send-zero.service';
 import { StatsService } from './stats.service';
 import { AnalyticsService } from './analytics.service';
 import { AuthGuard } from './auth.guard';
@@ -113,6 +114,7 @@ import { FooterComponent } from './footer/footer.component';
     FooterComponent,
     ConnectionDialogComponent,
     ReceiveFileDialogComponent,
+    InitiateConnectionDialogComponent,
   ],
   imports: [
     BrowserModule,
@@ -273,7 +275,8 @@ import { FooterComponent } from './footer/footer.component';
   // For dialogs
   entryComponents: [
     ConnectionDialogComponent,
-    ReceiveFileDialogComponent
+    ReceiveFileDialogComponent,
+    InitiateConnectionDialogComponent,
   ],
   providers: [
     SignalService,

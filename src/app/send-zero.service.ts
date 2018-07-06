@@ -660,6 +660,18 @@ export class SendZeroService {
       verticalPosition: 'top',
     });
   }
+
+  public openInitiateConnectionDialog(peerId: string): void {
+    const dialogRef = this.dialog.open(InitiateConnectionDialogComponent, {
+      data: {humanId: peerId},
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result === true) {
+        this.connectToPeer();
+      }
+    });
+  }
 }
 
 // Connection dialog component
@@ -675,6 +687,19 @@ export class SendZeroService {
 })
 export class ConnectionDialogComponent {
   constructor(@Inject(MAT_DIALOG_DATA) public data: any) { }
+}
+
+@Component({
+  selector: 'app-initiate-connection-dialog',
+  template: `
+    <h1 mat-dialog-title> Would you like to connect to <b>{{data.humanId}}</b>?</h1>
+    <mat-dialog-actions>
+    <button mat-raised-button [mat-dialog-close]="true" cdkFocusInitial color="primary">Yes</button>
+    <button mat-raised-button [mat-dialog-close]='false' color='warn'>No</button>
+    </mat-dialog-actions>`,
+})
+export class InitiateConnectionDialogComponent {
+  constructor(@Inject(MAT_DIALOG_DATA) public data: any) {}
 }
 
 @Component({
