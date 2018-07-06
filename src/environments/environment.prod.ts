@@ -4,7 +4,7 @@ export const environment = {
   siteName: 'SendZero',
 
   // Comment out Google Analytics below to prevent analytics from running
-  googleAnalyticsTrackingId: 'UA-120389053-1',
+  googleAnalyticsTrackingId: 'UA-120466200-3',
 
   // Comment out any of the below to prevent them being shown
   social: {
