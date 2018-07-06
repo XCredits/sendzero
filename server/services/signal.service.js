@@ -15,6 +15,7 @@ class Signal extends EventEmitter {
     this._sockets = {};
     this.peers = [];
     this.socketServer = io;
+    // this.setMaxListeners();
 
     io.on('connection', this._onConnect.bind(this));
   }
@@ -35,9 +36,9 @@ class Signal extends EventEmitter {
     socket.on('request declined', self._onDeclinedRequest.bind(self, socket));
 
     // TODO: try binding socket onto function
-    self.on('disconnect', (disconnectedSocket) => {
-      socket.emit('peer disconnected', disconnectedSocket.id);
-    });
+    // self.on('disconnect', (disconnectedSocket) => {
+    //   socket.emit('peer disconnected', disconnectedSocket.id);
+    // });
 
     // self.emit('connect', socket);
   }
@@ -55,7 +56,11 @@ class Signal extends EventEmitter {
       console.log(err);
     }
 
-    self.emit('disconnect', socket);
+    // self.emit('disconnect', socket);
+    // TODO: optimise
+    _.forIn(self._sockets, (_socket) => {
+      _socket.emit('peer disconnected', socket.id);
+    });
   }
 
   /**
