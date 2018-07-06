@@ -377,7 +377,10 @@ export class SendZeroService {
 
   // TODO: Error handling.
   private handlePeerError(err: any): void {
-    this.snackBar.open('Something went wrong! Please try again or get in touch with us!', 'Dismiss', {
+    this.snackBar.open(
+      'Something went wrong! Please try again or get in touch with us! If you are on a mobile network, try using Wi-Fi.',
+      'Dismiss',
+      {
       duration: 5000,
       verticalPosition: 'top',
       horizontalPosition: 'right',
