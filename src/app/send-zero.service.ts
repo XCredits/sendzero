@@ -185,6 +185,7 @@ export class SendZeroService {
     const peerId = disconnectedPeer;
     if (Object.keys(this.peers).includes(peerId)) {
       const humanId = this.peers[peerId].humanId;
+      this.peers[peerId].peer.destroy();
       delete this.peers[peerId];
       this.snackBar.open('User ' + humanId + ' has disconnected!', 'Dismiss', {
         duration: 5000,
