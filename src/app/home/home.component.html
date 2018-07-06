@@ -19,7 +19,7 @@
   <br>
   <div class="connectionBox">
     <mat-form-field>
-      <input matInput placeholder="Peer ID" type="text" name="peerId" id="peerId" [(ngModel)]="sendZeroService.peerToConnectTo">
+      <input matInput placeholder="Device ID" type="text" name="peerId" id="peerId" [(ngModel)]="sendZeroService.peerToConnectTo">
     </mat-form-field>
     &nbsp;
     <button mat-raised-button required color="primary" (click)="connectToPeer()" id="connectButton" name="connectButton" class="connectButton" [disabled]="sendZeroService.disableConnectButton">
@@ -32,7 +32,7 @@
 <br>
 <div class="send"  *ngIf="JSObject.keys(peers).length !== 0">
   <h3>2. Just send it!</h3>
-  Select a peer from the list below to send a file!
+  Select a device from the list below to send a file!
   <br>
   <!-- <mat-grid-list cols="3" rowHeight="2:1">
     <mat-grid-tile *ngFor="let peerId of JSObject.keys(peers)">
@@ -77,7 +77,7 @@
       </td>
     </ng-container>
     <ng-container matColumnDef="humanId">
-      <th mat-header-cell *matHeaderCellDef> Peer ID </th>
+      <th mat-header-cell *matHeaderCellDef> Device ID </th>
       <td mat-cell *matCellDef="let peerId"> {{peers[peerId].humanId}} </td>
     </ng-container>  
     <ng-container matColumnDef="status">

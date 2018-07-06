@@ -115,7 +115,7 @@ export class SendZeroService {
   }
 
   private handleSignalClientReadyState(): void {
-    this.prompt = 'You can connect to a peer by entering their ID below.';
+    this.prompt = 'You can connect to a device by entering its ID below.';
     this.id = this.signalService.id;
     this.connectionLink = window.location.origin + '/home?id=' + this.humanId;
     this.ref.tick();
@@ -136,7 +136,7 @@ export class SendZeroService {
       humanId: peer.humanId,
       files: [],
       isMobile: peer.isMobile,
-      prompt: 'Connected to peer!'
+      prompt: 'Connected to device!'
     };
     this.snackBar.open('Successfully connected to ' + peer.humanId, 'Dismiss', {
       duration: 5000,
@@ -178,7 +178,7 @@ export class SendZeroService {
   }
 
   private handleFindPeer() {
-    this.connectButtonText = 'Found peer! Waiting for confirmation!';
+    this.connectButtonText = 'Found device! Waiting for confirmation!';
   }
 
   private handleDisconnectedPeer(disconnectedPeer: any) {
@@ -195,7 +195,7 @@ export class SendZeroService {
   }
 
   private handlePeerConnect(peer: any): void {
-    this.peers[peer.id].prompt = 'Now connected to peer! Select a file to send!';
+    this.peers[peer.id].prompt = 'Now connected to device! Select a file to send!';
     this.connectButtonText = 'Connect';
     this.disableConnectButton = false;
     this.peerToConnectTo = '';
@@ -242,8 +242,8 @@ export class SendZeroService {
           && receivedData.message === 'File Declined') {
         // We should now clear all file related variables in our state.
         this.peers[receivedData.from].prompt
-            = 'Peer did not accept the file! Please try again.';
-        this.snackBar.open('Peer did not accept the file!', 'Dismiss', {
+            = 'User did not accept the file! Please try again.';
+        this.snackBar.open('User did not accept the file!', 'Dismiss', {
           duration: 5000,
           verticalPosition: 'top',
           horizontalPosition: 'right',
@@ -427,7 +427,7 @@ export class SendZeroService {
   private finishReadingFile(peerId: string, fileId: string,
       fileArrayBuffer: any): void {
     this.peers[peerId].prompt
-        = 'Finished processing file. Waiting for confirmation from peer!';
+        = 'Finished processing file. Waiting for confirmation from receiving user!';
     // // Don't allow the user to send any files for the timebeing
     // this.disableSendButton = true;
     this.ref.tick();
@@ -547,7 +547,7 @@ export class SendZeroService {
       return;
     }
     this.disableConnectButton = true;
-    this.connectButtonText = 'Looking for peer!';
+    this.connectButtonText = 'Looking for device!';
     // this.peers[peerId] = {
     //   prompt: 'Trying to connect to peer. '
     //       + 'If you\'re unable to connect after a few minutes, '
