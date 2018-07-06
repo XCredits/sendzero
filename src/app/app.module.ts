@@ -218,7 +218,9 @@ import { FooterComponent } from './footer/footer.component';
       },
       { // Default route
         path: '',
-        redirectTo: '/home',
+        component: HomeComponent,
+        data: { title: 'Home' },
+        // redirectTo: '/home',
         pathMatch: 'full',
       },
       {
