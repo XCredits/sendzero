@@ -31,7 +31,7 @@ export class SendZeroService {
   public id: string;
   public peerToConnectTo: string;
   public prompt: string;
-  public connectionPrompt: string;
+  public connectionLink: string;
   public disableConnectButton: boolean;
   public connectButtonText: string;
   public disableSendButton: boolean;
@@ -117,7 +117,7 @@ export class SendZeroService {
   private handleSignalClientReadyState(): void {
     this.prompt = 'You can connect to a peer by entering their ID below.';
     this.id = this.signalService.id;
-    this.connectionPrompt = 'Users can connect to you by following this link: ' + window.location.origin + '/home?id=' + this.humanId;
+    this.connectionLink = window.location.origin + '/home?id=' + this.humanId;
     this.ref.tick();
     this.disableConnectButton = false;
   }
