@@ -168,7 +168,7 @@ server {
     listen 80;
 }
 ```
-18) This will allow your `node` app to be accessed via the `nginx` server. Let's test it out now. Start up your `node.js` server in a new `tmux` window (remember to stop and kill any previous sessions) using the command `sudo node server.js`. Do not override the port this time. With your node server running in the background, restart your `nginx` server so it uses the new configuration using `sudo systemctl restart nginx`.
+18) This will allow your `node` app to be accessed via the `nginx` server. Let's test it out now. Start up your `node.js` server in a new `tmux` window (remember to stop and kill any previous sessions) using the command `sudo node server.js` (if you're working with Compute Engine, run `sudo GOOGLE_CLOUD_PROJECT='example-prod' node server`). Do not override the port this time. With your node server running in the background, restart your `nginx` server so it uses the new configuration using `sudo systemctl restart nginx`.
 
 19) Congrats! You should now have your app showing up when you navigate to your website. Remeber to use tools like [pm2](http://pm2.keymetrics.io/) to manage your `node` instances. Also don't forget to `ng build --prod` everytime you delpoy.
 
