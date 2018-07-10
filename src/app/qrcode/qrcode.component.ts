@@ -1,16 +1,18 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Input } from '@angular/core';
+import { SendZeroService } from '../send-zero.service';
 
 @Component({
-    selector: 'app-profile',
+    selector: 'app-qr',
     templateUrl: './qrcode.component.html',
     styleUrls: ['./qrcode.component.scss']
 })
 
 export class QRCodeComponent implements OnInit {
-    public angularxQrCode: string = null;
-    constructor () {
+    @Input() link: string = null;
+    constructor (private sendZeroService: SendZeroService) {
         // assign a value
-        this.angularxQrCode = 'Your QR code data string';
+        // this.link = 'Your QR code data string';
+        this.link = sendZeroService.connectionLink;
     }
 
     ngOnInit() {

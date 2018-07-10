@@ -86,7 +86,7 @@ import { UserRegisterChartComponent } from './user-register-chart/user-register-
 import { TermsComponent } from './terms/terms.component';
 import { PrivacyComponent } from './privacy/privacy.component';
 import { FooterComponent } from './footer/footer.component';
-// import { QRCodeComponent } from './qrcode/qrcode.component';
+import { QRCodeComponent } from './qrcode/qrcode.component';
 
 @NgModule({
   declarations: [
@@ -117,14 +117,14 @@ import { FooterComponent } from './footer/footer.component';
     ConnectionDialogComponent,
     ReceiveFileDialogComponent,
     InitiateConnectionDialogComponent,
-    // QRCodeComponent,
+    QRCodeComponent,
   ],
   imports: [
     BrowserModule,
     FormsModule,
     ReactiveFormsModule,
     HttpClientModule,
-    QRCodeModule,
+    QRCodeModule, // QR Module
 
     LocalStorageModule.withConfig({
         prefix: 'app',
