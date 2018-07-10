@@ -1,3 +1,4 @@
+<br>
 <div style="text-align:center">
   <h1>
     Welcome to {{ title }}!
@@ -13,9 +14,19 @@
 
 <div class="connect">  
   <div class="container">
+      <div class="row">
+          <div class="col-md-12">
+              <h3>1. Connect</h3>
+          </div>
+     </div>
     <div class="row">
-      <div class="col-sm-9">
-          <h3>1. Connect</h3>
+      <div class="col-md-4">
+        <!-- <div class="text-center"> -->
+          <app-qr></app-qr>
+        <!-- </div> -->
+      </div>
+      <!-- pull-md-9 -->
+      <div class="col-md-8">
           People can connect to this device by going to: <a [href]="sendZeroService.connectionLink" target="_blank">{{sendZeroService.connectionLink}}</a>
           <br>
           <b>{{sendZeroService.prompt}}</b>
@@ -30,15 +41,15 @@
           </button>
         </div>
       </div>
-      <div class="col-sm-3">
-          <app-qr></app-qr> <!-- QR Code image -->
-      </div>
+      <!-- <div class="col-sm-3 .offset-md-2">
+          <app-qr></app-qr>
+      </div> -->
     </div>
   </div>
 </div>
 
 <br>
-<mat-divider></mat-divider>
+<!-- <mat-divider></mat-divider> -->
 <br>
 <div class="send"  *ngIf="JSObject.keys(peers).length !== 0">
 
