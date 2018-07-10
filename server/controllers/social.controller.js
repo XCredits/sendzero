@@ -1,25 +1,28 @@
 'use strict';
 // The social controller intercepts scrapers and serves new URLs
+// The social controller should explicitly state the routes that it is
+// intercepting.
 
 const socialLinks = require('./social-links.controller');
-
-const socialDefaults = {
-  url: process.env.URL_ORIGIN,
-  title: process.env.SITE_NAME,
-  description: process.env.SITE_NAME,
-  image: '/assets/img/social-default.jpg',
-};
+const path = require('path');
+const fs = require('fs');
 
 module.exports = function(req, res, next) {
   let ua = req.headers['user-agent'];
-  if (typeof ua === 'string') {
+  const linkDetails = socialLinks(req.path);
+  if (typeof ua === 'string' && linkDetails) {
     ua = ua.toLowerCase();
     if (ua.includes('facebookexternalhit') ||
         ua.includes('facebot') ||
         ua.includes('linkedinbot') ||
         ua.includes('twitterbot') ) {
-      const customLink = socialLinks(req.path);
-      return res.send(html(customLink ? customLink : socialDefaults));
+      return res.send(html(linkDetails));
+    } else if (ua.includes('googlebot')) {
+      const filePath = path.join(__dirname, '../../dist/assets/cache/'
+          + linkDetails.path + '.html');
+      if (fs.existsSync(filePath)) {
+        return res.sendFile(filePath);
+      }
     }
   }
   next();

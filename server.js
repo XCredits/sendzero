@@ -10,6 +10,8 @@ const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 const socialController = require('./server/controllers/social.controller');
 const routes = require('./server/routes');
+const SignalService = require('./server/services/signal.service');
+const socketIO = require('socket.io');
 
 app.use(bodyParser.urlencoded({extended: true})); // extended gives full JSON
 app.use(bodyParser.json());
@@ -40,12 +42,9 @@ app.use('/', function(req, res, next) {
   next();
 });
 
-app.use(express.static(path.join(__dirname, 'dist')));
-
-const port = process.env.PORT || '3000';
-app.set('port', port);
-
 app.use(socialController);
+
+app.use(express.static(path.join(__dirname, 'dist')));
 
 routes(app);
 
@@ -57,20 +56,13 @@ app.post('*', function(req, res) {
   res.status(404).json({message: 'Route not found.'});
 });
 
+const port = process.env.PORT || '3000';
+app.set('port', port);
+
 const server = http.createServer(app);
-const io = require('socket.io')(server);
-const signalServer = require('simple-signal-server')(io); // eslint-disable-line
-
-io.on('connection', (socket) => {
-  socket.on('request declined', (request) => {
-    request.declinedBy = socket.id;
-    io.sockets.connected[request.id].emit('request declined', request);
-  });
-  signalServer.on('disconnect', (disconnectedSocket) => {
-    socket.emit('peer disconnected', disconnectedSocket.id);
-  });
-});
-
+const io = socketIO(server);
+// eslint-disable-next-line
+const signalServer = new SignalService(io);
 
 server.listen(port, function() {
   console.log(`Running on localhost:${port}`);

@@ -4,6 +4,7 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { Observable } from 'rxjs/Observable';
 import { Subscription } from 'rxjs/Subscription';
 import { SendZeroService } from '../send-zero.service';
+import { UserService } from '../user.service';
 import { FormGroup, FormControl } from '@angular/forms';
 import { OnDestroy } from '@angular/core/src/metadata/lifecycle_hooks';
 import { UploadEvent, UploadFile, FileSystemFileEntry } from 'ngx-file-drop';
@@ -26,10 +27,12 @@ export class HomeComponent implements OnInit, OnDestroy {
   sub: Subscription;
   @ViewChild('fileInput') fileInput;
   @ViewChild(MatTable) table: MatTable<any>;
-  columnsToDisplay: string[] = ['select', 'peerId', 'status', 'files'];
+  columnsToDisplay: string[] = ['select', 'humanId', 'status', 'files'];
   selection: SelectionModel<any>;
   sendError = '';
   fileError = '';
+  user: User;
+  isLoggedIn: boolean;
 
   // Untyped defs
   file;
@@ -40,9 +43,10 @@ export class HomeComponent implements OnInit, OnDestroy {
   constructor(private ref: ChangeDetectorRef,
               private sanitizer: DomSanitizer,
               public sendZeroService: SendZeroService,
+              private userService: UserService,
               private route: ActivatedRoute,
               private router: Router) {
-    this.title = 'SendZero Alpha';
+    this.title = 'SendZero';
     // this.fileForm = new FormGroup({
     //   selectFile: new FormControl(),
     // });
@@ -56,19 +60,17 @@ export class HomeComponent implements OnInit, OnDestroy {
   sendFile(): void {
     // const fileInput = this.fileForm.get('selectFile').value;
     if (!this.file) {
-      this.sendError = 'Please select a file first!';
+      this.sendZeroService.openSnackBar('Please select a file first!');
       return;
     }
     if (!this.selection.selected[0]) {
-      this.sendError = 'Please select a peer first!';
+      this.sendZeroService.openSnackBar('Please select a peer first!');
       return;
     }
-    this.sendError = '';
     this.sendZeroService.sendFile(this.file, this.selection.selected[0]);
   }
 
   ngOnInit(): void {
-    this.sendZeroService.init();
     this.sub = this.route.queryParams.subscribe(params => {
         const peerId = params['id'] || '';
         if (peerId.length > 0) {
@@ -81,6 +83,11 @@ export class HomeComponent implements OnInit, OnDestroy {
           this.table.renderRows();
         }
     });
+    this.userService.userObservable
+        .subscribe(user => {
+          this.user = user;
+          this.isLoggedIn = !!this.user;
+        });
   }
 
   // TODO: Set prompts
@@ -118,3 +125,15 @@ export class HomeComponent implements OnInit, OnDestroy {
   }
 
 }
+
+
+interface User {
+  id: string;
+  username: string;
+  givenName: string;
+  familyName: string;
+  email: string;
+  isLoggedIn: boolean;
+  isAdmin: boolean;
+}
+

@@ -7,7 +7,9 @@ import { LocalStorageModule } from 'angular-2-local-storage';
 import { QRCodeModule } from 'angularx-qrcode'; // QRcode
 import { AppComponent } from './app.component';
 import { UserService } from './user.service';
-import { SendZeroService, ConnectionDialogComponent, ReceiveFileDialogComponent } from './send-zero.service';
+import { SignalService } from './signal.service';
+import { SendZeroService } from './send-zero.service';
+import { ConnectionDialogComponent, ReceiveFileDialogComponent, InitiateConnectionDialogComponent } from './send-zero.service';
 import { StatsService } from './stats.service';
 import { AnalyticsService } from './analytics.service';
 import { AuthGuard } from './auth.guard';
@@ -114,6 +116,7 @@ import { FooterComponent } from './footer/footer.component';
     FooterComponent,
     ConnectionDialogComponent,
     ReceiveFileDialogComponent,
+    InitiateConnectionDialogComponent,
     // QRCodeComponent,
   ],
   imports: [
@@ -224,7 +227,9 @@ import { FooterComponent } from './footer/footer.component';
       },
       { // Default route
         path: '',
-        redirectTo: '/home',
+        component: HomeComponent,
+        data: { title: 'Home' },
+        // redirectTo: '/home',
         pathMatch: 'full',
       },
       {
@@ -281,9 +286,11 @@ import { FooterComponent } from './footer/footer.component';
   // For dialogs
   entryComponents: [
     ConnectionDialogComponent,
-    ReceiveFileDialogComponent
+    ReceiveFileDialogComponent,
+    InitiateConnectionDialogComponent,
   ],
   providers: [
+    SignalService,
     SendZeroService,
     UserService,
     StatsService,

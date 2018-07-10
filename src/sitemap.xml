@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="https://www.sitemaps.org/schemas/sitemap/0.9" 
+  xmlns:image="https://sendzero.net/assets/img/social-default.jpg">
+  <url> 
+    <loc>https://sendzero.net/</loc> 
+    <image:image>
+       <image:loc>https://sendzero.net/assets/img/social-default.jpg</image:loc>
+       <image:caption>SendZero</image:caption>
+    </image:image>
+  </url>
+  <url> 
+    <loc>https://sendzero.net/privacy</loc> 
+    <image:image>
+       <image:loc>https://sendzero.net/assets/img/social-default.jpg</image:loc>
+       <image:caption>SendZero</image:caption>
+    </image:image>
+  </url>
+  <url> 
+    <loc>https://sendzero.net/terms</loc> 
+    <image:image>
+       <image:loc>https://sendzero.net/assets/img/social-default.jpg</image:loc>
+       <image:caption>SendZero</image:caption>
+    </image:image>
+  </url>
+</urlset>
