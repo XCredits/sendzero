@@ -10,117 +10,138 @@
     <input align="center" matInput disabled type="text" name="id" id="id" [(ngModel)]="sendZeroService.humanId">
   </mat-form-field>
 </div>
-<div class="connect">
-  <h3>1. Connect</h3>
-  People can connect to this device by going to: <a [href]="sendZeroService.connectionLink" target="_blank">{{sendZeroService.connectionLink}}</a>
-  <br>
-  <b>{{sendZeroService.prompt}}</b>
-  <br>
-  <div class="connectionBox">
-    <mat-form-field>
-      <input matInput placeholder="Device ID" type="text" name="peerId" id="peerId" [(ngModel)]="sendZeroService.peerToConnectTo">
-    </mat-form-field>
-    &nbsp;
-    <button mat-raised-button required color="primary" (click)="connectToPeer()" id="connectButton" name="connectButton" class="connectButton" [disabled]="sendZeroService.disableConnectButton">
-      {{sendZeroService.connectButtonText}}
-    </button>
+
+<div class="connect">  
+  <div class="container">
+    <div class="row">
+      <div class="col-sm-9">
+          <h3>1. Connect</h3>
+          People can connect to this device by going to: <a [href]="sendZeroService.connectionLink" target="_blank">{{sendZeroService.connectionLink}}</a>
+          <br>
+          <b>{{sendZeroService.prompt}}</b>
+          <br>
+        <div class="connectionBox">
+          <mat-form-field>
+            <input matInput placeholder="Device ID" type="text" name="peerId" id="peerId" [(ngModel)]="sendZeroService.peerToConnectTo">
+          </mat-form-field>
+          &nbsp;
+          <button mat-raised-button required color="primary" (click)="connectToPeer()" id="connectButton" name="connectButton" class="connectButton" [disabled]="sendZeroService.disableConnectButton">
+            {{sendZeroService.connectButtonText}}
+          </button>
+        </div>
+      </div>
+      <div class="col-sm-3">
+          <app-qr></app-qr> <!-- QR Code image -->
+      </div>
+    </div>
   </div>
 </div>
+
 <br>
 <mat-divider></mat-divider>
 <br>
 <div class="send"  *ngIf="JSObject.keys(peers).length !== 0">
-  <h3>2. Just send it!</h3>
-  Select a device from the list below to send a file!
-  <br>
-  <!-- <mat-grid-list cols="3" rowHeight="2:1">
-    <mat-grid-tile *ngFor="let peerId of JSObject.keys(peers)">
-      <mat-card class="peerCard">
-        <mat-card-header>
-          <div mat-card-avatar>
-            <div *ngIf="peers[peerId].isMobile">
-              <mat-icon>smartphone</mat-icon>
-            </div>
-            <div *ngIf="!peers[peerId].isMobile">
-              <mat-icon>computer</mat-icon>
-            </div>
-          </div>
-          <mat-card-title><b>{{peers[peerId].humanId}}</b></mat-card-title>
-        </mat-card-header>
-        <mat-card-content class="cardContent">
-          {{peers[peerId].prompt}}
-          <div *ngFor="let file of peers[peerId].files" class="fileList">
-            <div class="receiveBox" id="receiveBox" *ngIf="file.maxFileChunks !== 0">
-              <mat-progress-bar *ngIf="file.fileReadyForDownload === false"    
-                  diameter="50"
-                  mode="determinate"
-                  [value]="file.receivedChunks*100/file.maxFileChunks">
-              </mat-progress-bar>
-              <div *ngIf="file.fileReadyForDownload">
-                  <a target="_blank" [href]="file.url" [download]="file.name">Click here to download file {{file.name}}</a>
+
+    <div class="connect">  
+        <div class="container">
+          <div class="row">
+            <div class="col-sm-12">
+                
+                <h3>2. Just send it!</h3>
+                Select a device from the list below to send a file!
+                <br>
+                <!-- <mat-grid-list cols="3" rowHeight="2:1">
+                  <mat-grid-tile *ngFor="let peerId of JSObject.keys(peers)">
+                    <mat-card class="peerCard">
+                      <mat-card-header>
+                        <div mat-card-avatar>
+                          <div *ngIf="peers[peerId].isMobile">
+                            <mat-icon>smartphone</mat-icon>
+                          </div>
+                          <div *ngIf="!peers[peerId].isMobile">
+                            <mat-icon>computer</mat-icon>
+                          </div>
+                        </div>
+                        <mat-card-title><b>{{peers[peerId].humanId}}</b></mat-card-title>
+                      </mat-card-header>
+                      <mat-card-content class="cardContent">
+                        {{peers[peerId].prompt}}
+                        <div *ngFor="let file of peers[peerId].files" class="fileList">
+                          <div class="receiveBox" id="receiveBox" *ngIf="file.maxFileChunks !== 0">
+                            <mat-progress-bar *ngIf="file.fileReadyForDownload === false"    
+                                diameter="50"
+                                mode="determinate"
+                                [value]="file.receivedChunks*100/file.maxFileChunks">
+                            </mat-progress-bar>
+                            <div *ngIf="file.fileReadyForDownload">
+                                <a target="_blank" [href]="file.url" [download]="file.name">Click here to download file {{file.name}}</a>
+                            </div>
+                          </div>
+                        </div>   
+                      </mat-card-content>
+                    </mat-card>
+                  </mat-grid-tile>
+                </mat-grid-list> -->
+                <table mat-table [dataSource]="JSObject.keys(peers)" class="mat-elevation-z8">
+                  <ng-container matColumnDef="select">
+                    <th mat-header-cell *matHeaderCellDef> Select to send file </th>
+                    <td mat-cell *matCellDef="let peerId">
+                      <mat-radio-button (click)="$event.stopPropagation()"
+                                    (change)="$event ? selection.toggle(peerId) : null"
+                                    [value]="selection.isSelected(peerId)">
+                      </mat-radio-button>
+                    </td>
+                  </ng-container>
+                  <ng-container matColumnDef="humanId">
+                    <th mat-header-cell *matHeaderCellDef> Device ID </th>
+                    <td mat-cell *matCellDef="let peerId"> {{peers[peerId].humanId}} </td>
+                  </ng-container>  
+                  <ng-container matColumnDef="status">
+                    <th mat-header-cell *matHeaderCellDef> Status </th>
+                    <td mat-cell *matCellDef="let peerId">{{peers[peerId].prompt}}</td> 
+                  </ng-container>
+                  <ng-container matColumnDef="files">
+                    <th mat-header-cell *matHeaderCellDef> Received files </th>
+                    <td mat-cell *matCellDef="let peerId">
+                      <div *ngFor="let file of peers[peerId].files">
+                        <div class="receiveBox" id="receiveBox" *ngIf="file.maxFileChunks !== 0">
+                          <mat-progress-bar *ngIf="file.fileReadyForDownload === false"    
+                              diameter="50"
+                              mode="determinate"
+                              [value]="file.receivedChunks*100/file.maxFileChunks">
+                          </mat-progress-bar>
+                          <div *ngIf="file.fileReadyForDownload">
+                              <a target="_blank" [href]="file.url" [download]="file.name">{{file.name}}</a>
+                          </div>
+                        </div>
+                      </div>
+                    </td> 
+                  </ng-container>
+                  
+                  <tr mat-header-row *matHeaderRowDef="columnsToDisplay"></tr>
+                  <tr mat-row *matRowDef="let row; columns: columnsToDisplay;"></tr>
+                </table>
+                <br>
+                <div *ngIf="JSObject.keys(peers).length !== 0 && !sendZeroService.disableFileSending" class="filePicker">
+                  <file-drop style="cursor: pointer; text-align: center" (click)="openFileInput()" headertext="{{file ? file.name + '&emsp;' +  (file.size | byteFormat) : 'Drag file here!'}}" (onFileDrop)="fileDropped($event)">
+                      <!-- <span>optional content (don't set headertext then)</span> -->
+                  </file-drop>
+                  <input type='file' style='visibility: hidden' (change)="fileChanged($event)" #fileInput>
+                  <div *ngIf="fileError !== ''">
+                    {{ fileError }}
+                  </div>
+                  <br>  
+                  <div class="sendFileButton">
+                    <button mat-raised-button color="primary" id="sendFileButton" name="sendFileButton" class="sendFileButton" (click)="sendFile()" [disabled]="sendZeroService.disableSendButton">Send File</button>
+                  </div>
+                  <!-- <div *ngIf="sendError !== ''">
+                      {{ sendError }}
+                  </div> -->
+                </div>
+
               </div>
             </div>
-          </div>   
-        </mat-card-content>
-      </mat-card>
-    </mat-grid-tile>
-  </mat-grid-list> -->
-  <table mat-table [dataSource]="JSObject.keys(peers)" class="mat-elevation-z8">
-    <ng-container matColumnDef="select">
-      <th mat-header-cell *matHeaderCellDef> Select to send file </th>
-      <td mat-cell *matCellDef="let peerId">
-        <mat-radio-button (click)="$event.stopPropagation()"
-                      (change)="$event ? selection.toggle(peerId) : null"
-                      [value]="selection.isSelected(peerId)">
-        </mat-radio-button>
-      </td>
-    </ng-container>
-    <ng-container matColumnDef="humanId">
-      <th mat-header-cell *matHeaderCellDef> Device ID </th>
-      <td mat-cell *matCellDef="let peerId"> {{peers[peerId].humanId}} </td>
-    </ng-container>  
-    <ng-container matColumnDef="status">
-      <th mat-header-cell *matHeaderCellDef> Status </th>
-      <td mat-cell *matCellDef="let peerId">{{peers[peerId].prompt}}</td> 
-    </ng-container>
-    <ng-container matColumnDef="files">
-      <th mat-header-cell *matHeaderCellDef> Received files </th>
-      <td mat-cell *matCellDef="let peerId">
-        <div *ngFor="let file of peers[peerId].files">
-          <div class="receiveBox" id="receiveBox" *ngIf="file.maxFileChunks !== 0">
-            <mat-progress-bar *ngIf="file.fileReadyForDownload === false"    
-                diameter="50"
-                mode="determinate"
-                [value]="file.receivedChunks*100/file.maxFileChunks">
-            </mat-progress-bar>
-            <div *ngIf="file.fileReadyForDownload">
-                <a target="_blank" [href]="file.url" [download]="file.name">{{file.name}}</a>
-            </div>
           </div>
-        </div>
-      </td> 
-    </ng-container>
-    
-    <tr mat-header-row *matHeaderRowDef="columnsToDisplay"></tr>
-    <tr mat-row *matRowDef="let row; columns: columnsToDisplay;"></tr>
-  </table>
-  <br>
-  <div *ngIf="JSObject.keys(peers).length !== 0 && !sendZeroService.disableFileSending" class="filePicker">
-    <file-drop style="cursor: pointer; text-align: center" (click)="openFileInput()" headertext="{{file ? file.name + '&emsp;' +  (file.size | byteFormat) : 'Drag file here!'}}" (onFileDrop)="fileDropped($event)">
-        <!-- <span>optional content (don't set headertext then)</span> -->
-    </file-drop>
-    <input type='file' style='visibility: hidden' (change)="fileChanged($event)" #fileInput>
-    <div *ngIf="fileError !== ''">
-      {{ fileError }}
-    </div>
-    <br>  
-    <div class="sendFileButton">
-      <button mat-raised-button color="primary" id="sendFileButton" name="sendFileButton" class="sendFileButton" (click)="sendFile()" [disabled]="sendZeroService.disableSendButton">Send File</button>
-    </div>
-    <!-- <div *ngIf="sendError !== ''">
-        {{ sendError }}
-    </div> -->
-  </div>
+      </div>
 </div>
 
-<app-qr></app-qr>
