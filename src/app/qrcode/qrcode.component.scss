@@ -1,29 +1,6 @@
-// .qr {
-//   // padding: 20px;
-//   // padding: 10%;
-//   // background-color: blue;
-//   // max-width: 100%;
-// }
-
-// qrcode {
-//   padding-right: 15px;
-//   max-width: 100%;
-//   // display: block;
-  
-//   /* display: inline-block; */
-//   /* margin: 25px 10px; */
-// }
-
-// img {
-//   width: 100%;
-//   display: '';
-// }
 
 @media (max-width: 767px) {
   .qr {
-      // background-color: lightblue;
       padding-left: calc(50% - 64px);
-      // padding-right: calc(50% + 128px);
-      // justify-content: center;
   }
 }
