@@ -41,7 +41,6 @@ export class SendZeroService {
   // public user: User;
   // public isLoggedIn: boolean;
 
-
   // Untyped definitions
   private socket: any;
   // Maybe interface this
@@ -58,6 +57,7 @@ export class SendZeroService {
     this.disableConnectButton = true;
     this.connectButtonText = 'Connect';
     this.humanId = this.createHumanId();
+    this.connectionLink = window.location.origin + '/?id=' + this.humanId;
    }
 
   public init(): void {
@@ -114,10 +114,10 @@ export class SendZeroService {
     });
   }
 
+  // This method has to be called before QR generation
   private handleSignalClientReadyState(): void {
     this.prompt = 'You can connect to a device by entering its ID below.';
     this.id = this.signalService.id;
-    this.connectionLink = window.location.origin + '/home?id=' + this.humanId;
     this.ref.tick();
     this.disableConnectButton = false;
   }
