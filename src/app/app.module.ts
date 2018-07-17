@@ -4,7 +4,8 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { HttpClientModule} from '@angular/common/http'; // Deprecation https://angular.io/api/http/HttpModule
 import { RouterModule } from '@angular/router';
 import { LocalStorageModule } from 'angular-2-local-storage';
-import { QRCodeModule } from 'angularx-qrcode'; // QRcode
+import { QRCodeModule } from 'angularx-qrcode'; // QRcode Generator
+import { ZXingScannerModule } from '@zxing/ngx-scanner'; // QRCode Scanner
 import { AppComponent } from './app.component';
 import { UserService } from './user.service';
 import { SignalService } from './signal.service';
@@ -125,6 +126,8 @@ import { QRCodeComponent } from './qrcode/qrcode.component';
     ReactiveFormsModule,
     HttpClientModule,
     QRCodeModule, // QR Module
+    // ZXingScannerModule,
+    ZXingScannerModule.forRoot(),
 
     LocalStorageModule.withConfig({
         prefix: 'app',
