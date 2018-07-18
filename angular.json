@@ -27,7 +27,8 @@
               "src/styles.scss",
               "node_modules/font-awesome/scss/font-awesome.scss"
             ],
-            "scripts": []
+            "scripts": [
+            ]
           },
           "configurations": {
             "production": {

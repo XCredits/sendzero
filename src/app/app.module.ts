@@ -15,7 +15,7 @@ import { StatsService } from './stats.service';
 import { AnalyticsService } from './analytics.service';
 import { AuthGuard } from './auth.guard';
 import { AdminGuard } from './admin.guard';
-
+import { BrowserQRCodeReader, VideoInputDevice } from '@zxing/library';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 // import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
 import { AngularFontAwesomeModule } from 'angular-font-awesome';
@@ -127,7 +127,8 @@ import { QRCodeComponent } from './qrcode/qrcode.component';
     HttpClientModule,
     QRCodeModule, // QR Module
     // ZXingScannerModule,
-    ZXingScannerModule.forRoot(),
+    ZXingScannerModule,
+    // BrowserQRCodeReader,
 
     LocalStorageModule.withConfig({
         prefix: 'app',
@@ -139,6 +140,7 @@ import { QRCodeComponent } from './qrcode/qrcode.component';
         path: 'home',
         component: HomeComponent,
         data: { title: 'Home' },
+        // Potentially add qr scanner javadscript here
       },
       // {
       //   path: 'qrcode',

@@ -44,7 +44,7 @@ app.use('/', function(req, res, next) {
 
 app.use(socialController);
 
-app.use(express.static(path.join(__dirname, 'dist')));
+app.use(express.static(path.join(__dirname, 'dist'))); // We can access any file here
 
 routes(app);
 

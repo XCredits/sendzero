@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, ChangeDetectorRef } from '@angular/core';
+import { Component, VERSION, OnInit, ViewChild, ChangeDetectorRef } from '@angular/core';
 import { DomSanitizer } from '@angular/platform-browser';
 import { Router, ActivatedRoute } from '@angular/router';
 import { Observable } from 'rxjs/Observable';
@@ -11,6 +11,13 @@ import { UploadEvent, UploadFile, FileSystemFileEntry } from 'ngx-file-drop';
 import { MatTable } from '@angular/material';
 import { isEmpty } from 'lodash';
 import { SelectionModel } from '@angular/cdk/collections';
+import { BrowserQRCodeReader, VideoInputDevice } from '@zxing/library';
+// import { Injectable } from '@angular/core';
+import { ZXingScannerModule } from '@zxing/ngx-scanner';
+import { ZXingScannerComponent } from '@zxing/ngx-scanner/zxing-ngx-scanner';
+
+import { Result } from '@zxing/library';
+
 
 @Component({
   selector: 'app-home',
@@ -34,6 +41,21 @@ export class HomeComponent implements OnInit, OnDestroy {
   user: User;
   isLoggedIn: boolean;
   // parentMesage = 'lol'; // get the url here
+  // codeReader: BrowserQRCodeReader = new BrowserQRCodeReader();
+
+  ngVersion = VERSION.full;
+
+  // @ViewChild('scanner')
+  //   scanner: ZXingScannerComponent;
+
+  // hasDevices: boolean;
+  //   hasPermission: boolean;
+  //   qrResultString: string;
+  //   qrResult: Result;
+
+  //   availableDevices: MediaDeviceInfo[];
+  //   currentDevice: MediaDeviceInfo;
+
 
   // Untyped defs
   file;
@@ -58,6 +80,15 @@ export class HomeComponent implements OnInit, OnDestroy {
       new SelectionModel<any>(allowMultiSelect, initialSelection);
   }
 
+  // getVideoInputDevices(): void {
+  //   this.codeReader.getVideoInputDevices().then(videoInputDevices => {
+  //       videoInputDevices.forEach(
+  //           device => console.log(`${device.label}, ${device.deviceId}`)
+  //       );
+  //   })
+  //   .catch(err => console.error(err));
+  // }
+
   sendFile(): void {
     // const fileInput = this.fileForm.get('selectFile').value;
     if (!this.file) {
@@ -72,7 +103,11 @@ export class HomeComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    this.sub = this.route.queryParams.subscribe(params => {
+    // this.scanner.camerasFound.subscribe((devices: MediaDeviceInfo[]) => this.availableDevices = devices);
+    //     this.scanner.hasDevices.subscribe((has: boolean) => this.hasDevices = has);
+    //     this.scanner.scanComplete.subscribe((result: Result) => this.qrResult = result);
+    //     this.scanner.permissionResponse.subscribe((perm: boolean) => this.hasPermission = perm);  
+        this.sub = this.route.queryParams.subscribe(params => {
         const peerId = params['id'] || '';
         if (peerId.length > 0) {
           this.sendZeroService.setConnectToPeerId(peerId);
@@ -90,6 +125,37 @@ export class HomeComponent implements OnInit, OnDestroy {
           this.isLoggedIn = !!this.user;
         });
   }
+
+//   displayCameras(cameras: MediaDeviceInfo[]) {
+//     console.debug('Devices: ', cameras);
+//     this.availableDevices = cameras;
+// }
+
+// handleQrCodeResult(resultString: string) {
+//     console.debug('Result: ', resultString);
+//     this.qrResultString = resultString;
+// }
+
+// onDeviceSelectChange(selectedValue: string) {
+//     console.debug('Selection changed: ', selectedValue);
+//     this.currentDevice = this.scanner.getDeviceById(selectedValue);
+// }
+
+// stateToEmoji(state: boolean): string {
+
+//     const states = {
+//         // not checked
+//         undefined: '❔',
+//         // failed to check
+//         null: '⭕',
+//         // success
+//         true: '✔',
+//         // can't touch that
+//         false: '❌'
+//     };
+
+//     return states['' + state];
+// }
 
   // TODO: Set prompts
   fileDropped(event: UploadEvent): void {
@@ -125,7 +191,7 @@ export class HomeComponent implements OnInit, OnDestroy {
     this.sendZeroService.connectToPeer();
   }
 
-}
+  }
 
 interface User {
   id: string;
