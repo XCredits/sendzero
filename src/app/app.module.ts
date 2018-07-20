@@ -88,6 +88,7 @@ import { TermsComponent } from './terms/terms.component';
 import { PrivacyComponent } from './privacy/privacy.component';
 import { FooterComponent } from './footer/footer.component';
 import { QRCodeComponent } from './qrcode/qrcode.component';
+import { QRScannerComponent } from './qrscanner/qrscanner.component';
 
 @NgModule({
   declarations: [
@@ -119,6 +120,7 @@ import { QRCodeComponent } from './qrcode/qrcode.component';
     ReceiveFileDialogComponent,
     InitiateConnectionDialogComponent,
     QRCodeComponent,
+    QRScannerComponent,
   ],
   imports: [
     BrowserModule,

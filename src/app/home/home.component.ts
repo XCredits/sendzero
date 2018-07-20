@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, ChangeDetectorRef } from '@angular/core';
+import { Component, ViewChild, ViewEncapsulation, OnInit, ChangeDetectorRef } from '@angular/core';
 import { DomSanitizer } from '@angular/platform-browser';
 import { Router, ActivatedRoute } from '@angular/router';
 import { Observable } from 'rxjs/Observable';
@@ -33,7 +33,6 @@ export class HomeComponent implements OnInit, OnDestroy {
   fileError = '';
   user: User;
   isLoggedIn: boolean;
-  // parentMesage = 'lol'; // get the url here
 
   // Untyped defs
   file;
