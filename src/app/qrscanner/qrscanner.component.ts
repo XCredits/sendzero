@@ -12,9 +12,6 @@ export class QRScannerComponent implements OnInit {
     @ViewChild(QrScannerComponent) qrScannerComponent: QrScannerComponent ;
     @Input() resultLink: string = null;
     constructor (private sendZeroService: SendZeroService) {
-        // assign a value
-        // this.link = 'Your QR code data string';
-        // this.link = sendZeroService.connectionLink;
     }
 
     ngOnInit() {

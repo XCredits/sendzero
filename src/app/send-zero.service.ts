@@ -8,6 +8,7 @@ import { SignalService } from './signal.service';
 import { isEmpty } from 'lodash';
 import adjectives from './adjectives';
 import animals from './animals';
+import { Router, UrlTree, UrlSegmentGroup, UrlSegment, PRIMARY_OUTLET } from '../../node_modules/@angular/router';
 // import { UserService } from './user.service';
 // TODO: find out why import doesn't work
 const shortid = require('shortid');
@@ -29,6 +30,7 @@ if (String(window.location.hostname) === 'localhost') {
 export class SendZeroService {
   // Typed definitions
   public id: string;
+  public peerToConnectToURL: string;
   public peerToConnectTo: string;
   public prompt: string;
   public connectionLink: string;
@@ -46,18 +48,21 @@ export class SendZeroService {
   // Maybe interface this
   private peers: any;
   public peerSubject = new BehaviorSubject(this.peers);
+  // router: Router;
 
   constructor(private ref: ApplicationRef,
               private signalService: SignalService,
               private sanitizer: DomSanitizer,
               public dialog: MatDialog,
-              public snackBar: MatSnackBar) {
+              public snackBar: MatSnackBar,
+              private router: Router) {
     this.id = '';
     this.prompt = 'Please wait...';
     this.disableConnectButton = true;
     this.connectButtonText = 'Connect';
     this.humanId = this.createHumanId();
-    this.connectionLink = window.location.origin + '/?id=' + this.humanId;
+    this.connectionLink = window.location.origin + '/?id=' + this.humanId; // Creates connection link
+    // this.router = router;
    }
 
   public init(): void {
@@ -568,8 +573,18 @@ export class SendZeroService {
 
   // Add a method that will update device id when using qr scanner
   public removeURLFromPeer(url: string): string {
-    const id: string = url;
-    return id;
+
+    let peerToConnectToURL = url;
+    if (url.startsWith('http://')) {
+      peerToConnectToURL = url.substring(7, url.length);
+    } else if (url.startsWith('https://')) {
+      peerToConnectToURL = url.substring(8, url.length);
+    }
+
+    const tree: UrlTree = this.router.parseUrl(peerToConnectToURL);
+    console.log(tree.queryParams['id']);
+    peerToConnectToURL = tree.queryParams['id'];
+    return peerToConnectToURL;
   }
 
   // In case we get id from URL
