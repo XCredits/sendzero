@@ -566,6 +566,12 @@ export class SendZeroService {
     return this.id;
   }
 
+  // Add a method that will update device id when using qr scanner
+  public removeURLFromPeer(url: string): string {
+    const id: string = url;
+    return id;
+  }
+
   // In case we get id from URL
   public setConnectToPeerId(id: string): void {
     this.peerToConnectTo = id;
@@ -664,6 +670,7 @@ export class SendZeroService {
     });
   }
 
+  // This creates a popup asking user to connect to device
   public openInitiateConnectionDialog(peerId: string): void {
     const dialogRef = this.dialog.open(InitiateConnectionDialogComponent, {
       data: {humanId: peerId},
@@ -675,6 +682,7 @@ export class SendZeroService {
       }
     });
   }
+
 }
 
 // Connection dialog component
