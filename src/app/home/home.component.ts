@@ -33,7 +33,6 @@ export class HomeComponent implements OnInit, OnDestroy {
   fileError = '';
   user: User;
   isLoggedIn: boolean;
-  // parentMesage = 'lol'; // get the url here
 
   // Untyped defs
   file;

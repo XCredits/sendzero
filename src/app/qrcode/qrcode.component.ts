@@ -10,8 +10,6 @@ import { SendZeroService } from '../send-zero.service';
 export class QRCodeComponent implements OnInit {
     @Input() link: string = null;
     constructor (private sendZeroService: SendZeroService) {
-        // assign a value
-        // this.link = 'Your QR code data string';
         this.link = sendZeroService.connectionLink;
     }
 

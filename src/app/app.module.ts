@@ -137,11 +137,6 @@ import { QRCodeComponent } from './qrcode/qrcode.component';
         component: HomeComponent,
         data: { title: 'Home' },
       },
-      // {
-      //   path: 'qrcode',
-      //   component: QRCodeComponent,
-      //   data: { title: 'QR Code' },
-      // },
       {
         path: 'feed',
         component: FeedComponent,
