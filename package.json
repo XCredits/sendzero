@@ -55,7 +55,7 @@
     "moment": "^2.22.1",
     "mongoose": "^5.0.16",
     "ngx-file-drop": "^4.0.4",
-    "ngx-material-file-input": "^0.1.0",
+    "ngx-material-file-input": "^0.2.0",
     "node-sass": "^4.9.0",
     "nodemon": "^1.17.4",
     "passport": "^0.4.0",
