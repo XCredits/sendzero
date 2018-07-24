@@ -38,9 +38,22 @@
           </button>
         </div>
       </div>
+      
+      <div class="col-md-8">
+      <div class="connectionBox">
+        <!-- <mat-form-field>
+          <input matInput placeholder="Device ID" type="text" name="peerId" id="peerId" [(ngModel)]="sendZeroService.peerToConnectTo">
+        </mat-form-field>
+        &nbsp; -->
+        <!-- [disabled]="sendZeroService.disableConnectButton" -->
+        <button mat-raised-button required color="primary" (click)="openQRScanner()" name="connectButton" class="connectButton">
+          {{sendZeroService.qrscannerButtonText}}
+        </button>
+      </div>
+    </div>
+
       <!-- The button is pressed to generate popup qrscanner which can be closed -->
-      <button>QR Scanner</button>
-      <app-qrscan></app-qrscan>
+      <!-- <app-qrscan></app-qrscan> -->
     </div>
   </div>
 </div>

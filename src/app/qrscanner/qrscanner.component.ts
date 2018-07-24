@@ -16,6 +16,7 @@ export class QRScannerComponent implements OnInit {
     }
 
     ngOnInit() {
+        console.log('QR Scanner Starting!');
         this.qrScannerComponent.getMediaDevices()
           .then(devices => {
             console.log(devices);

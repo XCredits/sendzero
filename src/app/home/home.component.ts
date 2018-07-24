@@ -127,6 +127,10 @@ export class HomeComponent implements OnInit, OnDestroy {
     this.sendZeroService.connectToPeer();
   }
 
+  openQRScanner(): void {
+    this.sendZeroService.openQRScanner();
+  }
+
 }
 
 interface User {

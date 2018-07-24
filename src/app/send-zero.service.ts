@@ -38,6 +38,7 @@ export class SendZeroService {
   public connectionLink: string;
   public disableConnectButton: boolean;
   public connectButtonText: string;
+  public qrscannerButtonText: string;
   public disableSendButton: boolean;
   public disableFileSending = false;
   public humanId: string;
@@ -62,6 +63,7 @@ export class SendZeroService {
     this.prompt = 'Please wait...';
     this.disableConnectButton = true;
     this.connectButtonText = 'Connect';
+    this.qrscannerButtonText = 'QRScanner';
     this.humanId = this.createHumanId();
     this.connectionLink = window.location.origin + '/?id=' + this.humanId; // Creates connection link
     // this.router = router;
@@ -569,6 +571,27 @@ export class SendZeroService {
     this.signalService.connect(peerId);
   }
 
+  public openQRScanner(): void {
+    // const peerId = this.peerToConnectTo.trim();
+    // if (peerId.length < 1) {
+    //   return;
+    // }
+    // this.disableConnectButton = true;
+    // this.connectButtonText = 'Looking for device!';
+    // this.peers[peerId] = {
+    //   prompt: 'Trying to connect to peer. '
+    //       + 'If you\'re unable to connect after a few minutes, '
+    //       + 'please check that you have entered the ID correctly.'
+    // };
+    // if (Object.keys(this.peers).length === 1) {
+    //   this.disableFileSending = true;
+    //   this.ref.tick();
+    // }
+    // this.signalService.connect(peerId);
+    console.log('It works QR');
+    this.openInitiateQRConnectionDialog();
+  }
+
   public getId(): string {
     return this.id;
   }
@@ -692,7 +715,7 @@ export class SendZeroService {
     const dialogRef = this.dialog.open(InitiateConnectionDialogComponent, {
       data: {humanId: peerId},
     });
-
+    console.log('Peer box');
     dialogRef.afterClosed().subscribe(result => {
       if (result === true) {
         this.connectToPeer();
@@ -702,16 +725,18 @@ export class SendZeroService {
 
   // This creates a popup for qrscanner
   // This creates a popup asking user to connect to device
-  public openInitiateQRConnectionDialog(peerId: string): void {
+  // peerId: string
+  public openInitiateQRConnectionDialog(): void {
     const dialogRef = this.dialog.open(QRScannerDialogComponent, {
-      data: {humanId: peerId},
+      // data: {humanId: peerId},
     });
+    console.log('It works');
 
-    dialogRef.afterClosed().subscribe(result => {
-      if (result === true) {
-        this.connectToPeer();
-      }
-    });
+    // dialogRef.afterClosed().subscribe(result => {
+      // if (result === true) {
+        // this.connectToPeer();
+      // }
+    // });
   }
 
 }
@@ -747,7 +772,8 @@ export class InitiateConnectionDialogComponent {
 @Component({
   selector: 'app-initiate-qr-scanner',
   template: `
-    <h1 mat-dialog-title> QRScanner <app-qrscan></app-qrscan></h1>
+    <h1 mat-dialog-title> QRScanner </h1>
+    <app-qrscan></app-qrscan>
     <mat-dialog-actions>
     <button mat-raised-button [mat-dialog-close]="true" cdkFocusInitial color="primary">Yes</button>
     <button mat-raised-button [mat-dialog-close]='false' color='warn'>No</button>
