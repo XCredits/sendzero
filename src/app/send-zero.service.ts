@@ -9,6 +9,8 @@ import { isEmpty } from 'lodash';
 import adjectives from './adjectives';
 import animals from './animals';
 import { Router, UrlTree, UrlSegmentGroup, UrlSegment, PRIMARY_OUTLET } from '../../node_modules/@angular/router';
+import { QRScannerComponent } from './qrscanner/qrscanner.component';
+
 // import { UserService } from './user.service';
 // TODO: find out why import doesn't work
 const shortid = require('shortid');
@@ -698,6 +700,20 @@ export class SendZeroService {
     });
   }
 
+  // This creates a popup for qrscanner
+  // This creates a popup asking user to connect to device
+  public openInitiateQRConnectionDialog(peerId: string): void {
+    const dialogRef = this.dialog.open(QRScannerDialogComponent, {
+      data: {humanId: peerId},
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result === true) {
+        this.connectToPeer();
+      }
+    });
+  }
+
 }
 
 // Connection dialog component
@@ -729,6 +745,19 @@ export class InitiateConnectionDialogComponent {
 }
 
 @Component({
+  selector: 'app-initiate-qr-scanner',
+  template: `
+    <h1 mat-dialog-title> QRScanner <app-qrscan></app-qrscan></h1>
+    <mat-dialog-actions>
+    <button mat-raised-button [mat-dialog-close]="true" cdkFocusInitial color="primary">Yes</button>
+    <button mat-raised-button [mat-dialog-close]='false' color='warn'>No</button>
+    </mat-dialog-actions>`,
+})
+export class QRScannerDialogComponent {
+  constructor(@Inject(MAT_DIALOG_DATA) public data: any) {}
+}
+
+@Component({
   selector: 'app-receive-file-dialog',
   template: `
     <h1 mat-dialog-title> <b>{{data.humanId}}</b> wants to send you a file. Accept?</h1>
@@ -744,6 +773,7 @@ export class InitiateConnectionDialogComponent {
     <button mat-raised-button (click)='closeDialog(false)' color='warn'>No</button>
     </mat-dialog-actions>`,
 })
+
 export class ReceiveFileDialogComponent {
   constructor(private dialogRef: MatDialogRef<ReceiveFileDialogComponent>,
               private ref: ApplicationRef,

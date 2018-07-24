@@ -10,7 +10,7 @@ import { AppComponent } from './app.component';
 import { UserService } from './user.service';
 import { SignalService } from './signal.service';
 import { SendZeroService } from './send-zero.service';
-import { ConnectionDialogComponent, ReceiveFileDialogComponent, InitiateConnectionDialogComponent } from './send-zero.service';
+import { ConnectionDialogComponent, ReceiveFileDialogComponent, InitiateConnectionDialogComponent, QRScannerDialogComponent } from './send-zero.service';
 import { StatsService } from './stats.service';
 import { AnalyticsService } from './analytics.service';
 import { AuthGuard } from './auth.guard';
@@ -119,6 +119,7 @@ import { QRScannerComponent } from './qrscanner/qrscanner.component';
     ConnectionDialogComponent,
     ReceiveFileDialogComponent,
     InitiateConnectionDialogComponent,
+    QRScannerDialogComponent,
     QRCodeComponent,
     QRScannerComponent,
   ],
@@ -141,11 +142,6 @@ import { QRScannerComponent } from './qrscanner/qrscanner.component';
         component: HomeComponent,
         data: { title: 'Home' },
       },
-      // {
-      //   path: 'qrcode',
-      //   component: QRCodeComponent,
-      //   data: { title: 'QR Code' },
-      // },
       {
         path: 'feed',
         component: FeedComponent,
@@ -292,6 +288,7 @@ import { QRScannerComponent } from './qrscanner/qrscanner.component';
     ConnectionDialogComponent,
     ReceiveFileDialogComponent,
     InitiateConnectionDialogComponent,
+    QRScannerDialogComponent,
   ],
   providers: [
     SignalService,

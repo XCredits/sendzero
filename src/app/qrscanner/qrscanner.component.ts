@@ -1,3 +1,4 @@
+// https://github.com/goergch/angular2-qrscanner
 import { Component, ViewChild, ViewEncapsulation, OnChanges, OnInit, Input } from '@angular/core';
 import { SendZeroService } from '../send-zero.service';
 import {QrScannerComponent} from 'angular2-qrscanner';
