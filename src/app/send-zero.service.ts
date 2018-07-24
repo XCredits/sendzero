@@ -572,23 +572,6 @@ export class SendZeroService {
   }
 
   public openQRScanner(): void {
-    // const peerId = this.peerToConnectTo.trim();
-    // if (peerId.length < 1) {
-    //   return;
-    // }
-    // this.disableConnectButton = true;
-    // this.connectButtonText = 'Looking for device!';
-    // this.peers[peerId] = {
-    //   prompt: 'Trying to connect to peer. '
-    //       + 'If you\'re unable to connect after a few minutes, '
-    //       + 'please check that you have entered the ID correctly.'
-    // };
-    // if (Object.keys(this.peers).length === 1) {
-    //   this.disableFileSending = true;
-    //   this.ref.tick();
-    // }
-    // this.signalService.connect(peerId);
-    console.log('It works QR');
     this.openInitiateQRConnectionDialog();
   }
 
@@ -715,7 +698,7 @@ export class SendZeroService {
     const dialogRef = this.dialog.open(InitiateConnectionDialogComponent, {
       data: {humanId: peerId},
     });
-    console.log('Peer box');
+    // console.log('Peer box');
     dialogRef.afterClosed().subscribe(result => {
       if (result === true) {
         this.connectToPeer();
@@ -724,19 +707,16 @@ export class SendZeroService {
   }
 
   // This creates a popup for qrscanner
-  // This creates a popup asking user to connect to device
-  // peerId: string
   public openInitiateQRConnectionDialog(): void {
     const dialogRef = this.dialog.open(QRScannerDialogComponent, {
-      // data: {humanId: peerId},
     });
-    console.log('It works');
-
-    // dialogRef.afterClosed().subscribe(result => {
-      // if (result === true) {
-        // this.connectToPeer();
-      // }
-    // });
+    // dialogRef.beforeClose().subscribe()
+    console.log(this.peerToConnectToURL);
+    dialogRef.afterClosed().subscribe(result => {
+      if (result === true) {
+        this.connectToPeer();
+      }
+    });
   }
 
 }
@@ -775,8 +755,7 @@ export class InitiateConnectionDialogComponent {
     <h1 mat-dialog-title> QRScanner </h1>
     <app-qrscan></app-qrscan>
     <mat-dialog-actions>
-    <button mat-raised-button [mat-dialog-close]="true" cdkFocusInitial color="primary">Yes</button>
-    <button mat-raised-button [mat-dialog-close]='false' color='warn'>No</button>
+    <button mat-raised-button [mat-dialog-close]='false' color='warn'>Cancel</button>
     </mat-dialog-actions>`,
 })
 export class QRScannerDialogComponent {

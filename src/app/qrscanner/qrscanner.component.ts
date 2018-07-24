@@ -16,10 +16,10 @@ export class QRScannerComponent implements OnInit {
     }
 
     ngOnInit() {
-        console.log('QR Scanner Starting!');
+        // console.log('QR Scanner Starting!');
         this.qrScannerComponent.getMediaDevices()
           .then(devices => {
-            console.log(devices);
+            // console.log(devices);
             const videoDevices: MediaDeviceInfo[] = [];
             for (const device of devices) {
                 if (device.kind.toString() === 'videoinput') {
@@ -45,7 +45,7 @@ export class QRScannerComponent implements OnInit {
         this.qrScannerComponent.capturedQr
           .subscribe(result => {
             this.resultLink = result;
-            console.log(this.resultLink);
+            // console.log(this.resultLink);
             this.resultLink = this.sendZeroService.removeURLFromPeer(this.resultLink); // Converts link into user id
             this.sendZeroService.setConnectToPeerId(this.resultLink); // Connects to user id
         });
