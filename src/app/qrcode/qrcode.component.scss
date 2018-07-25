@@ -1,4 +1,6 @@
-.qr {
-  padding: 20px;
-  // background-color: blue;
+
+@media (max-width: 767px) {
+  .qr {
+      padding-left: calc(50% - 64px);
+  }
 }

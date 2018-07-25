@@ -1,6 +1,5 @@
 .id {
   width: 225px;
-  // background-color: aqua;
 }
 
 .peerid {
@@ -49,4 +48,16 @@ table {
 mat-header-cell {
   display:flex;
   justify-content:flex-end;
+}
+
+#scanButton {
+  margin-top: 5%;
+}
+
+@media (max-width: 767px) {
+  #scanButton {
+    width: 40%;
+    margin-left: 30%;
+    margin-right: 30%
+  }
 }

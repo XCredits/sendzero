@@ -1,8 +1,8 @@
-
 import {filter} from 'rxjs/operators';
-import { Component, ViewChild, OnChanges, OnInit } from '@angular/core';
+import { Component, ViewChild, ViewEncapsulation, OnChanges, OnInit } from '@angular/core';
 // Imports needed for router import for title
-import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
+import { ActivatedRoute, NavigationStart, NavigationEnd, Router } from '@angular/router'; 
+import { Location, PopStateEvent } from '@angular/common'; 
 import { UserService } from './user.service';
 import { AnalyticsService } from './analytics.service';
 import { SendZeroService } from './send-zero.service';
@@ -10,10 +10,12 @@ import { SendZeroService } from './send-zero.service';
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
-  styleUrls: ['./app.component.scss']
+  styleUrls: ['./app.component.scss'],
+  encapsulation: ViewEncapsulation.None,
 })
-export class AppComponent implements OnChanges, OnInit {
+export class AppComponent implements OnInit {
   @ViewChild('sideNavDrawer') sideNavDrawer;
+  @ViewChild('routerOutletParent') routerOutletEle;
   screenWidth: number;
   mobileWidth = false; // boolean
   title: string;
@@ -22,6 +24,10 @@ export class AppComponent implements OnChanges, OnInit {
   userIsAdmin: boolean;
   drawerMode: string;
   drawerOpened: boolean;
+  // Scroll position maintainer
+  private lastPoppedScrollTop: number;
+  private currentRouteId: number;
+  private yScrollStack: number[] = [];
 
 
   // Edit the area below to create main nav links
@@ -110,6 +116,7 @@ export class AppComponent implements OnChanges, OnInit {
       private route: ActivatedRoute,
       private userService: UserService,
       private analytics: AnalyticsService,
+      private location: Location, 
       private sendZeroService: SendZeroService,
     ) {
     // Set side bar mode
@@ -145,12 +152,35 @@ export class AppComponent implements OnChanges, OnInit {
 
   ngOnInit() {
     this.sendZeroService.init();
+
+    // set sidebar after every change
+    this.setSideBar();
+
+    this.router.events.subscribe((ev: any) => {
+      if (ev instanceof NavigationStart) {
+        if (this.routerOutletEle.nativeElement) { // this has been placed here as a hack since this element is not ready on first load
+          const el = this.routerOutletEle.nativeElement;
+          this.yScrollStack[this.currentRouteId] = el.scrollTop;
+          // Determine if we are going back
+          if (ev.restoredState && ev.restoredState.navigationId
+              && this.yScrollStack[ev.restoredState.navigationId]) {
+            this.lastPoppedScrollTop =
+                this.yScrollStack[ev.restoredState.navigationId];
+          } else {
+            this.lastPoppedScrollTop = 0;
+          }
+        }
+      } else if (ev instanceof NavigationEnd) {
+        if (this.routerOutletEle.nativeElement) { // this has been placed here as a hack since this element is not ready on first load
+          this.currentRouteId = ev.id;
+          const el = this.routerOutletEle.nativeElement;
+          el.scrollTop = this.lastPoppedScrollTop ?
+              this.lastPoppedScrollTop : 0;
+        }
+      }
+    });
   }
 
-  // set sidebar after every change
-  ngOnChanges() {
-    this.setSideBar();
-  }
 }
 
 interface NavLink {

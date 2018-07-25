@@ -4,12 +4,14 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { HttpClientModule} from '@angular/common/http'; // Deprecation https://angular.io/api/http/HttpModule
 import { RouterModule } from '@angular/router';
 import { LocalStorageModule } from 'angular-2-local-storage';
-import { QRCodeModule } from 'angularx-qrcode'; // QRcode
+import { QRCodeModule } from 'angularx-qrcode'; // QRcode Generator
+import { NgQrScannerModule } from 'angular2-qrscanner';
 import { AppComponent } from './app.component';
 import { UserService } from './user.service';
 import { SignalService } from './signal.service';
 import { SendZeroService } from './send-zero.service';
-import { ConnectionDialogComponent, ReceiveFileDialogComponent, InitiateConnectionDialogComponent } from './send-zero.service';
+import { ConnectionDialogComponent, ReceiveFileDialogComponent,
+  InitiateConnectionDialogComponent, QRScannerDialogComponent } from './send-zero.service';
 import { StatsService } from './stats.service';
 import { AnalyticsService } from './analytics.service';
 import { AuthGuard } from './auth.guard';
@@ -87,6 +89,7 @@ import { TermsComponent } from './terms/terms.component';
 import { PrivacyComponent } from './privacy/privacy.component';
 import { FooterComponent } from './footer/footer.component';
 import { QRCodeComponent } from './qrcode/qrcode.component';
+import { QRScannerComponent } from './qrscanner/qrscanner.component';
 
 @NgModule({
   declarations: [
@@ -117,7 +120,9 @@ import { QRCodeComponent } from './qrcode/qrcode.component';
     ConnectionDialogComponent,
     ReceiveFileDialogComponent,
     InitiateConnectionDialogComponent,
+    QRScannerDialogComponent,
     QRCodeComponent,
+    QRScannerComponent,
   ],
   imports: [
     BrowserModule,
@@ -125,6 +130,7 @@ import { QRCodeComponent } from './qrcode/qrcode.component';
     ReactiveFormsModule,
     HttpClientModule,
     QRCodeModule, // QR Module
+    NgQrScannerModule,
 
     LocalStorageModule.withConfig({
         prefix: 'app',
@@ -137,11 +143,6 @@ import { QRCodeComponent } from './qrcode/qrcode.component';
         component: HomeComponent,
         data: { title: 'Home' },
       },
-      // {
-      //   path: 'qrcode',
-      //   component: QRCodeComponent,
-      //   data: { title: 'QR Code' },
-      // },
       {
         path: 'feed',
         component: FeedComponent,
@@ -288,6 +289,7 @@ import { QRCodeComponent } from './qrcode/qrcode.component';
     ConnectionDialogComponent,
     ReceiveFileDialogComponent,
     InitiateConnectionDialogComponent,
+    QRScannerDialogComponent,
   ],
   providers: [
     SignalService,
