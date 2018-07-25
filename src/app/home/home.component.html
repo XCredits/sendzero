@@ -22,6 +22,15 @@
     <div class="row">
       <div class="col-md-4">
           <app-qr></app-qr>
+          <!-- <br> -->
+          <div class="col-md-8">
+            <div class="connectionBox">
+              <button mat-raised-button required color="primary" (click)="openQRScanner()" name="connectButton" id="scanButton" class="connectButton">
+                {{sendZeroService.qrscannerButtonText}}
+              </button>
+            </div>
+          </div>
+          <br>
       </div>
 
       <div class="col-md-8">
@@ -39,15 +48,6 @@
           </button>
         </div>
       </div>
-      
-      <div class="col-md-8">
-      <div class="connectionBox">
-        <button mat-raised-button required color="primary" (click)="openQRScanner()" name="connectButton" class="connectButton">
-          {{sendZeroService.qrscannerButtonText}}
-        </button>
-      </div>
-    </div>
-
     </div>
   </div>
 </div>

@@ -63,7 +63,7 @@ export class SendZeroService {
     this.prompt = 'Please wait...';
     this.disableConnectButton = true;
     this.connectButtonText = 'Connect';
-    this.qrscannerButtonText = 'QRScanner';
+    this.qrscannerButtonText = 'Scan'; // QRScanner name
     this.humanId = this.createHumanId();
     this.connectionLink = window.location.origin + '/?id=' + this.humanId; // Creates connection link
     // this.router = router;
@@ -758,11 +758,9 @@ export class InitiateConnectionDialogComponent {
 @Component({
   selector: 'app-initiate-qr-scanner',
   template: `
-    <h1 mat-dialog-title> QRScanner </h1>
+    <h1 mat-dialog-title> Scan a SendZero QRCode </h1>
     <app-qrscan></app-qrscan>
     <mat-dialog-actions>
-    <!-- <button mat-raised-button [mat-dialog-close]="false" color='warn'>Cancel</button> -->
-    <!-- <button mat-raised-button (click)='closeDialog(false)' color='warn'>Cancel</button> -->
     <button mat-raised-button (click)='closeDialog(false)' color='warn'>Cancel</button>
     </mat-dialog-actions>`,
 })
