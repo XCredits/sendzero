@@ -12,7 +12,6 @@ module.exports = [
 'able',
 'abnormal',
 'aboard',
-'aboriginal',
 'abortive',
 'abounding',
 'abrasive',
