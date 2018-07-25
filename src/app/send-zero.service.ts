@@ -8,7 +8,7 @@ import { SignalService } from './signal.service';
 import { isEmpty } from 'lodash';
 import adjectives from './adjectives';
 import animals from './animals';
-import { Router, UrlTree, UrlSegmentGroup, UrlSegment, PRIMARY_OUTLET } from '../../node_modules/@angular/router';
+import { Router, UrlTree } from '@angular/router';
 import { QRScannerComponent } from './qrscanner/qrscanner.component';
 
 // import { UserService } from './user.service';
@@ -51,7 +51,6 @@ export class SendZeroService {
   // Maybe interface this
   private peers: any;
   public peerSubject = new BehaviorSubject(this.peers);
-  // router: Router;
 
   constructor(private ref: ApplicationRef,
               private signalService: SignalService,
@@ -66,7 +65,6 @@ export class SendZeroService {
     this.qrscannerButtonText = 'Scan'; // QRScanner name
     this.humanId = this.createHumanId();
     this.connectionLink = window.location.origin + '/?id=' + this.humanId; // Creates connection link
-    // this.router = router;
    }
 
   public init(): void {
@@ -698,7 +696,6 @@ export class SendZeroService {
     const dialogRef = this.dialog.open(InitiateConnectionDialogComponent, {
       data: {humanId: peerId},
     });
-    // console.log('Peer box');
     dialogRef.afterClosed().subscribe(result => {
       if (result === true) {
         this.connectToPeer();
@@ -710,7 +707,6 @@ export class SendZeroService {
   public openInitiateQRConnectionDialog(): void {
     const dialogRef = this.dialog.open(QRScannerDialogComponent, {
     });
-    // console.log(this.peerToConnectToURL);
     dialogRef.afterClosed().subscribe(result => {
       if (this.peerToConnectToURL !== null) {
         dialogRef.close(true);

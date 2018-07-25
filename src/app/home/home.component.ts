@@ -88,9 +88,6 @@ export class HomeComponent implements OnInit, OnDestroy {
           this.user = user;
           this.isLoggedIn = !!this.user;
         });
-
-    // this.sendZeroService.testRemove(); // Test removing parts of url, remove this when done
-
   }
 
   // TODO: Set prompts
