@@ -31,8 +31,8 @@ export class QRScannerComponent implements OnInit {
           for (const dev of videoDevices) {
             // This is for finding the desktop/phone camera loop
             if (dev.label.includes('back') ||
-              dev.label.includes('Back') ||
-              dev.label.includes('rear')) {
+                dev.label.includes('Back') ||
+                dev.label.includes('rear')) {
               choosenDev = dev;
               break;
             }
