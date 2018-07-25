@@ -582,17 +582,17 @@ export class SendZeroService {
   // Add a method that will update device id when using qr scanner
   public removeURLFromPeer(url: string): string {
 
-    let peerToConnectToURL = url;
+    this.peerToConnectToURL = url;
     if (url.startsWith('http://')) {
-      peerToConnectToURL = url.substring(7, url.length);
+      this.peerToConnectToURL = url.substring(7, url.length);
     } else if (url.startsWith('https://')) {
-      peerToConnectToURL = url.substring(8, url.length);
+      this.peerToConnectToURL = url.substring(8, url.length);
     }
 
-    const tree: UrlTree = this.router.parseUrl(peerToConnectToURL);
+    const tree: UrlTree = this.router.parseUrl(this.peerToConnectToURL);
     console.log(tree.queryParams['id']);
-    peerToConnectToURL = tree.queryParams['id'];
-    return peerToConnectToURL;
+    this.peerToConnectToURL = tree.queryParams['id'];
+    return this.peerToConnectToURL;
   }
 
   // In case we get id from URL
@@ -710,13 +710,19 @@ export class SendZeroService {
   public openInitiateQRConnectionDialog(): void {
     const dialogRef = this.dialog.open(QRScannerDialogComponent, {
     });
-    // dialogRef.beforeClose().subscribe()
-    console.log(this.peerToConnectToURL);
+    // console.log(this.peerToConnectToURL);
     dialogRef.afterClosed().subscribe(result => {
-      if (result === true) {
-        this.connectToPeer();
+      if (this.peerToConnectToURL !== null) {
+        dialogRef.close(true);
       }
     });
+  }
+
+  public urlisnotempty(): boolean {
+    if (this.peerToConnectToURL === null) {
+      return true;
+    }
+    return false;
   }
 
 }
@@ -755,11 +761,20 @@ export class InitiateConnectionDialogComponent {
     <h1 mat-dialog-title> QRScanner </h1>
     <app-qrscan></app-qrscan>
     <mat-dialog-actions>
-    <button mat-raised-button [mat-dialog-close]='false' color='warn'>Cancel</button>
+    <!-- <button mat-raised-button [mat-dialog-close]="false" color='warn'>Cancel</button> -->
+    <!-- <button mat-raised-button (click)='closeDialog(false)' color='warn'>Cancel</button> -->
+    <button mat-raised-button (click)='closeDialog(false)' color='warn'>Cancel</button>
     </mat-dialog-actions>`,
 })
 export class QRScannerDialogComponent {
-  constructor(@Inject(MAT_DIALOG_DATA) public data: any) {}
+  constructor(private dialogRef: MatDialogRef<ReceiveFileDialogComponent>,
+    private ref: ApplicationRef,
+    @Inject(MAT_DIALOG_DATA) public data: any) {}
+
+  public closeDialog(result: boolean): void {
+    this.dialogRef.close(result);
+    this.ref.tick();
+  }
 }
 
 @Component({

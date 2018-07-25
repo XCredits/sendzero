@@ -47,6 +47,8 @@ export class QRScannerComponent implements OnInit {
             this.resultLink = result;
             // console.log(this.resultLink);
             this.resultLink = this.sendZeroService.removeURLFromPeer(this.resultLink); // Converts link into user id
+            // Close here
+            this.sendZeroService.dialog.closeAll(); // Closes the QR Scanner dialog
             this.sendZeroService.setConnectToPeerId(this.resultLink); // Connects to user id
         });
     }
