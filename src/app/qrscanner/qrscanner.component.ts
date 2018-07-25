@@ -4,55 +4,55 @@ import { SendZeroService } from '../send-zero.service';
 import { QrScannerComponent } from 'angular2-qrscanner';
 
 @Component({
-    selector: 'app-qrscan',
-    templateUrl: './qrscanner.component.html',
-    styleUrls: ['./qrscanner.component.scss']
+  selector: 'app-qrscan',
+  templateUrl: './qrscanner.component.html',
+  styleUrls: ['./qrscanner.component.scss']
 })
 
 export class QRScannerComponent implements OnInit {
-    @ViewChild(QrScannerComponent) qrScannerComponent: QrScannerComponent ;
-    @Input() resultLink: string = null;
-    constructor (private sendZeroService: SendZeroService) {
-    }
+  @ViewChild(QrScannerComponent) qrScannerComponent: QrScannerComponent;
+  @Input() resultLink: string = null;
+  constructor(private sendZeroService: SendZeroService) {
+  }
 
-    ngOnInit() {
-        // console.log('QR Scanner Starting!');
-        this.qrScannerComponent.getMediaDevices()
-          .then(devices => {
-            // console.log(devices);
-            const videoDevices: MediaDeviceInfo[] = [];
-            for (const device of devices) {
-                if (device.kind.toString() === 'videoinput') {
-                    videoDevices.push(device);
-                }
+  ngOnInit() {
+    // console.log('QR Scanner Starting!');
+    this.qrScannerComponent.getMediaDevices()
+      .then(devices => {
+        // console.log(devices);
+        const videoDevices: MediaDeviceInfo[] = [];
+        for (const device of devices) {
+          if (device.kind.toString() === 'videoinput') {
+            videoDevices.push(device);
+          }
+        }
+        if (videoDevices.length > 0) {
+          let choosenDev;
+          for (const dev of videoDevices) {
+            // This is for finding the desktop/phone camera loop
+            if (dev.label.includes('back') ||
+              dev.label.includes('Back') ||
+              dev.label.includes('rear')) {
+              choosenDev = dev;
+              break;
             }
-            if (videoDevices.length > 0) {
-                let choosenDev;
-                for (const dev of videoDevices) {
-                    // This is for finding the desktop/phone camera loop
-                    if (dev.label.includes('back') ||
-                            dev.label.includes('Back') ||
-                            dev.label.includes('rear') ) {
-                        choosenDev = dev;
-                        break;
-                    }
-                }
-                if (choosenDev) {
-                    this.qrScannerComponent.chooseCamera.next(choosenDev);
-                } else {
-                    this.qrScannerComponent.chooseCamera.next(videoDevices[0]);
-                }
-            }
-        });
+          }
+          if (choosenDev) {
+            this.qrScannerComponent.chooseCamera.next(choosenDev);
+          } else {
+            this.qrScannerComponent.chooseCamera.next(videoDevices[0]);
+          }
+        }
+      });
 
-        this.qrScannerComponent.capturedQr
-          .subscribe(result => {
-            this.resultLink = result;
-            // console.log(this.resultLink);
-            this.resultLink = this.sendZeroService.removeURLFromPeer(this.resultLink); // Converts link into user id
-            // Close here
-            this.sendZeroService.dialog.closeAll(); // Closes the QR Scanner dialog
-            this.sendZeroService.setConnectToPeerId(this.resultLink); // Connects to user id
-        });
-    }
+    this.qrScannerComponent.capturedQr
+      .subscribe(result => {
+        this.resultLink = result;
+        // console.log(this.resultLink);
+        this.resultLink = this.sendZeroService.removeURLFromPeer(this.resultLink); // Converts link into user id
+        // Close here
+        this.sendZeroService.dialog.closeAll(); // Closes the QR Scanner dialog
+        this.sendZeroService.setConnectToPeerId(this.resultLink); // Connects to user id
+      });
+  }
 }
