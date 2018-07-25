@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, ChangeDetectorRef } from '@angular/core';
+import { Component, ViewChild, ViewEncapsulation, OnInit, ChangeDetectorRef } from '@angular/core';
 import { DomSanitizer } from '@angular/platform-browser';
 import { Router, ActivatedRoute } from '@angular/router';
 import { Observable } from 'rxjs/Observable';
@@ -88,6 +88,9 @@ export class HomeComponent implements OnInit, OnDestroy {
           this.user = user;
           this.isLoggedIn = !!this.user;
         });
+
+    // this.sendZeroService.testRemove(); // Test removing parts of url, remove this when done
+
   }
 
   // TODO: Set prompts
@@ -124,6 +127,10 @@ export class HomeComponent implements OnInit, OnDestroy {
     this.sendZeroService.connectToPeer();
   }
 
+  openQRScanner(): void {
+    this.sendZeroService.openQRScanner();
+  }
+
 }
 
 interface User {
@@ -135,4 +142,3 @@ interface User {
   isLoggedIn: boolean;
   isAdmin: boolean;
 }
-

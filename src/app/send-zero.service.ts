@@ -8,6 +8,9 @@ import { SignalService } from './signal.service';
 import { isEmpty } from 'lodash';
 import adjectives from './adjectives';
 import animals from './animals';
+import { Router, UrlTree, UrlSegmentGroup, UrlSegment, PRIMARY_OUTLET } from '../../node_modules/@angular/router';
+import { QRScannerComponent } from './qrscanner/qrscanner.component';
+
 // import { UserService } from './user.service';
 // TODO: find out why import doesn't work
 const shortid = require('shortid');
@@ -29,11 +32,13 @@ if (String(window.location.hostname) === 'localhost') {
 export class SendZeroService {
   // Typed definitions
   public id: string;
+  public peerToConnectToURL: string;
   public peerToConnectTo: string;
   public prompt: string;
   public connectionLink: string;
   public disableConnectButton: boolean;
   public connectButtonText: string;
+  public qrscannerButtonText: string;
   public disableSendButton: boolean;
   public disableFileSending = false;
   public humanId: string;
@@ -46,18 +51,22 @@ export class SendZeroService {
   // Maybe interface this
   private peers: any;
   public peerSubject = new BehaviorSubject(this.peers);
+  // router: Router;
 
   constructor(private ref: ApplicationRef,
               private signalService: SignalService,
               private sanitizer: DomSanitizer,
               public dialog: MatDialog,
-              public snackBar: MatSnackBar) {
+              public snackBar: MatSnackBar,
+              private router: Router) {
     this.id = '';
     this.prompt = 'Please wait...';
     this.disableConnectButton = true;
     this.connectButtonText = 'Connect';
+    this.qrscannerButtonText = 'Scan'; // QRScanner name
     this.humanId = this.createHumanId();
-    this.connectionLink = window.location.origin + '/?id=' + this.humanId;
+    this.connectionLink = window.location.origin + '/?id=' + this.humanId; // Creates connection link
+    // this.router = router;
    }
 
   public init(): void {
@@ -562,8 +571,28 @@ export class SendZeroService {
     this.signalService.connect(peerId);
   }
 
+  public openQRScanner(): void {
+    this.openInitiateQRConnectionDialog();
+  }
+
   public getId(): string {
     return this.id;
+  }
+
+  // Add a method that will update device id when using qr scanner
+  public removeURLFromPeer(url: string): string {
+
+    this.peerToConnectToURL = url;
+    if (url.startsWith('http://')) {
+      this.peerToConnectToURL = url.substring(7, url.length);
+    } else if (url.startsWith('https://')) {
+      this.peerToConnectToURL = url.substring(8, url.length);
+    }
+
+    const tree: UrlTree = this.router.parseUrl(this.peerToConnectToURL);
+    console.log(tree.queryParams['id']);
+    this.peerToConnectToURL = tree.queryParams['id'];
+    return this.peerToConnectToURL;
   }
 
   // In case we get id from URL
@@ -664,17 +693,38 @@ export class SendZeroService {
     });
   }
 
+  // This creates a popup asking user to connect to device
   public openInitiateConnectionDialog(peerId: string): void {
     const dialogRef = this.dialog.open(InitiateConnectionDialogComponent, {
       data: {humanId: peerId},
     });
-
+    // console.log('Peer box');
     dialogRef.afterClosed().subscribe(result => {
       if (result === true) {
         this.connectToPeer();
       }
     });
   }
+
+  // This creates a popup for qrscanner
+  public openInitiateQRConnectionDialog(): void {
+    const dialogRef = this.dialog.open(QRScannerDialogComponent, {
+    });
+    // console.log(this.peerToConnectToURL);
+    dialogRef.afterClosed().subscribe(result => {
+      if (this.peerToConnectToURL !== null) {
+        dialogRef.close(true);
+      }
+    });
+  }
+
+  public urlisnotempty(): boolean {
+    if (this.peerToConnectToURL === null) {
+      return true;
+    }
+    return false;
+  }
+
 }
 
 // Connection dialog component
@@ -706,6 +756,26 @@ export class InitiateConnectionDialogComponent {
 }
 
 @Component({
+  selector: 'app-initiate-qr-scanner',
+  template: `
+    <h1 mat-dialog-title> Scan a SendZero QRCode </h1>
+    <app-qrscan></app-qrscan>
+    <mat-dialog-actions>
+    <button mat-raised-button (click)='closeDialog(false)' color='warn'>Cancel</button>
+    </mat-dialog-actions>`,
+})
+export class QRScannerDialogComponent {
+  constructor(private dialogRef: MatDialogRef<ReceiveFileDialogComponent>,
+    private ref: ApplicationRef,
+    @Inject(MAT_DIALOG_DATA) public data: any) {}
+
+  public closeDialog(result: boolean): void {
+    this.dialogRef.close(result);
+    this.ref.tick();
+  }
+}
+
+@Component({
   selector: 'app-receive-file-dialog',
   template: `
     <h1 mat-dialog-title> <b>{{data.humanId}}</b> wants to send you a file. Accept?</h1>
@@ -721,6 +791,7 @@ export class InitiateConnectionDialogComponent {
     <button mat-raised-button (click)='closeDialog(false)' color='warn'>No</button>
     </mat-dialog-actions>`,
 })
+
 export class ReceiveFileDialogComponent {
   constructor(private dialogRef: MatDialogRef<ReceiveFileDialogComponent>,
               private ref: ApplicationRef,

@@ -1,6 +1,5 @@
-
 import {filter} from 'rxjs/operators';
-import { Component, ViewChild, OnInit } from '@angular/core';
+import { Component, ViewChild, ViewEncapsulation, OnChanges, OnInit } from '@angular/core';
 // Imports needed for router import for title
 import { ActivatedRoute, NavigationStart, NavigationEnd, Router } from '@angular/router'; 
 import { Location, PopStateEvent } from '@angular/common'; 
@@ -11,7 +10,8 @@ import { SendZeroService } from './send-zero.service';
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
-  styleUrls: ['./app.component.scss']
+  styleUrls: ['./app.component.scss'],
+  encapsulation: ViewEncapsulation.None,
 })
 export class AppComponent implements OnInit {
   @ViewChild('sideNavDrawer') sideNavDrawer;
