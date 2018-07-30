@@ -3,6 +3,7 @@ require('dotenv').config();
 require('./server/config');
 require('./server/mongoose-start');
 const express = require('express');
+const compression = require('compression');
 const app = express();
 const path = require('path');
 const http = require('http');
@@ -13,6 +14,7 @@ const routes = require('./server/routes');
 const SignalService = require('./server/services/signal.service');
 const socketIO = require('socket.io');
 
+app.use(compression());
 app.use(bodyParser.urlencoded({extended: true})); // extended gives full JSON
 app.use(bodyParser.json());
 app.use(cookieParser());
