@@ -1,5 +1,6 @@
 declare var require: any;
 import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject } from 'rxjs';
 import { findKey as _findKey } from 'lodash';
 
@@ -12,13 +13,14 @@ export class SignalService {
   _requests: any;
   id: any;
   humanId: any;
+  turnInfo: any;
   socket: any;
   signal: BehaviorSubject<any>;
   isMobile: boolean;
 
   /**
    */
-  constructor() {
+  constructor(private http: HttpClient) {
     this._peers = {};
     this._requests = {};
     this.id = null;
@@ -29,6 +31,11 @@ export class SignalService {
     this.socket = socket;
     this.humanId = humanId;
     this.isMobile = isMobile;
+
+    this.http.get('/api/get-turn-info')
+        .subscribe(data => {
+          this.turnInfo = data;
+        });
 
     // Find your own socket id
     socket.on('connect', function() {
@@ -81,6 +88,14 @@ export class SignalService {
         accept: function() {
           const opts = {
             initiator: false,
+            config:
+              {
+                iceServers: [{
+                  urls: self.turnInfo.turnUrl,
+                  username: self.turnInfo.turnUsername,
+                  credential: self.turnInfo.turnPassword,
+                }]
+              },
           };
 
           // @ts-ignore
