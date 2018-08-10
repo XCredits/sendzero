@@ -136,21 +136,6 @@ export class SendZeroService {
   }
 
   private handleSignalClientPeer(peer: any): void {
-    // Add to peers list
-    this.peers[peer.id] = {
-      peer: peer,
-      id: peer.id,
-      humanId: peer.humanId,
-      files: [],
-      isMobile: peer.isMobile,
-      prompt: 'Connected to device!'
-    };
-    this.snackBar.open('Successfully connected to ' + peer.humanId, 'Dismiss', {
-      duration: 5000,
-      verticalPosition: 'top',
-      horizontalPosition: 'right',
-    });
-    this.disableFileSending = false;
     // Set up peer handling functions
     peer.on('connect', () => this.handlePeerConnect.bind(this)(peer));
     peer.on('close', this.handlePeerClose.bind(this));
@@ -203,7 +188,21 @@ export class SendZeroService {
   }
 
   private handlePeerConnect(peer: any): void {
-    this.peers[peer.id].prompt = 'Now connected to device! Select a file to send!';
+    // Add to peers list
+    this.peers[peer.id] = {
+      peer: peer,
+      id: peer.id,
+      humanId: peer.humanId,
+      files: [],
+      isMobile: peer.isMobile,
+      prompt: 'Connected to device! Select a file to send!'
+    };
+    this.snackBar.open('Successfully connected to ' + peer.humanId, 'Dismiss', {
+      duration: 5000,
+      verticalPosition: 'top',
+      horizontalPosition: 'right',
+    });
+    this.disableFileSending = false;
     this.connectButtonText = 'Connect';
     this.disableConnectButton = false;
     this.peerToConnectTo = '';
