@@ -185,8 +185,11 @@ sudo firewall-cmd --runtime-to-permanent
 sudo iptables -I INPUT -p tcp -m tcp --dport 80 -j ACCEPT
 ```
 
-2) Now head to certbot's website [here](https://certbot.eff.org/) and follow the instructions to download the correct flavor of `certbot`. You can then follow the instructions on the site to set it up.
+2) Now head to certbot's website [here](https://certbot.eff.org/) and follow the instructions to download the correct flavor of `certbot`. You can then follow the instructions on the site to set it up. For an `nginx` server on a `debian` installation, run the command `sudo certbot certonly --webroot --webroot-path=/home/your-username/your-app/dist -d example.com -d www.example.com`. To renew, use `sudo certbot renew` and `sudo certbot renew --dry-run` to do a dry run first.
 
-3) And it's as easy as that. Restart your `nginx` server and you're good to go! Make sure to set up a cron job that runs twice a day to renew your SSL certificate as they expire every 3 months.
+3) And it's as easy as that. Restart your `nginx` server and you're good to go!
+
+4) To set up a cronjob to take care of renewal for you, first run `crontab -e` to edit your cron jobs. Then add `0 0,12 * * * sudo certbot renew && sudo service nginx reload` at the bottom of the file and exit the editor. This will try renew your SSL certificates everyday at 12 AM and 12 PM. Easy as that!
+
 
 
