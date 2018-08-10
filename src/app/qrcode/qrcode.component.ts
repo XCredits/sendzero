@@ -19,7 +19,6 @@ export class QRCodeComponent implements OnInit, AfterViewInit {
 
     ngAfterViewInit() {
         const qrDiv = document.getElementById('qr');
-        console.log(qrDiv);
         const qrDivChild = qrDiv.firstElementChild;
         const img = qrDivChild.lastElementChild;
         img.setAttribute('width', '100%');
