@@ -1,58 +1,52 @@
 // https://github.com/goergch/angular2-qrscanner
 import { Component, ViewChild, ViewEncapsulation, OnChanges, OnInit, Input } from '@angular/core';
-import { SendZeroService } from '../send-zero.service';
-import { QrScannerComponent } from 'angular2-qrscanner';
+import { SendZeroService, QRScannerDialogComponent } from '../send-zero.service';
+import { ZXingScannerComponent } from '@zxing/ngx-scanner';
 
 @Component({
-  selector: 'app-qrscan',
+  selector: 'app-qrscanner',
   templateUrl: './qrscanner.component.html',
   styleUrls: ['./qrscanner.component.scss']
 })
 
 export class QRScannerComponent implements OnInit {
-  @ViewChild(QrScannerComponent) qrScannerComponent: QrScannerComponent;
-  @Input() resultLink: string = null;
-  constructor(private sendZeroService: SendZeroService) {
-  }
+  @ViewChild('scanner') qrScanner: ZXingScannerComponent;
+
+  constructor(private sendZeroService: SendZeroService,
+              private qrScannerDialogComponent: QRScannerDialogComponent) {}
 
   ngOnInit() {
-    // console.log('QR Scanner Starting!');
-    this.qrScannerComponent.getMediaDevices()
-      .then(devices => {
-        // console.log(devices);
-        const videoDevices: MediaDeviceInfo[] = [];
-        for (const device of devices) {
-          if (device.kind.toString() === 'videoinput') {
-            videoDevices.push(device);
-          }
-        }
-        if (videoDevices.length > 0) {
-          let choosenDev;
-          for (const dev of videoDevices) {
-            // This is for finding the desktop/phone camera loop
-            if (dev.label.includes('back') ||
-                dev.label.includes('Back') ||
-                dev.label.includes('rear')) {
-              choosenDev = dev;
-              break;
-            }
-          }
-          if (choosenDev) {
-            this.qrScannerComponent.chooseCamera.next(choosenDev);
-          } else {
-            this.qrScannerComponent.chooseCamera.next(videoDevices[0]);
-          }
-        }
+    const self = this;
+    const enumerateDevicesPromise = new Promise((resolve, reject) => {
+      this.qrScanner.enumarateVideoDevices((devices) => {
+        resolve(devices);
       });
+    });
 
-    this.qrScannerComponent.capturedQr
-      .subscribe(result => {
-        this.resultLink = result;
-        // console.log(this.resultLink);
-        this.resultLink = this.sendZeroService.removeURLFromPeer(this.resultLink); // Converts link into user id
-        // Close here
-        this.sendZeroService.dialog.closeAll(); // Closes the QR Scanner dialog
-        this.sendZeroService.setConnectToPeerId(this.resultLink); // Connects to user id
-      });
+    enumerateDevicesPromise
+        .then((devices: any) => {
+          self.qrScanner.startScan(devices[0]); // scan(devices[0].deviceId);
+        });
+  }
+  scanSuccessHandler(event: any) {
+    // console.log(event);
+    const peerId = this.sendZeroService.removeURLFromPeer(event);
+    this.sendZeroService.setConnectToPeerId(peerId);
+    this.qrScannerDialogComponent.closeDialog(true);
+    this.qrScanner.resetScan();
+  }
+
+
+  // TODO: Use event emitters
+  scanErrorHandler(event: any) {
+    // console.log(event);
+  }
+
+  scanFailureHandler(event: any) {
+    // console.log(event);
+  }
+
+  scanCompleteHandler(event: Event) {
+    // console.log(event);
   }
 }
