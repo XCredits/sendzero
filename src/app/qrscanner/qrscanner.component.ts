@@ -1,6 +1,6 @@
 // https://github.com/goergch/angular2-qrscanner
 import { Component, ViewChild, ViewEncapsulation, OnChanges, OnInit, Input } from '@angular/core';
-import { SendZeroService } from '../send-zero.service';
+import { SendZeroService, QRScannerDialogComponent } from '../send-zero.service';
 import { ZXingScannerComponent } from '@zxing/ngx-scanner';
 
 @Component({
@@ -12,7 +12,8 @@ import { ZXingScannerComponent } from '@zxing/ngx-scanner';
 export class QRScannerComponent implements OnInit {
   @ViewChild('scanner') qrScanner: ZXingScannerComponent;
 
-  constructor(private sendZeroService: SendZeroService) {}
+  constructor(private sendZeroService: SendZeroService,
+              private qrScannerDialog: QRScannerDialogComponent) {}
 
   // TODO: Being reused in Dialog Compnent as well, think about making into
   // a service
@@ -65,8 +66,8 @@ export class QRScannerComponent implements OnInit {
     const peerId = this.sendZeroService.removeURLFromPeer(event);
     this.sendZeroService.setConnectToPeerId(peerId);
     // Try not to use this
-    this.sendZeroService.dialog.closeAll();
-    // this.qrScannerDialogComponent.closeDialog(true);
+    // this.sendZeroService.dialog.closeAll();
+    this.qrScannerDialog.closeDialog(true);
     this.qrScanner.resetScan();
   }
 
