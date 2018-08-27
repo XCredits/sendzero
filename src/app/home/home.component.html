@@ -12,44 +12,63 @@
   </mat-form-field>
 </div>
 
-<div class="connect">  
-  <div class="container">
+<mat-expansion-panel class="connection-expansion-panel"
+    [expanded]="JSObject.keys(peers).length < 1">
+  <mat-expansion-panel-header>
+      <mat-panel-title>
+        Connect
+      </mat-panel-title>
+      <mat-panel-description>
+        Connect to other devices to send files!
+      </mat-panel-description>
+  </mat-expansion-panel-header>
+  <div class="connect">  
+    <div class="container">
       <div class="row">
           <div class="col-md-12">
               <h3>1. Connect</h3>
           </div>
-     </div>
-    <div class="row">
-      <div class="col-md-4 centered">
-          <app-qr></app-qr>
-          <button mat-raised-button required color="primary" (click)="openQRScanner()" name="scanButton" class="scanButton">
-              {{sendZeroService.qrscannerButtonText}}
-          </button>
       </div>
-      <br>
-      <div class="col-md-8">
-          People can connect to this device by scanning the QR code or going to: <a [href]="sendZeroService.connectionLink" target="_blank">{{sendZeroService.connectionLink}}</a>
-          <br>
-          <b>{{sendZeroService.prompt}}</b>
-          <br>
-        <div class="connectionBox">
-          <mat-form-field>
-            <input matInput placeholder="Device ID" type="text" name="peerId" id="peerId" [(ngModel)]="sendZeroService.peerToConnectTo">
-          </mat-form-field>
-          &nbsp;
-          <button mat-raised-button required color="primary" (click)="connectToPeer()" id="connectButton" name="connectButton" class="connectButton" [disabled]="sendZeroService.disableConnectButton">
-            {{sendZeroService.connectButtonText}}
-          </button>
+      <div class="row">
+        <div class="col-md-4 centered">
+            <app-qr></app-qr>
+            <button mat-raised-button required color="primary" (click)="openQRScanner()" name="scanButton" class="scanButton">
+                {{sendZeroService.qrscannerButtonText}}
+            </button>
+        </div>
+        <br>
+        <div class="col-md-8">
+            People can connect to this device by scanning the QR code or going to: <a [href]="sendZeroService.connectionLink" target="_blank">{{sendZeroService.connectionLink}}</a>
+            <br>
+            <b>{{sendZeroService.prompt}}</b>
+            <br>
+          <div class="connectionBox">
+            <mat-form-field>
+              <input matInput placeholder="Device ID" type="text" name="peerId" id="peerId" [(ngModel)]="sendZeroService.peerToConnectTo">
+            </mat-form-field>
+            &nbsp;
+            <button mat-raised-button required color="primary" (click)="connectToPeer()" id="connectButton" name="connectButton" class="connectButton" [disabled]="sendZeroService.disableConnectButton">
+              {{sendZeroService.connectButtonText}}
+            </button>
+          </div>
         </div>
       </div>
     </div>
   </div>
-</div>
+</mat-expansion-panel>
 <br>
 <!-- <mat-divider></mat-divider> -->
 <br>
 <div class="send"  *ngIf="JSObject.keys(peers).length !== 0">
-
+  <mat-expansion-panel class="send-expansion-panel" [expanded]="true">
+    <mat-expansion-panel-header>
+      <mat-panel-title>
+        Just send it!
+      </mat-panel-title>
+      <mat-panel-description>
+        Send files to connected devices
+      </mat-panel-description>
+    </mat-expansion-panel-header>
     <div class="connect">  
         <div class="container">
           <div class="row">
@@ -151,4 +170,5 @@
             </div>
           </div>
       </div>
+    </mat-expansion-panel>
 </div>
