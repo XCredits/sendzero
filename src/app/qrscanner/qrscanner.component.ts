@@ -25,7 +25,16 @@ export class QRScannerComponent implements OnInit {
 
     enumerateDevicesPromise
         .then((devices: any) => {
-          self.qrScanner.startScan(devices[0]); // scan(devices[0].deviceId);
+          let device;
+          devices.forEach(dev => {
+            if (dev.label.includes('back') ||
+                dev.label.includes('Back') ||
+                dev.label.includes('rear') ||
+                dev.label.includes('Rear')) {
+              device = dev;
+            }
+          });
+          self.qrScanner.startScan(device);
         });
   }
   scanSuccessHandler(event: any) {
