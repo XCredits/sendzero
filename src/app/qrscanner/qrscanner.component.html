@@ -8,7 +8,6 @@
     </qr-scanner> -->
     <zxing-scanner #scanner
         [scannerEnabled]="true"
-        [autofocusEnabled]="true"
         (scanSuccess)="scanSuccessHandler($event)"
         (scanError)="scanErrorHandler($event)"
         (scanFailure)="scanFailureHandler($event)"
