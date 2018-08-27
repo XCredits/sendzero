@@ -9,7 +9,8 @@ import { isEmpty } from 'lodash';
 import adjectives from './adjectives';
 import animals from './animals';
 import { Router, UrlTree } from '@angular/router';
-import { QRScannerComponent } from './qrscanner/qrscanner.component';
+// import { ZXingScannerComponent } from '@zxing/ngx-scanner';
+// import { QRScannerComponent } from './qrscanner/qrscanner.component';
 
 // import { UserService } from './user.service';
 // TODO: find out why import doesn't work
@@ -753,12 +754,17 @@ export class InitiateConnectionDialogComponent {
 })
 export class QRScannerDialogComponent {
   constructor(private dialogRef: MatDialogRef<QRScannerDialogComponent>,
+              // private qrScannerComponent: QRScannerComponent,
               private ref: ApplicationRef) {}
 
   public closeDialog(result: boolean): void {
     this.dialogRef.close(result);
     this.ref.tick();
   }
+
+  // public switchCamera(): void {
+  //   this.qrScannerComponent.switchCamera();
+  // }
 }
 
 @Component({

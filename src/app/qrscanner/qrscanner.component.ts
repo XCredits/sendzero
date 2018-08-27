@@ -1,6 +1,6 @@
 // https://github.com/goergch/angular2-qrscanner
 import { Component, ViewChild, ViewEncapsulation, OnChanges, OnInit, Input } from '@angular/core';
-import { SendZeroService, QRScannerDialogComponent } from '../send-zero.service';
+import { SendZeroService } from '../send-zero.service';
 import { ZXingScannerComponent } from '@zxing/ngx-scanner';
 
 @Component({
@@ -12,9 +12,10 @@ import { ZXingScannerComponent } from '@zxing/ngx-scanner';
 export class QRScannerComponent implements OnInit {
   @ViewChild('scanner') qrScanner: ZXingScannerComponent;
 
-  constructor(private sendZeroService: SendZeroService,
-              private qrScannerDialogComponent: QRScannerDialogComponent) {}
+  constructor(private sendZeroService: SendZeroService) {}
 
+  // TODO: Being reused in Dialog Compnent as well, think about making into
+  // a service
   ngOnInit() {
     const self = this;
     const enumerateDevicesPromise = new Promise((resolve, reject) => {
@@ -37,14 +38,37 @@ export class QRScannerComponent implements OnInit {
           self.qrScanner.startScan(device);
         });
   }
+
+  // switchCamera(): void {
+  //   const self = this;
+
+  //   const currentDevice = self.qrScanner.device;
+  //   const enumerateDevicesPromise = new Promise((resolve, reject) => {
+  //     self.qrScanner.enumarateVideoDevices((devices) => {
+  //       resolve(devices);
+  //     });
+  //   });
+  //   let allDevices: Array<any>;
+  //   enumerateDevicesPromise.then((devices: Array<any>) => allDevices = devices);
+  //   const currentDeviceIndex
+  //       = allDevices.findIndex(dev => dev.deviceId === currentDevice.deviceId);
+
+  //   const newDevice
+  //     = allDevices[currentDeviceIndex + 1]
+  //       ? allDevices[currentDeviceIndex + 1]
+  //       : allDevices[0];
+  //   this.qrScanner.changeDevice(newDevice);
+  // }
+
   scanSuccessHandler(event: any) {
     // console.log(event);
     const peerId = this.sendZeroService.removeURLFromPeer(event);
     this.sendZeroService.setConnectToPeerId(peerId);
-    this.qrScannerDialogComponent.closeDialog(true);
+    // Try not to use this
+    this.sendZeroService.dialog.closeAll();
+    // this.qrScannerDialogComponent.closeDialog(true);
     this.qrScanner.resetScan();
   }
-
 
   // TODO: Use event emitters
   scanErrorHandler(event: any) {
