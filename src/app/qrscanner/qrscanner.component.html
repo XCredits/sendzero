@@ -1,9 +1,16 @@
 <div class="qrscanner">
-    <qr-scanner
+    <!-- <qr-scanner
       [debug]="false"
       [canvasWidth]="300"
       [canvasHeight]="300"
       [stopAfterScan]="true"
       [updateTime]="500">
-    </qr-scanner>
+    </qr-scanner> -->
+    <zxing-scanner #scanner
+        [scannerEnabled]="true"
+        (scanSuccess)="scanSuccessHandler($event)"
+        (scanError)="scanErrorHandler($event)"
+        (scanFailure)="scanFailureHandler($event)"
+        (scanComplete)="scanCompleteHandler($event)">
+    </zxing-scanner>
 </div>
