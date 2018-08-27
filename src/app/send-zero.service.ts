@@ -587,7 +587,7 @@ export class SendZeroService {
     }
 
     const tree: UrlTree = this.router.parseUrl(this.peerToConnectToURL);
-    console.log(tree.queryParams['id']);
+    // console.log(tree.queryParams['id']);
     this.peerToConnectToURL = tree.queryParams['id'];
     return this.peerToConnectToURL;
   }
@@ -704,20 +704,12 @@ export class SendZeroService {
 
   // This creates a popup for qrscanner
   public openInitiateQRConnectionDialog(): void {
-    const dialogRef = this.dialog.open(QRScannerDialogComponent, {
-    });
+    const dialogRef = this.dialog.open(QRScannerDialogComponent);
     dialogRef.afterClosed().subscribe(result => {
       if (this.peerToConnectToURL !== null) {
         dialogRef.close(true);
       }
     });
-  }
-
-  public urlisnotempty(): boolean {
-    if (this.peerToConnectToURL === null) {
-      return true;
-    }
-    return false;
   }
 
 }
@@ -754,15 +746,14 @@ export class InitiateConnectionDialogComponent {
   selector: 'app-initiate-qr-scanner',
   template: `
     <h1 mat-dialog-title> Scan a SendZero QRCode </h1>
-    <app-qrscan></app-qrscan>
+    <app-qrscanner></app-qrscanner>
     <mat-dialog-actions>
     <button mat-raised-button (click)='closeDialog(false)' color='warn'>Cancel</button>
     </mat-dialog-actions>`,
 })
 export class QRScannerDialogComponent {
-  constructor(private dialogRef: MatDialogRef<ReceiveFileDialogComponent>,
-    private ref: ApplicationRef,
-    @Inject(MAT_DIALOG_DATA) public data: any) {}
+  constructor(private dialogRef: MatDialogRef<QRScannerDialogComponent>,
+              private ref: ApplicationRef) {}
 
   public closeDialog(result: boolean): void {
     this.dialogRef.close(result);
