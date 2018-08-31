@@ -36,6 +36,9 @@ export class QRScannerComponent implements OnInit {
               device = dev;
             }
           });
+          if (!device) {
+            device = devices[0];
+          }
           self.qrScanner.startScan(device);
         });
   }

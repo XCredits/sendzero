@@ -59,7 +59,7 @@
 <br>
 <!-- <mat-divider></mat-divider> -->
 <br>
-<div class="send"  *ngIf="JSObject.keys(peers).length !== 0">
+<div *ngIf="JSObject.keys(peers).length !== 0">
   <mat-expansion-panel class="send-expansion-panel" [expanded]="true">
     <mat-expansion-panel-header>
       <mat-panel-title>
@@ -69,7 +69,7 @@
         Send files to connected devices
       </mat-panel-description>
     </mat-expansion-panel-header>
-    <div class="connect">  
+    <div class="send">  
         <div class="container">
           <div class="row">
             <div class="col-sm-12">
