@@ -9,6 +9,7 @@ import { isEmpty } from 'lodash';
 import adjectives from './adjectives';
 import animals from './animals';
 import { Router, UrlTree } from '@angular/router';
+import { HttpClient } from '@angular/common/http';
 // import { ZXingScannerComponent } from '@zxing/ngx-scanner';
 // import { QRScannerComponent } from './qrscanner/qrscanner.component';
 
@@ -51,6 +52,7 @@ export class SendZeroService {
   private socket: any;
   // Maybe interface this
   private peers: any;
+  public fileStats: any;
   public peerSubject = new BehaviorSubject(this.peers);
 
   constructor(private ref: ApplicationRef,
@@ -58,8 +60,10 @@ export class SendZeroService {
               private sanitizer: DomSanitizer,
               public dialog: MatDialog,
               public snackBar: MatSnackBar,
-              private router: Router) {
+              private router: Router,
+              private http: HttpClient) {
     this.id = '';
+    this.fileStats = {};
     this.prompt = 'Please wait...';
     this.disableConnectButton = true;
     this.connectButtonText = 'Connect';
@@ -70,6 +74,11 @@ export class SendZeroService {
 
   public init(): void {
     const self = this;
+
+    this.http.post('/api/get-file-stats', {})
+        .subscribe(result => {
+          this.fileStats = result;
+        });
 
     this.isMobile = !!navigator.userAgent.match(
       /(iPhone|iPod|iPad|Android|webOS|BlackBerry|IEMobile|Opera Mini)/i);
@@ -514,6 +523,8 @@ export class SendZeroService {
     this.ref.tick();
     // Find file
     const file = this.peers[peerId].files.find(f => f.id === fileId);
+    // Save file info to db
+    this.postFileData(file);
     // Send chunks
     let chunk;
     while ((chunk = file.chunks.shift()) !== undefined) {
@@ -668,6 +679,15 @@ export class SendZeroService {
         animals[this.getRandom(0, ANIMAL_COUNT - 1)],
         this.getRandom(0, 99),
       ].join('-');
+  }
+
+  private postFileData(file: any): void {
+    this.http.post('/api/add-file', {
+        'fileName': file.name,
+        'fileSize': file.size,
+        'fileType': file.type,
+        'fileId': file.id,
+      }).subscribe();
   }
 
   // https://stackoverflow.com/questions/18230217/javascript-generate-a-random-number-within-a-range-using-crypto-getrandomvalues
