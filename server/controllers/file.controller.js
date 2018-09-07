@@ -1,10 +1,10 @@
-const auth = require('../config/jwt-auth.js');
+// const auth = require('../config/jwt-auth.js');
 
 const File = require('../models/file.model.js');
 
 module.exports = function(app) {
-  app.post('/api/add-file', auth.jwt, addFile);
-  app.post('/api/get-file-stats', auth.jwt, getFileStats);
+  app.post('/api/add-file', addFile);
+  app.post('/api/get-file-stats', getFileStats);
 };
 
 /**
@@ -20,8 +20,9 @@ function addFile(req, res) {
   const fileType = req.body.fileType;
   // Validation
   // id should have set length?
+  // TODO: no auth so don't accept all requests
   if (typeof fileName !== 'string' ||
-      typeof fileSize !== 'number' || size === 0 ||
+      typeof fileSize !== 'number' || fileSize === 0 ||
       typeof fileId !== 'string' ||
       typeof fileType !== 'string') {
     return res.status(422).json({message: 'Request failed validation.'});
@@ -32,7 +33,6 @@ function addFile(req, res) {
   file.id = fileId;
   file.size = fileSize;
   file.type = fileType;
-
   return file.save()
       .then((result) => {
         res.status(200).send({message: 'Success'});
@@ -51,20 +51,21 @@ function addFile(req, res) {
  * @return {*}
  */
 function getFileStats(req, res) {
-  // let totalSize;
-  // let fileCount;
+  let totalSize;
+  let fileCount;
+  // TODO: no auth so don't accept all requests
   return File.aggregate([
         {$group: {_id: null, totalSize: {$sum: '$size'}}},
         {$project: {_id: 0, totalSize: 1}},
       ])
       .then((result) => {
         console.log(result);
-        // totalSize = result.totalSize;
+        totalSize = result[0].totalSize;
         return File.count();
       })
       .then((result) => {
-        // fileCount = result.count;
-        console.log(result);
+        fileCount = result;
+        return res.status(200).json({fileCount, totalSize});
       })
       .catch((error) => {
         console.log('Error');
