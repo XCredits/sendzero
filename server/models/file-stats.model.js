@@ -5,7 +5,8 @@ const Schema = mongoose.Schema;
 let FileStatsSchema = new Schema({
      totalFiles: {type: Number},
      totalSize: {type: Number},
-     machineId: {type: Number},
+     machineId: {type: String},
+     machineIp: {tyep: String},
   }
 );
 
