@@ -9,6 +9,8 @@ import { isEmpty } from 'lodash';
 import adjectives from './adjectives';
 import animals from './animals';
 import { Router, UrlTree } from '@angular/router';
+import { HttpClient } from '@angular/common/http';
+import { LocalStorageService } from 'angular-2-local-storage';
 // import { ZXingScannerComponent } from '@zxing/ngx-scanner';
 // import { QRScannerComponent } from './qrscanner/qrscanner.component';
 
@@ -44,6 +46,9 @@ export class SendZeroService {
   public disableFileSending = false;
   public humanId: string;
   public isMobile: boolean;
+  private machineId: string;
+  public totalFiles: number;
+  public totalSize: number;
   // public user: User;
   // public isLoggedIn: boolean;
 
@@ -58,7 +63,9 @@ export class SendZeroService {
               private sanitizer: DomSanitizer,
               public dialog: MatDialog,
               public snackBar: MatSnackBar,
-              private router: Router) {
+              private router: Router,
+              private http: HttpClient,
+              private localStorageService: LocalStorageService) {
     this.id = '';
     this.prompt = 'Please wait...';
     this.disableConnectButton = true;
@@ -70,6 +77,25 @@ export class SendZeroService {
 
   public init(): void {
     const self = this;
+
+    this.machineId = this.localStorageService.get('machineId');
+    if (!this.machineId) {
+      this.machineId = shortid.generate();
+      self.localStorageService.set('machineId', self.machineId);
+      this.totalFiles = 0;
+      this.totalSize = 0;
+      this.http.post('/api/set-file-stats', {
+        machineId: self.machineId,
+        totalFiles: self.totalFiles,
+        totalSize: self.totalSize,
+      }).subscribe();
+    } else {
+      this.http.post('/api/get-file-stats', {machineId: self.machineId})
+          .subscribe((result: any) => {
+            self.totalFiles = result.totalFiles;
+            self.totalSize = result.totalSize;
+          });
+    }
 
     this.isMobile = !!navigator.userAgent.match(
       /(iPhone|iPod|iPad|Android|webOS|BlackBerry|IEMobile|Opera Mini)/i);
@@ -514,6 +540,8 @@ export class SendZeroService {
     this.ref.tick();
     // Find file
     const file = this.peers[peerId].files.find(f => f.id === fileId);
+    // Save file info to db
+    this.postFileDataAndUpdateStats(file);
     // Send chunks
     let chunk;
     while ((chunk = file.chunks.shift()) !== undefined) {
@@ -670,6 +698,25 @@ export class SendZeroService {
       ].join('-');
   }
 
+  private postFileDataAndUpdateStats(file: any): void {
+    const self = this;
+
+    this.totalFiles++;
+    this.totalSize += file.size;
+
+    this.http.post('/api/add-file', {
+        'fileSize': file.size,
+        'fileType': file.type,
+        'fileId': file.id,
+    }).subscribe();
+
+    this.http.post('/api/update-file-stats', {
+      'machineId': self.machineId,
+      'totalFiles': self.totalFiles,
+      'totalSize': self.totalSize,
+    }).subscribe();
+  }
+
   // https://stackoverflow.com/questions/18230217/javascript-generate-a-random-number-within-a-range-using-crypto-getrandomvalues
   private getRandom(min: number, max: number): number {
     const byteArrray = new Uint16Array(1);
@@ -776,7 +823,7 @@ export class QRScannerDialogComponent {
       <br>
       File Type: {{data.fileType}}
       <br>
-      File Size: {{data.fileSize | byteFormat}}
+      File Size: {{data.fileSize | formatSize:2}}
     </mat-dialog-content>
     <mat-dialog-actions>
     <button mat-raised-button (click)='closeDialog(true)' cdkFocusInitial color='primary'>Yes</button>

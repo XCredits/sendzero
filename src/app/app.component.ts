@@ -1,8 +1,8 @@
 import {filter} from 'rxjs/operators';
 import { Component, ViewChild, ViewEncapsulation, OnChanges, OnInit } from '@angular/core';
 // Imports needed for router import for title
-import { ActivatedRoute, NavigationStart, NavigationEnd, Router } from '@angular/router'; 
-import { Location, PopStateEvent } from '@angular/common'; 
+import { ActivatedRoute, NavigationStart, NavigationEnd, Router } from '@angular/router';
+import { Location, PopStateEvent } from '@angular/common';
 import { UserService } from './user.service';
 import { AnalyticsService } from './analytics.service';
 import { SendZeroService } from './send-zero.service';
@@ -116,7 +116,7 @@ export class AppComponent implements OnInit {
       private route: ActivatedRoute,
       private userService: UserService,
       private analytics: AnalyticsService,
-      private location: Location, 
+      private location: Location,
       private sendZeroService: SendZeroService,
     ) {
     // Set side bar mode
