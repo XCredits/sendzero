@@ -5,6 +5,7 @@ const FileStats = require('../models/file-stats.model');
 module.exports = function(app) {
   app.post('/api/set-file-stats', setFileStats);
   app.post('/api/get-file-stats', getFileStats);
+  app.post('/api/update-file-stats', updateFileStats);
 };
 
 /**
@@ -51,8 +52,6 @@ function setFileStats(req, res) {
  * @return {*}
  */
 function getFileStats(req, res) {
-  // let totalSize;
-  // let fileCount;
   const machineId = req.body.machineId;
   // Validation
   // TODO: Check valid id, same ip maybe?
@@ -66,6 +65,40 @@ function getFileStats(req, res) {
           totalFiles: result.totalFiles,
           totalSize: result.totalSize,
         });
+      })
+      .catch((error) => {
+        console.log('Error');
+        console.log(error.message);
+        return res.status(500).json({message: error.message});
+      });
+}
+/**
+ * update file stats for a machine
+ * @param {*} req request object
+ * @param {*} res response object
+ * @return {*}
+ */
+function updateFileStats(req, res) {
+  const machineId = req.body.machineId;
+  const totalFiles = req.body.totalFiles;
+  const totalSize = req.body.totalSize;
+
+  // Validation
+  // TODO: id should be valid, maybe ip should be same?
+  if (typeof machineId !== 'string' ||
+      typeof totalFiles !== 'number' ||
+      typeof totalSize !== 'number') {
+    return res.status(422).json({message: 'Request failed validation.'});
+  }
+
+  return FileStats.findOne({machineId: machineId})
+      .then((fileStats) => {
+        fileStats.totalFiles = totalFiles;
+        fileStats.totalSize = totalSize;
+        return fileStats.save();
+      })
+      .then((result) => {
+        return res.status(200).json({message: 'Success'});
       })
       .catch((error) => {
         console.log('Error');
