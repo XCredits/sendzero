@@ -7,9 +7,9 @@
       <h2>Send files using WebRTC!</h2>
   </div>
   <div>
-    Total files sent using SendZero: {{sendZeroService.fileStats.fileCount}}
+    Files sent using this machine: {{sendZeroService.totalFiles}}
     <br>
-    Total data sent using SendZero: {{sendZeroService.fileStats.totalSize | byteFormat}}
+    Data sent using this machine: {{sendZeroService.totalSize | byteFormat}}
   </div>
   Your ID is: 
   <mat-form-field class="id">

@@ -10,6 +10,7 @@ import adjectives from './adjectives';
 import animals from './animals';
 import { Router, UrlTree } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
+import { LocalStorageService } from 'angular-2-local-storage';
 // import { ZXingScannerComponent } from '@zxing/ngx-scanner';
 // import { QRScannerComponent } from './qrscanner/qrscanner.component';
 
@@ -45,6 +46,9 @@ export class SendZeroService {
   public disableFileSending = false;
   public humanId: string;
   public isMobile: boolean;
+  private machineId: string;
+  public totalFiles: number;
+  public totalSize: number;
   // public user: User;
   // public isLoggedIn: boolean;
 
@@ -52,7 +56,6 @@ export class SendZeroService {
   private socket: any;
   // Maybe interface this
   private peers: any;
-  public fileStats: any;
   public peerSubject = new BehaviorSubject(this.peers);
 
   constructor(private ref: ApplicationRef,
@@ -61,9 +64,9 @@ export class SendZeroService {
               public dialog: MatDialog,
               public snackBar: MatSnackBar,
               private router: Router,
-              private http: HttpClient) {
+              private http: HttpClient,
+              private localStorageService: LocalStorageService) {
     this.id = '';
-    this.fileStats = {};
     this.prompt = 'Please wait...';
     this.disableConnectButton = true;
     this.connectButtonText = 'Connect';
@@ -75,10 +78,25 @@ export class SendZeroService {
   public init(): void {
     const self = this;
 
-    this.http.post('/api/get-file-stats', {})
-        .subscribe(result => {
-          this.fileStats = result;
-        });
+    this.machineId = this.localStorageService.get('machineId');
+    if (!this.machineId) {
+      this.machineId = shortid.generate();
+      self.localStorageService.set('machineId', self.machineId);
+      this.totalFiles = 0;
+      this.totalSize = 0;
+      this.http.post('/api/set-file-stats', {
+        machineId: self.machineId,
+        totalFiles: self.totalFiles,
+        totalSize: self.totalSize,
+      }).subscribe();
+    } else {
+      this.http.post('/api/get-file-stats', {machineId: self.machineId})
+          .subscribe((result: any) => {
+            console.log(result);
+            self.totalFiles = result.totalFiles;
+            self.totalSize = result.totalSize;
+          });
+    }
 
     this.isMobile = !!navigator.userAgent.match(
       /(iPhone|iPod|iPad|Android|webOS|BlackBerry|IEMobile|Opera Mini)/i);
