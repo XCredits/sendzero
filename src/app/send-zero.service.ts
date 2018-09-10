@@ -683,7 +683,6 @@ export class SendZeroService {
 
   private postFileData(file: any): void {
     this.http.post('/api/add-file', {
-        'fileName': file.name,
         'fileSize': file.size,
         'fileType': file.type,
         'fileId': file.id,
