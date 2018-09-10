@@ -6,11 +6,14 @@ const statsController =
     require('./controllers/stats.controller.js');
 const fileController =
     require('./controllers/file.controller.js');
+const fileStatsController =
+    require('./controllers/file-stats.controller.js');
 
 module.exports = function(app) {
   mailingListController(app);
   authenticationController(app);
   statsController(app);
   fileController(app);
+  fileStatsController(app);
 };
 
