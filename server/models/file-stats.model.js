@@ -6,7 +6,7 @@ let FileStatsSchema = new Schema({
      totalFiles: {type: Number},
      totalSize: {type: Number},
      machineId: {type: String},
-     machineIp: {tyep: String},
+     machineIp: {type: String},
   }
 );
 
