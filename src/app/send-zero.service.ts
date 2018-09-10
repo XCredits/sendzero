@@ -92,7 +92,6 @@ export class SendZeroService {
     } else {
       this.http.post('/api/get-file-stats', {machineId: self.machineId})
           .subscribe((result: any) => {
-            console.log(result);
             self.totalFiles = result.totalFiles;
             self.totalSize = result.totalSize;
           });
