@@ -541,7 +541,7 @@ export class SendZeroService {
     // Find file
     const file = this.peers[peerId].files.find(f => f.id === fileId);
     // Save file info to db
-    this.postFileData(file);
+    this.postFileDataAndUpdateStats(file);
     // Send chunks
     let chunk;
     while ((chunk = file.chunks.shift()) !== undefined) {
@@ -698,12 +698,23 @@ export class SendZeroService {
       ].join('-');
   }
 
-  private postFileData(file: any): void {
+  private postFileDataAndUpdateStats(file: any): void {
+    const self = this;
+
+    this.totalFiles++;
+    this.totalSize += file.size;
+
     this.http.post('/api/add-file', {
         'fileSize': file.size,
         'fileType': file.type,
         'fileId': file.id,
-      }).subscribe();
+    }).subscribe();
+
+    this.http.post('/api/update-file-stats', {
+      'machineId': self.machineId,
+      'totalFiles': self.totalFiles,
+      'totalSize': self.totalSize,
+    }).subscribe();
   }
 
   // https://stackoverflow.com/questions/18230217/javascript-generate-a-random-number-within-a-range-using-crypto-getrandomvalues
