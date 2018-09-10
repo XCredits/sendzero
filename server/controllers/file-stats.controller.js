@@ -60,7 +60,7 @@ function getFileStats(req, res) {
     return res.status(422).json({message: 'Request failed validation.'});
   }
 
-  return FileStats.find({machineId: machineId})
+  return FileStats.findOne({machineId: machineId})
       .then((result) => {
         return res.json({
           totalFiles: result.totalFiles,
