@@ -9,7 +9,7 @@
   <div>
     Files sent using this machine: {{sendZeroService.totalFiles}}
     <br>
-    Data sent using this machine: {{sendZeroService.totalSize | byteFormat}}
+    Data sent using this machine: {{sendZeroService.totalSize | formatSize:2}}
   </div>
   Your ID is: 
   <mat-form-field class="id">
@@ -155,7 +155,7 @@
                 </table>
                 <br>
                 <div *ngIf="JSObject.keys(peers).length !== 0 && !sendZeroService.disableFileSending" class="filePicker">
-                  <file-drop style="cursor: pointer; text-align: center" (click)="openFileInput()" headertext="{{file ? file.name + '&emsp;' +  (file.size | byteFormat) : 'Drag file here!'}}" (onFileDrop)="fileDropped($event)">
+                  <file-drop style="cursor: pointer; text-align: center" (click)="openFileInput()" headertext="{{file ? file.name + '&emsp;' +  (file.size | formatSize:2) : 'Drag file here!'}}" (onFileDrop)="fileDropped($event)">
                       <!-- <span>optional content (don't set headertext then)</span> -->
                   </file-drop>
                   <input type='file' style='visibility: hidden' (change)="fileChanged($event)" #fileInput>

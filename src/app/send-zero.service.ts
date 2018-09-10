@@ -823,7 +823,7 @@ export class QRScannerDialogComponent {
       <br>
       File Type: {{data.fileType}}
       <br>
-      File Size: {{data.fileSize | byteFormat}}
+      File Size: {{data.fileSize | formatSize:2}}
     </mat-dialog-content>
     <mat-dialog-actions>
     <button mat-raised-button (click)='closeDialog(true)' cdkFocusInitial color='primary'>Yes</button>
