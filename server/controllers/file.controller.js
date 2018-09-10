@@ -4,7 +4,6 @@ const File = require('../models/file.model.js');
 
 module.exports = function(app) {
   app.post('/api/add-file', addFile);
-  app.post('/api/get-file-stats', getFileStats);
 };
 
 /**
