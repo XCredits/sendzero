@@ -23,7 +23,7 @@ function setFileStats(req, res) {
   // TODO: id should have set length
   if (typeof machineId !== 'string' ||
       typeof totalFiles !== 'number' ||
-      typeof totalSize !== 'string') {
+      typeof totalSize !== 'number') {
     return res.status(422).json({message: 'Request failed validation.'});
   }
 
@@ -35,7 +35,7 @@ function setFileStats(req, res) {
 
   return fileStats.save()
       .then((result) => {
-        res.status(200).send({message: 'Success'});
+        return res.status(200).send({message: 'Success'});
       })
       .catch((error) => {
         console.log('Error');
@@ -55,12 +55,21 @@ function getFileStats(req, res) {
   // let fileCount;
   const machineId = req.body.machineId;
   // Validation
+  // TODO: Check valid id, same ip maybe?
   if (typeof machineId !== 'string') {
     return res.status(422).json({message: 'Request failed validation.'});
   }
 
   return FileStats.find({machineId: machineId})
       .then((result) => {
-        console.log(result);
+        return res.json({
+          totalFiles: result.totalFiles,
+          totalSize: result.totalSize,
+        });
+      })
+      .catch((error) => {
+        console.log('Error');
+        console.log(error.message);
+        return res.status(500).json({message: error.message});
       });
 }
