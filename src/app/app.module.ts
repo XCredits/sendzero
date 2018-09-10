@@ -91,6 +91,9 @@ import { FooterComponent } from './footer/footer.component';
 import { QRCodeComponent } from './qrcode/qrcode.component';
 import { QRScannerComponent } from './qrscanner/qrscanner.component';
 
+// Pipes
+import { FormatSizePipe } from './format-size.pipe';
+
 @NgModule({
   declarations: [
     AppComponent,
@@ -123,6 +126,8 @@ import { QRScannerComponent } from './qrscanner/qrscanner.component';
     QRScannerDialogComponent,
     QRCodeComponent,
     QRScannerComponent,
+    // Pipes
+    FormatSizePipe,
   ],
   imports: [
     BrowserModule,
