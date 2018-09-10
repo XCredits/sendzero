@@ -20,8 +20,7 @@ function addFile(req, res) {
   // Validation
   // id should have set length?
   // TODO: no auth so don't accept all requests
-  if (typeof fileName !== 'string' ||
-      typeof fileSize !== 'number' || fileSize === 0 ||
+  if (typeof fileSize !== 'number' || fileSize === 0 ||
       typeof fileId !== 'string' ||
       typeof fileType !== 'string') {
     return res.status(422).json({message: 'Request failed validation.'});
