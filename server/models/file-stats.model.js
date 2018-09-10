@@ -9,4 +9,4 @@ let FileStatsSchema = new Schema({
   }
 );
 
-module.exports = mongoose.model('File', FileStatsSchema);
+module.exports = mongoose.model('FileStats', FileStatsSchema);
