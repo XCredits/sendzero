@@ -33,7 +33,7 @@ function addFile(req, res) {
   file.senderIp = ip;
   return file.save()
       .then((result) => {
-        res.status(200).send({message: 'Success'});
+        return res.status(200).send({message: 'Success'});
       })
       .catch((error) => {
         console.log('Error');
