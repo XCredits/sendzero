@@ -4,7 +4,7 @@ import { Router } from '@angular/router';
 import { Subject, BehaviorSubject, ReplaySubject } from 'rxjs';
 import { take } from 'rxjs/operators';
 import { isEqual } from 'lodash';
-import { LocalStorageService } from 'angular-2-local-storage';
+import {LocalStorageService, SessionStorageService} from 'ngx-webstorage';
 
 // https://scotch.io/tutorials/protecting-angular-v2-routes-with-canactivatecanactivatechild-guards#toc-authentication-guard
 // https://www.youtube.com/watch?v=WveRq-tlb6I
@@ -32,11 +32,11 @@ export class UserService {
   nav: NavObj;
 
   // Local storage variables
-  // user-service-jwt-exp // <number>
-  // user-service-jwt-refresh-token-exp // <number> a proxy for isLoggedIn
-  // user-service-user // <User>
-  // user-service-user-set-time // <number>, in milliseconds
-  // user-service-is-refreshing // <boolean>
+  // user-service.jwt-exp // <number>
+  // user-service.jwt-refresh-token-exp // <number> a proxy for isLoggedIn
+  // user-service.user // <User>
+  // user-service.user-set-time // <number>, in milliseconds
+  // user-service.is-refreshing // <boolean>
 
   constructor( private http: HttpClient,
       private router: Router,
@@ -45,7 +45,7 @@ export class UserService {
     // Check if user is logged in. Note that because the JWT is stored in the
     // HTTP cookie, the front-end can't see the JWT.
     this.jwtRefreshTokenExp =
-        this.localStorageService.get('user-service-jwt-refresh-token-exp');
+        this.localStorageService.retrieve('user-service.jwt-refresh-token-exp');
 
     this.userLocalStorageChecker();
     if (this.jwtRefreshTokenExp &&
@@ -54,7 +54,7 @@ export class UserService {
     } else {
       this.userObservable.next(undefined);
       this.jwtRefreshTokenExp = undefined;
-      this.localStorageService.remove('user-service-jwt-refresh-token-exp');
+      this.localStorageService.clear('user-service.jwt-refresh-token-exp');
     }
   }
 
@@ -65,8 +65,8 @@ export class UserService {
     this.jwtExp = jwtExp;
     this.jwtRefreshTokenExp = jwtRefreshTokenExp;
 
-    this.localStorageService.set('user-service-jwt-exp', this.jwtExp);
-    this.localStorageService.set('user-service-jwt-refresh-token-exp',
+    this.localStorageService.store('user-service.jwt-exp', this.jwtExp);
+    this.localStorageService.store('user-service.jwt-refresh-token-exp',
         this.jwtRefreshTokenExp);
 
     this._setUser(user);
@@ -84,8 +84,8 @@ export class UserService {
       this.user = user;
       this.userSetTime = Date.now();
       // Store user in local storage
-      this.localStorageService.set('user-service-user', this.user);
-      this.localStorageService.set('user-service-user-set-time',
+      this.localStorageService.store('user-service.user', this.user);
+      this.localStorageService.store('user-service.user-set-time',
           this.userSetTime);
 
       this.userObservable.next(this.user);
@@ -108,7 +108,7 @@ export class UserService {
   checkThenRefreshJwt() {
     const self = this;
     const isRefreshing =
-        this.localStorageService.get('user-service-is-refreshing');
+        this.localStorageService.retrieve('user-service.is-refreshing');
 
     // If another tab is checking, wait for a response
     if (isRefreshing) { // currently checking, come back soon, say 1 second
@@ -119,7 +119,7 @@ export class UserService {
     }
     // If the expiry time has changed, update expiry and wait until next time
     const lsJwtExp =
-        Number(this.localStorageService.get('user-service-jwt-exp'));
+        Number(this.localStorageService.retrieve('user-service.jwt-exp'));
     if (this.jwtExp && this.jwtExp < lsJwtExp && lsJwtExp < Date.now() / 1000) {
       this.jwtExp = lsJwtExp;
       this.compareUserLsUserThenUpdate();
@@ -132,13 +132,13 @@ export class UserService {
 
   refreshJwt() {
     // If this happens to be the lucky app that is refreshing
-    this.localStorageService.set('user-service-is-refreshing', true);
+    this.localStorageService.store('user-service.is-refreshing', true);
     this.http.get<any>('/api/user/refresh-jwt')
         .subscribe(
         response => {
           this.jwtExp = response.jwtExp;
-          this.localStorageService.set('user-service-jwt-exp', this.jwtExp);
-          this.localStorageService.remove('user-service-is-refreshing');
+          this.localStorageService.store('user-service.jwt-exp', this.jwtExp);
+          this.localStorageService.clear('user-service.is-refreshing');
 
           // If the user has not been set (e.g. this page has just been loaded)
           if (!this.user) {
@@ -148,7 +148,7 @@ export class UserService {
         },
         errorResponse => {
           // On failure
-          this.localStorageService.remove('user-service-is-refreshing');
+          this.localStorageService.clear('user-service.is-refreshing');
           if (errorResponse.status === 401) {
             // Clear all data, call next on user observable
             this.clearAllUserData();
@@ -191,10 +191,10 @@ export class UserService {
    */
   private compareUserLsUserThenUpdate() {
     const lsUserSetTime: number =
-        this.localStorageService.get('user-service-user-set-time');
+        this.localStorageService.retrieve('user-service.user-set-time');
     if (this.userSetTime !== lsUserSetTime) {
       this.userSetTime = lsUserSetTime;
-      const lsUser: User = this.localStorageService.get('user-service-user');
+      const lsUser: User = this.localStorageService.retrieve('user-service.user');
       if (!isEqual(this.user, lsUser)) {
         this.user = lsUser;
         this.userObservable.next(this.user);
@@ -245,11 +245,11 @@ export class UserService {
     clearTimeout(this.refreshJwtTimeoutId);
 
     // Clear localstorage
-    this.localStorageService.remove('user-service-jwt-exp');
-    this.localStorageService.remove('user-service-jwt-refresh-token-exp');
-    this.localStorageService.remove('user-service-user');
-    this.localStorageService.remove('user-service-user-set-time');
-    this.localStorageService.remove('user-service-is-refreshing');
+    this.localStorageService.clear('user-service.jwt-exp');
+    this.localStorageService.clear('user-service.jwt-refresh-token-exp');
+    this.localStorageService.clear('user-service.user');
+    this.localStorageService.clear('user-service.user-set-time');
+    this.localStorageService.clear('user-service.is-refreshing');
 
     // inform the rest of the app that a log out has occurred
     this.userObservable.next(undefined);

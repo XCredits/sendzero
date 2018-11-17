@@ -3,7 +3,7 @@ import { NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { HttpClientModule} from '@angular/common/http'; // Deprecation https://angular.io/api/http/HttpModule
 import { RouterModule } from '@angular/router';
-import { LocalStorageModule } from 'angular-2-local-storage';
+import { NgxWebstorageModule } from 'ngx-webstorage';
 import { QRCodeModule } from 'angularx-qrcode'; // QRcode Generator
 import { ZXingScannerModule } from '@zxing/ngx-scanner';
 import { AppComponent } from './app.component';
@@ -135,10 +135,10 @@ import { FormatSizePipe } from './format-size.pipe';
     HttpClientModule,
     QRCodeModule, // QR Module
     ZXingScannerModule,
-
-    LocalStorageModule.withConfig({
-        prefix: 'app',
-        storageType: 'localStorage'
+    NgxWebstorageModule.forRoot({
+      prefix: 'app',
+      separator: '.',
+      caseSensitive: true
     }),
 
     RouterModule.forRoot([
