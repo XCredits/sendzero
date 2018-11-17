@@ -20,9 +20,13 @@ export class QRScannerComponent implements OnInit {
   ngOnInit() {
     const self = this;
     const enumerateDevicesPromise = new Promise((resolve, reject) => {
-      this.qrScanner.enumarateVideoDevices((devices) => {
+      self.qrScanner.camerasFound.subscribe((devices: MediaDeviceInfo[]) => {
         resolve(devices);
       });
+      //
+      // this.qrScanner.enumarateVideoDevices((devices) => {
+      //   resolve(devices);
+      // });
     });
 
     enumerateDevicesPromise
@@ -71,7 +75,9 @@ export class QRScannerComponent implements OnInit {
     // Try not to use this
     // this.sendZeroService.dialog.closeAll();
     this.qrScannerDialog.closeDialog(true);
-    this.qrScanner.resetScan();
+
+    // TODO Try to bring this back in
+    // this.qrScanner.resetScan();
   }
 
   // TODO: Use event emitters
