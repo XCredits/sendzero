@@ -56,7 +56,6 @@ import {
   MatToolbarModule,
   MatTooltipModule,
 } from '@angular/material';
-import { MaterialFileInputModule } from 'ngx-material-file-input';
 import { FileDropModule } from 'ngx-file-drop';
 
 
@@ -282,7 +281,6 @@ import { FormatSizePipe } from './format-size.pipe';
     MatTabsModule,
     MatToolbarModule,
     MatTooltipModule,
-    MaterialFileInputModule,
     FileDropModule,
 
     // Below is for Progressive Web App (PWA) functionality
