@@ -1,13 +1,13 @@
 <div class="simple-form-aligner">
   <mat-card class="simple-form-card">
-    <mat-card-title>	Login </mat-card-title>
-    <mat-card-subtitle>	Don't have an account? 
-      <a routerLink="/register" [queryParams]="loginRegisterSwitchQueryParams">
-        Register here.
-      </a>
-    </mat-card-subtitle>
-    <mat-card-content>
-      <form [formGroup]="form" (ngSubmit)="submit(form.value)">
+    <form [formGroup]="form" (ngSubmit)="submit(form.value)">
+      <mat-card-title>	Login </mat-card-title>
+      <mat-card-subtitle>	Don't have an account? 
+        <a routerLink="/register" [queryParams]="loginRegisterSwitchQueryParams">
+          Register here.
+        </a>
+      </mat-card-subtitle>
+      <mat-card-content>
         <div class="form-group">
           <mat-form-field class="simple-form-field-100">
             <input matInput placeholder="Username" name="username" formControlName="username">
@@ -39,18 +39,18 @@
             {{formErrorMessage}}
           </span>
         </div>
-        </form>
-    </mat-card-content>
-    <mat-card-subtitle>	
-      Forgot your password? 
-      <a routerLink="/forgot-password">
-        Reset it here.
-      </a>
-      <br>
-      Forgot your username? 
-      <a routerLink="/forgot-username">
-        Get it sent to your email.
-      </a>
-    </mat-card-subtitle>
+      </mat-card-content>
+      <mat-card-subtitle>	
+        Forgot your password? 
+        <a routerLink="/forgot-password">
+          Reset it here.
+        </a>
+        <br>
+        Forgot your username? 
+        <a routerLink="/forgot-username">
+          Get it sent to your email.
+        </a>
+      </mat-card-subtitle>
+    </form>
   </mat-card>
 </div>

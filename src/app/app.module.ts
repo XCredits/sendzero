@@ -3,7 +3,7 @@ import { NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { HttpClientModule} from '@angular/common/http'; // Deprecation https://angular.io/api/http/HttpModule
 import { RouterModule } from '@angular/router';
-import { LocalStorageModule } from 'angular-2-local-storage';
+import { NgxWebstorageModule } from 'ngx-webstorage';
 import { QRCodeModule } from 'angularx-qrcode'; // QRcode Generator
 import { ZXingScannerModule } from '@zxing/ngx-scanner';
 import { AppComponent } from './app.component';
@@ -56,7 +56,6 @@ import {
   MatToolbarModule,
   MatTooltipModule,
 } from '@angular/material';
-import { MaterialFileInputModule } from 'ngx-material-file-input';
 import { FileDropModule } from 'ngx-file-drop';
 
 
@@ -136,10 +135,10 @@ import { FormatSizePipe } from './format-size.pipe';
     HttpClientModule,
     QRCodeModule, // QR Module
     ZXingScannerModule,
-
-    LocalStorageModule.withConfig({
-        prefix: 'app',
-        storageType: 'localStorage'
+    NgxWebstorageModule.forRoot({
+      prefix: 'app',
+      separator: '.',
+      caseSensitive: true
     }),
 
     RouterModule.forRoot([
@@ -282,7 +281,6 @@ import { FormatSizePipe } from './format-size.pipe';
     MatTabsModule,
     MatToolbarModule,
     MatTooltipModule,
-    MaterialFileInputModule,
     FileDropModule,
 
     // Below is for Progressive Web App (PWA) functionality

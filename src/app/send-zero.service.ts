@@ -10,7 +10,7 @@ import adjectives from './adjectives';
 import animals from './animals';
 import { Router, UrlTree } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
-import { LocalStorageService } from 'angular-2-local-storage';
+import { LocalStorageService } from 'ngx-webstorage';
 // import { ZXingScannerComponent } from '@zxing/ngx-scanner';
 // import { QRScannerComponent } from './qrscanner/qrscanner.component';
 
@@ -78,10 +78,10 @@ export class SendZeroService {
   public init(): void {
     const self = this;
 
-    this.machineId = this.localStorageService.get('machineId');
+    this.machineId = this.localStorageService.retrieve('machineId');
     if (!this.machineId) {
       this.machineId = shortid.generate();
-      self.localStorageService.set('machineId', self.machineId);
+      self.localStorageService.store('machineId', self.machineId);
       this.totalFiles = 0;
       this.totalSize = 0;
       this.http.post('/api/set-file-stats', {
