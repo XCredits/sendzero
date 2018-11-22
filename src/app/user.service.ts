@@ -23,6 +23,7 @@ export class UserService {
   private refreshUserTimeoutId: any;
   private tabId: number;
   private refreshJwtAttempts: number;
+  readonly usernameRegexString = '^[a-zA-Z0-9_.-]*$';
 
   // Below we only only activate the subscribe after userObservable has
   // next called. The '1' refers to how many states are kept in the buffer to be

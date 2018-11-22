@@ -51,7 +51,7 @@ const passport = require('passport');
 const crypto = require('crypto');
 require('../config/passport.js');
 
-// const emailController =
+const usernameRegex = /^[a-zA-Z0-9_.-]*$/;
 
 module.exports = function(app) {
   app.use(passport.initialize());
@@ -88,7 +88,7 @@ function register(req, res) {
       typeof username !== 'string' ||
       typeof password !== 'string' ||
       !validator.isEmail(email) ||
-      !validator.isAlphanumeric(username) ||
+      !usernameRegex.test(username) ||
       !validator.isLength(password, 8)
     ) {
     return res.status(422).json({message: 'Request failed validation'});
@@ -176,7 +176,7 @@ function login(req, res) {
   // Validate
   if (typeof username !== 'string' ||
       typeof password !== 'string' ||
-      !validator.isAlphanumeric(username)
+      !usernameRegex.test(username)
     ) {
     return res.status(422).json({message: 'Request failed validation'});
   }
@@ -273,7 +273,7 @@ function requestResetPassword(req, res) {
   let username = req.body.username;
   // Validate
   if (typeof username !== 'string' ||
-      !validator.isAlphanumeric(username)
+      !usernameRegex.test(username)
     ) {
     return res.status(422).json({message: 'Request failed validation'});
   }
