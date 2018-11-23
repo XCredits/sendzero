@@ -2,6 +2,7 @@
 import { Component, ViewChild, ViewEncapsulation, OnChanges, OnInit, Input } from '@angular/core';
 import { SendZeroService } from '../send-zero.service';
 import { DialogService } from '../dialog.service';
+import { QrService } from '../qr.service';
 import { ZXingScannerComponent } from '@zxing/ngx-scanner';
 
 @Component({
@@ -16,7 +17,16 @@ export class QRScannerComponent implements OnInit {
   deviceBeingUsed: MediaDeviceInfo;
 
   constructor(private sendZeroService: SendZeroService,
-              private dialogService: DialogService) {}
+              private qrService: QrService,
+              private dialogService: DialogService) {
+    this.qrService.eventEmitter.subscribe(event => {
+      switch (event) {
+        case 'switch camera':
+          this.switchCamera();
+          break;
+      }
+    });
+  }
 
   ngOnInit() {
     const self = this;
@@ -28,6 +38,7 @@ export class QRScannerComponent implements OnInit {
 
     enumerateDevicesPromise
         .then((devices: any) => {
+          self.devices = devices;
           let device;
           devices.forEach(dev => {
             if (dev.label.includes('back') ||

@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { QrService } from '../qr.service';
 
 @Component({
   selector: 'app-qr-scanner-dialog',
@@ -7,10 +8,10 @@ import { Component, OnInit } from '@angular/core';
 })
 export class QrScannerDialogComponent implements OnInit {
 
-  constructor() { }
+  constructor(private qrService: QrService) { }
 
   public switchCamera(): void {
-    //
+    this.qrService.switchScannerCamera();
   }
 
   ngOnInit() {

@@ -11,6 +11,7 @@ import { UserService } from './user.service';
 import { SignalService } from './signal.service';
 import { SendZeroService } from './send-zero.service';
 import { DialogService } from './dialog.service';
+import { QrService } from './qr.service';
 import { StatsService } from './stats.service';
 import { AnalyticsService } from './analytics.service';
 import { AuthGuard } from './auth.guard';
@@ -309,6 +310,7 @@ import { ReceiveFileDialogComponent } from './receive-file-dialog/receive-file-d
     StatsService,
     AnalyticsService,
     DialogService,
+    QrService,
   ],
   bootstrap: [AppComponent]
 })
