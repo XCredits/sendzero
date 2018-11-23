@@ -72,22 +72,24 @@ export class HomeComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.sub = this.route.queryParams.subscribe(params => {
-        const peerId = params['id'] || '';
-        if (peerId.length > 0) {
-          this.sendZeroService.setConnectToPeerId(peerId);
-        }
+      const peerId = params['id'] || '';
+      if (peerId.length > 0) {
+        // setTimeout because Angular doesn't like it when you initialize
+        // compnents before it checks values
+        setTimeout(() => this.sendZeroService.setConnectToPeerId(peerId));
+      }
     });
     this.sendZeroService.peerSubject.subscribe((data) => {
-        this.peers = data;
-        if (this.table) {
-          this.table.renderRows();
-        }
+      this.peers = data;
+      if (this.table) {
+        this.table.renderRows();
+      }
     });
     this.userService.userObservable
-        .subscribe(user => {
-          this.user = user;
-          this.isLoggedIn = !!this.user;
-        });
+      .subscribe(user => {
+        this.user = user;
+        this.isLoggedIn = !!this.user;
+    });
   }
 
   // TODO: Set prompts

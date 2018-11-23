@@ -10,8 +10,7 @@ import { AppComponent } from './app.component';
 import { UserService } from './user.service';
 import { SignalService } from './signal.service';
 import { SendZeroService } from './send-zero.service';
-import { ConnectionDialogComponent, ReceiveFileDialogComponent,
-  InitiateConnectionDialogComponent, QRScannerDialogComponent } from './send-zero.service';
+import { DialogService } from './dialog.service';
 import { StatsService } from './stats.service';
 import { AnalyticsService } from './analytics.service';
 import { AuthGuard } from './auth.guard';
@@ -93,6 +92,12 @@ import { QRScannerComponent } from './qrscanner/qrscanner.component';
 // Pipes
 import { FormatSizePipe } from './format-size.pipe';
 
+// Dialogs
+import { ReceiveConnectionDialogComponent } from './receive-connection-dialog/receive-connection-dialog.component';
+import { InitiateConnectionDialogComponent } from './initiate-connection-dialog/initiate-connection-dialog.component';
+import { QrScannerDialogComponent } from './qr-scanner-dialog/qr-scanner-dialog.component';
+import { ReceiveFileDialogComponent } from './receive-file-dialog/receive-file-dialog.component';
+
 @NgModule({
   declarations: [
     AppComponent,
@@ -119,12 +124,15 @@ import { FormatSizePipe } from './format-size.pipe';
     TermsComponent,
     PrivacyComponent,
     FooterComponent,
-    ConnectionDialogComponent,
     ReceiveFileDialogComponent,
     InitiateConnectionDialogComponent,
-    QRScannerDialogComponent,
     QRCodeComponent,
     QRScannerComponent,
+    // Dialogs
+    InitiateConnectionDialogComponent,
+    ReceiveFileDialogComponent,
+    ReceiveConnectionDialogComponent,
+    QrScannerDialogComponent,
     // Pipes
     FormatSizePipe,
   ],
@@ -289,10 +297,10 @@ import { FormatSizePipe } from './format-size.pipe';
   ],
   // For dialogs
   entryComponents: [
-    ConnectionDialogComponent,
+    ReceiveConnectionDialogComponent,
     ReceiveFileDialogComponent,
     InitiateConnectionDialogComponent,
-    QRScannerDialogComponent,
+    QrScannerDialogComponent,
   ],
   providers: [
     SignalService,
@@ -300,6 +308,7 @@ import { FormatSizePipe } from './format-size.pipe';
     UserService,
     StatsService,
     AnalyticsService,
+    DialogService,
   ],
   bootstrap: [AppComponent]
 })
