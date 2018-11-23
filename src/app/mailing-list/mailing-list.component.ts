@@ -58,7 +58,9 @@ export class MailingListComponent implements OnInit {
         data => {
           this.waiting = false;
           this.snackBar.open('Successfully subscribed to the mailing list', 'Dismiss', {
-            duration: 5000
+            duration: 5000,
+            verticalPosition: 'top',
+            horizontalPosition: 'right',
           });
           this.analytics.mailingList();
         },

@@ -3,15 +3,15 @@ import { NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { HttpClientModule} from '@angular/common/http'; // Deprecation https://angular.io/api/http/HttpModule
 import { RouterModule } from '@angular/router';
-import { LocalStorageModule } from 'angular-2-local-storage';
+import { NgxWebstorageModule } from 'ngx-webstorage';
 import { QRCodeModule } from 'angularx-qrcode'; // QRcode Generator
 import { ZXingScannerModule } from '@zxing/ngx-scanner';
 import { AppComponent } from './app.component';
 import { UserService } from './user.service';
 import { SignalService } from './signal.service';
 import { SendZeroService } from './send-zero.service';
-import { ConnectionDialogComponent, ReceiveFileDialogComponent,
-  InitiateConnectionDialogComponent, QRScannerDialogComponent } from './send-zero.service';
+import { DialogService } from './dialog.service';
+import { QrService } from './qr.service';
 import { StatsService } from './stats.service';
 import { AnalyticsService } from './analytics.service';
 import { AuthGuard } from './auth.guard';
@@ -56,7 +56,6 @@ import {
   MatToolbarModule,
   MatTooltipModule,
 } from '@angular/material';
-import { MaterialFileInputModule } from 'ngx-material-file-input';
 import { FileDropModule } from 'ngx-file-drop';
 
 
@@ -94,6 +93,12 @@ import { QRScannerComponent } from './qrscanner/qrscanner.component';
 // Pipes
 import { FormatSizePipe } from './format-size.pipe';
 
+// Dialogs
+import { ReceiveConnectionDialogComponent } from './receive-connection-dialog/receive-connection-dialog.component';
+import { InitiateConnectionDialogComponent } from './initiate-connection-dialog/initiate-connection-dialog.component';
+import { QrScannerDialogComponent } from './qr-scanner-dialog/qr-scanner-dialog.component';
+import { ReceiveFileDialogComponent } from './receive-file-dialog/receive-file-dialog.component';
+
 @NgModule({
   declarations: [
     AppComponent,
@@ -120,12 +125,15 @@ import { FormatSizePipe } from './format-size.pipe';
     TermsComponent,
     PrivacyComponent,
     FooterComponent,
-    ConnectionDialogComponent,
     ReceiveFileDialogComponent,
     InitiateConnectionDialogComponent,
-    QRScannerDialogComponent,
     QRCodeComponent,
     QRScannerComponent,
+    // Dialogs
+    InitiateConnectionDialogComponent,
+    ReceiveFileDialogComponent,
+    ReceiveConnectionDialogComponent,
+    QrScannerDialogComponent,
     // Pipes
     FormatSizePipe,
   ],
@@ -136,10 +144,10 @@ import { FormatSizePipe } from './format-size.pipe';
     HttpClientModule,
     QRCodeModule, // QR Module
     ZXingScannerModule,
-
-    LocalStorageModule.withConfig({
-        prefix: 'app',
-        storageType: 'localStorage'
+    NgxWebstorageModule.forRoot({
+      prefix: 'app',
+      separator: '.',
+      caseSensitive: true
     }),
 
     RouterModule.forRoot([
@@ -282,7 +290,6 @@ import { FormatSizePipe } from './format-size.pipe';
     MatTabsModule,
     MatToolbarModule,
     MatTooltipModule,
-    MaterialFileInputModule,
     FileDropModule,
 
     // Below is for Progressive Web App (PWA) functionality
@@ -291,10 +298,10 @@ import { FormatSizePipe } from './format-size.pipe';
   ],
   // For dialogs
   entryComponents: [
-    ConnectionDialogComponent,
+    ReceiveConnectionDialogComponent,
     ReceiveFileDialogComponent,
     InitiateConnectionDialogComponent,
-    QRScannerDialogComponent,
+    QrScannerDialogComponent,
   ],
   providers: [
     SignalService,
@@ -302,6 +309,8 @@ import { FormatSizePipe } from './format-size.pipe';
     UserService,
     StatsService,
     AnalyticsService,
+    DialogService,
+    QrService,
   ],
   bootstrap: [AppComponent]
 })

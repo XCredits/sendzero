@@ -1,8 +1,8 @@
 declare var require: any;
-import { Injectable, Component, Inject, ViewChild } from '@angular/core';
-import { OnInit, ApplicationRef } from '@angular/core';
-import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
-import {MatDialog, MatDialogRef, MAT_DIALOG_DATA, MatTable, MatSnackBar } from '@angular/material';
+import { Injectable } from '@angular/core';
+import { ApplicationRef } from '@angular/core';
+import { DomSanitizer } from '@angular/platform-browser';
+import { MatDialog, MatSnackBar } from '@angular/material';
 import { BehaviorSubject } from 'rxjs';
 import { SignalService } from './signal.service';
 import { isEmpty } from 'lodash';
@@ -10,16 +10,12 @@ import adjectives from './adjectives';
 import animals from './animals';
 import { Router, UrlTree } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
-import { LocalStorageService } from 'angular-2-local-storage';
-// import { ZXingScannerComponent } from '@zxing/ngx-scanner';
-// import { QRScannerComponent } from './qrscanner/qrscanner.component';
+import { LocalStorageService } from 'ngx-webstorage';
+import { DialogService } from './dialog.service';
 
-// import { UserService } from './user.service';
 // TODO: find out why import doesn't work
 const shortid = require('shortid');
 const io = require('socket.io-client');
-// const Peer = require('simple-peer');
-// const SimpleSignalClient = require('simple-signal-client');
 
 // Simple peer splits files greater than ~64k, so we make our lives easier
 // by splitting up files ino 60k chunks
@@ -60,6 +56,7 @@ export class SendZeroService {
 
   constructor(private ref: ApplicationRef,
               private signalService: SignalService,
+              private dialogService: DialogService,
               private sanitizer: DomSanitizer,
               public dialog: MatDialog,
               public snackBar: MatSnackBar,
@@ -78,12 +75,12 @@ export class SendZeroService {
   public init(): void {
     const self = this;
 
-    this.machineId = this.localStorageService.get('machineId');
+    this.machineId = this.localStorageService.retrieve('machineId');
+    this.totalFiles = 0;
+    this.totalSize = 0;
     if (!this.machineId) {
       this.machineId = shortid.generate();
-      self.localStorageService.set('machineId', self.machineId);
-      this.totalFiles = 0;
-      this.totalSize = 0;
+      self.localStorageService.store('machineId', self.machineId);
       this.http.post('/api/set-file-stats', {
         machineId: self.machineId,
         totalFiles: self.totalFiles,
@@ -92,10 +89,18 @@ export class SendZeroService {
     } else {
       this.http.post('/api/get-file-stats', {machineId: self.machineId})
           .subscribe((result: any) => {
-            self.totalFiles = result.totalFiles;
-            self.totalSize = result.totalSize;
+            if (result.totalFiles && result.totalSize) {
+              self.totalFiles = result.totalFiles;
+              self.totalSize = result.totalSize;
+            } else {
+              this.http.post('/api/set-file-stats', {
+                machineId: self.machineId,
+                totalFiles: 0,
+                totalSize: 0,
+              }).subscribe();
+            }
           });
-    }
+  }
 
     this.isMobile = !!navigator.userAgent.match(
       /(iPhone|iPod|iPad|Android|webOS|BlackBerry|IEMobile|Opera Mini)/i);
@@ -159,7 +164,7 @@ export class SendZeroService {
   // Maybe add more logic here - esp for some domains/IPs
   private handleSignalClientRequest(request: any): void {
     // This function will handle the acceptance of the offer
-    this.openConnectionDialog(request);
+    this.openReceiveConnectionDialog(request);
   }
 
   private handleSignalClientPeer(peer: any): void {
@@ -233,7 +238,6 @@ export class SendZeroService {
     this.connectButtonText = 'Connect';
     this.disableConnectButton = false;
     this.peerToConnectTo = '';
-    this.ref.tick();
   }
 
   private handlePeerClose(): void {
@@ -598,7 +602,7 @@ export class SendZeroService {
   }
 
   public openQRScanner(): void {
-    this.openInitiateQRConnectionDialog();
+    this.openQrScannerDialog();
   }
 
   public getId(): string {
@@ -627,13 +631,11 @@ export class SendZeroService {
     this.openInitiateConnectionDialog(id);
   }
 
-  private openConnectionDialog(request: any): void {
-    const dialogRef = this.dialog.open(ConnectionDialogComponent, {
-      data: {humanId: request.humanId},
-    });
-
-    dialogRef.afterClosed().subscribe(result => {
-      if (result === true) {
+  // Receive connection request
+  private openReceiveConnectionDialog(request: any): void {
+    this.dialogService.openReceiveConnectionDialog(request.humanId);
+    this.dialogService.receiveConnectionDialogResult$.subscribe(value => {
+      if (value.result === true) {
         request.accept();
       } else {
         this.socket.emit('request declined', request);
@@ -642,16 +644,12 @@ export class SendZeroService {
   }
 
   private openReceiveFileDialog(metadata: any): void {
-    this.ref.tick();
     const peerId = metadata.from;
     const fileId = metadata.fileId;
     const file = this.peers[peerId].files.find(f => f.id === fileId);
-    const dialogRef = this.dialog.open(ReceiveFileDialogComponent, {
-      data: metadata,
-    });
-    this.ref.tick();
-    dialogRef.afterClosed().subscribe(result => {
-      if (result === true) {
+    this.dialogService.openReceiveFileDialog(metadata);
+    this.dialogService.receiveFileDialogResult$.subscribe(value => {
+      if (value.result === true) {
         const toSend = {
           type: 'MESSAGE',
           message: 'File Accepted',
@@ -740,107 +738,19 @@ export class SendZeroService {
 
   // This creates a popup asking user to connect to device
   public openInitiateConnectionDialog(peerId: string): void {
-    const dialogRef = this.dialog.open(InitiateConnectionDialogComponent, {
-      data: {humanId: peerId},
-    });
-    dialogRef.afterClosed().subscribe(result => {
-      if (result === true) {
+    this.dialogService.openInitiateConnectionDialog(peerId);
+    this.dialogService.initiateConnectionDialogResult$.subscribe(value => {
+      if (value.result === true) {
         this.connectToPeer();
       }
     });
   }
 
   // This creates a popup for qrscanner
-  public openInitiateQRConnectionDialog(): void {
-    const dialogRef = this.dialog.open(QRScannerDialogComponent);
-    dialogRef.afterClosed().subscribe(result => {
-      if (this.peerToConnectToURL !== null) {
-        dialogRef.close(true);
-      }
-    });
+  public openQrScannerDialog(): void {
+    this.dialogService.openQrScannerDialog();
   }
 
-}
-
-// Connection dialog component
-// TODO: move to home component
-@Component({
-  selector: 'app-connection-dialog',
-  template: `
-    <h1 mat-dialog-title> <b>{{data.humanId}}</b> wants to connect to your browser. Accept?</h1>
-    <mat-dialog-actions>
-    <button mat-raised-button [mat-dialog-close]='true' cdkFocusInitial color='primary'>Yes</button>
-    <button mat-raised-button [mat-dialog-close]='false' color='warn'>No</button>
-    </mat-dialog-actions>`,
-})
-export class ConnectionDialogComponent {
-  constructor(@Inject(MAT_DIALOG_DATA) public data: any) { }
-}
-
-@Component({
-  selector: 'app-initiate-connection-dialog',
-  template: `
-    <h1 mat-dialog-title> Would you like to connect to <b>{{data.humanId}}</b>?</h1>
-    <mat-dialog-actions>
-    <button mat-raised-button [mat-dialog-close]="true" cdkFocusInitial color="primary">Yes</button>
-    <button mat-raised-button [mat-dialog-close]='false' color='warn'>No</button>
-    </mat-dialog-actions>`,
-})
-export class InitiateConnectionDialogComponent {
-  constructor(@Inject(MAT_DIALOG_DATA) public data: any) {}
-}
-
-@Component({
-  selector: 'app-initiate-qr-scanner',
-  template: `
-    <h1 mat-dialog-title> Scan a SendZero QRCode </h1>
-    <app-qrscanner></app-qrscanner>
-    <mat-dialog-actions>
-    <button mat-raised-button (click)='closeDialog(false)' color='warn'>Cancel</button>
-    </mat-dialog-actions>`,
-})
-export class QRScannerDialogComponent {
-  constructor(private dialogRef: MatDialogRef<QRScannerDialogComponent>,
-              // private qrScannerComponent: QRScannerComponent,
-              private ref: ApplicationRef) {}
-
-  public closeDialog(result: boolean): void {
-    this.dialogRef.close(result);
-    this.ref.tick();
-  }
-
-  // public switchCamera(): void {
-  //   this.qrScannerComponent.switchCamera();
-  // }
-}
-
-@Component({
-  selector: 'app-receive-file-dialog',
-  template: `
-    <h1 mat-dialog-title> <b>{{data.humanId}}</b> wants to send you a file. Accept?</h1>
-    <mat-dialog-content>
-      File Name: {{data.fileName}}
-      <br>
-      File Type: {{data.fileType}}
-      <br>
-      File Size: {{data.fileSize | formatSize:2}}
-    </mat-dialog-content>
-    <mat-dialog-actions>
-    <button mat-raised-button (click)='closeDialog(true)' cdkFocusInitial color='primary'>Yes</button>
-    <button mat-raised-button (click)='closeDialog(false)' color='warn'>No</button>
-    </mat-dialog-actions>`,
-})
-
-export class ReceiveFileDialogComponent {
-  constructor(private dialogRef: MatDialogRef<ReceiveFileDialogComponent>,
-              private ref: ApplicationRef,
-              @Inject(MAT_DIALOG_DATA) public data: any) {
-  }
-
-  public closeDialog(result: boolean): void {
-    this.dialogRef.close(result);
-    this.ref.tick();
-  }
 }
 
 /**

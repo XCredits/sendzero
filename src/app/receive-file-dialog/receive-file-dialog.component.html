@@ -1,0 +1,12 @@
+<h1 mat-dialog-title> <b>{{data.humanId}}</b> wants to send you a file. Accept?</h1>
+<mat-dialog-content>
+  File Name: {{data.fileName}}
+  <br>
+  File Type: {{data.fileType}}
+  <br>
+  File Size: {{data.fileSize | formatSize:2}}
+</mat-dialog-content>
+<mat-dialog-actions>
+  <button mat-raised-button [mat-dialog-close]="true" cdkFocusInitial color='primary'>Yes</button>
+  <button mat-raised-button [mat-dialog-close]="false" color='warn'>No</button>
+</mat-dialog-actions>

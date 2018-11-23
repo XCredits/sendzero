@@ -88,7 +88,6 @@ export class AppComponent implements OnInit {
     },
   ];
 
-
   toggleSideNavDrawer() {
     this.sideNavDrawer.toggle();
   }
@@ -148,11 +147,11 @@ export class AppComponent implements OnInit {
       });
 
     this.setSideBar(); // set the sidebar values
+
+    this.sendZeroService.init();
   }
 
   ngOnInit() {
-    this.sendZeroService.init();
-
     // set sidebar after every change
     this.setSideBar();
 

@@ -1,6 +1,8 @@
 // https://github.com/goergch/angular2-qrscanner
 import { Component, ViewChild, ViewEncapsulation, OnChanges, OnInit, Input } from '@angular/core';
-import { SendZeroService, QRScannerDialogComponent } from '../send-zero.service';
+import { SendZeroService } from '../send-zero.service';
+import { DialogService } from '../dialog.service';
+import { QrService } from '../qr.service';
 import { ZXingScannerComponent } from '@zxing/ngx-scanner';
 
 @Component({
@@ -11,22 +13,35 @@ import { ZXingScannerComponent } from '@zxing/ngx-scanner';
 
 export class QRScannerComponent implements OnInit {
   @ViewChild('scanner') qrScanner: ZXingScannerComponent;
+  devices: MediaDeviceInfo[];
+  deviceBeingUsed: MediaDeviceInfo;
 
   constructor(private sendZeroService: SendZeroService,
-              private qrScannerDialog: QRScannerDialogComponent) {}
+              private qrService: QrService,
+              private dialogService: DialogService) {
+    this.qrService.eventEmitter.subscribe(event => {
+      switch (event) {
+        case 'switch camera':
+          this.switchCamera();
+          break;
+      }
+    });
+  }
 
-  // TODO: Being reused in Dialog Compnent as well, think about making into
-  // a service
   ngOnInit() {
     const self = this;
     const enumerateDevicesPromise = new Promise((resolve, reject) => {
-      this.qrScanner.enumarateVideoDevices((devices) => {
+      self.qrScanner.camerasFound.subscribe((devices: MediaDeviceInfo[]) => {
         resolve(devices);
       });
     });
 
     enumerateDevicesPromise
-        .then((devices: any) => {
+        .then((devices: MediaDeviceInfo[]) => {
+          self.devices = devices;
+          if (devices.length === 1) {
+            self.qrService.disableSwitchCamera();
+          }
           let device;
           devices.forEach(dev => {
             if (dev.label.includes('back') ||
@@ -39,39 +54,31 @@ export class QRScannerComponent implements OnInit {
           if (!device) {
             device = devices[0];
           }
+          self.deviceBeingUsed = device;
           self.qrScanner.startScan(device);
         });
   }
 
-  // switchCamera(): void {
-  //   const self = this;
-
-  //   const currentDevice = self.qrScanner.device;
-  //   const enumerateDevicesPromise = new Promise((resolve, reject) => {
-  //     self.qrScanner.enumarateVideoDevices((devices) => {
-  //       resolve(devices);
-  //     });
-  //   });
-  //   let allDevices: Array<any>;
-  //   enumerateDevicesPromise.then((devices: Array<any>) => allDevices = devices);
-  //   const currentDeviceIndex
-  //       = allDevices.findIndex(dev => dev.deviceId === currentDevice.deviceId);
-
-  //   const newDevice
-  //     = allDevices[currentDeviceIndex + 1]
-  //       ? allDevices[currentDeviceIndex + 1]
-  //       : allDevices[0];
-  //   this.qrScanner.changeDevice(newDevice);
-  // }
+  switchCamera(): void {
+    const self = this;
+    const allDevices = self.devices;
+    const currentDevice = self.deviceBeingUsed;
+    const currentDeviceIndex
+        = allDevices.findIndex(dev => dev.deviceId === currentDevice.deviceId);
+    const newDevice
+      = allDevices[currentDeviceIndex + 1]
+        ? allDevices[currentDeviceIndex + 1]
+        : allDevices[0];
+    self.deviceBeingUsed = newDevice;
+    this.qrScanner.changeDevice(newDevice);
+  }
 
   scanSuccessHandler(event: any) {
     // console.log(event);
     const peerId = this.sendZeroService.removeURLFromPeer(event);
     this.sendZeroService.setConnectToPeerId(peerId);
-    // Try not to use this
-    // this.sendZeroService.dialog.closeAll();
-    this.qrScannerDialog.closeDialog(true);
-    this.qrScanner.resetScan();
+    this.dialogService.closeQrScannerDialog(true);
+    this.qrScanner.resetCodeReader();
   }
 
   // TODO: Use event emitters

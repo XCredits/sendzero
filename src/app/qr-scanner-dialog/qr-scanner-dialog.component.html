@@ -1,0 +1,7 @@
+<h1 mat-dialog-title> Scan a SendZero QRCode </h1>
+<app-qrscanner></app-qrscanner>
+<mat-dialog-actions>
+  <button mat-raised-button [disabled]="disableSwitchCamera" (click)='switchCamera()' color='primary'
+            cdkFocusInitial>Switch Camera</button>
+  <button mat-raised-button [mat-dialog-close]="false" color='warn'>Cancel</button>
+</mat-dialog-actions>

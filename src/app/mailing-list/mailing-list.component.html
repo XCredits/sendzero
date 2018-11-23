@@ -1,11 +1,11 @@
 <div class="simple-form-aligner">
   <mat-card class="simple-form-card">
-    <mat-card-title> Join the mailing list </mat-card-title>
-    <mat-card-subtitle>
-        Be the first to hear new announcements about XCredits
-    </mat-card-subtitle>
-    <mat-card-content>
-      <form [formGroup]="form" (ngSubmit)="submit(form.value)">
+    <form [formGroup]="form" (ngSubmit)="submit(form.value)">
+      <mat-card-title> Join the mailing list </mat-card-title>
+      <mat-card-subtitle>
+          Be the first to hear new announcements about XCredits
+      </mat-card-subtitle>
+      <mat-card-content>
         <div class="form-group">
           <mat-form-field class="simple-form-field-50">
             <input matInput placeholder="Given name" name="givenName" formControlName="givenName">
@@ -40,7 +40,7 @@
             {{formErrorMessage}}
           </span>
         </div>
-        </form>
-    </mat-card-content>
+      </mat-card-content>
+    </form>
   </mat-card>
 </div>
