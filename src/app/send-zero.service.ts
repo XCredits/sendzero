@@ -100,7 +100,7 @@ export class SendZeroService {
               }).subscribe();
             }
           });
-    }
+  }
 
     this.isMobile = !!navigator.userAgent.match(
       /(iPhone|iPod|iPad|Android|webOS|BlackBerry|IEMobile|Opera Mini)/i);
