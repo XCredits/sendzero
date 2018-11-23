@@ -76,11 +76,11 @@ export class SendZeroService {
     const self = this;
 
     this.machineId = this.localStorageService.retrieve('machineId');
+    this.totalFiles = 0;
+    this.totalSize = 0;
     if (!this.machineId) {
       this.machineId = shortid.generate();
       self.localStorageService.store('machineId', self.machineId);
-      this.totalFiles = 0;
-      this.totalSize = 0;
       this.http.post('/api/set-file-stats', {
         machineId: self.machineId,
         totalFiles: self.totalFiles,
@@ -89,8 +89,16 @@ export class SendZeroService {
     } else {
       this.http.post('/api/get-file-stats', {machineId: self.machineId})
           .subscribe((result: any) => {
-            self.totalFiles = result.totalFiles;
-            self.totalSize = result.totalSize;
+            if (result.totalFiles && result.totalSize) {
+              self.totalFiles = result.totalFiles;
+              self.totalSize = result.totalSize;
+            } else {
+              this.http.post('/api/set-file-stats', {
+                machineId: self.machineId,
+                totalFiles: 0,
+                totalSize: 0,
+              }).subscribe();
+            }
           });
     }
 
