@@ -37,9 +37,8 @@ export class QRScannerComponent implements OnInit {
     });
 
     enumerateDevicesPromise
-        .then((devices: Array<any>) => {
+        .then((devices: MediaDeviceInfo[]) => {
           self.devices = devices;
-          console.log(devices);
           if (devices.length === 1) {
             self.qrService.disableSwitchCamera();
           }
