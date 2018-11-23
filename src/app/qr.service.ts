@@ -11,4 +11,8 @@ export class QrService {
   switchScannerCamera(): void {
     this.eventEmitter.emit('switch camera');
   }
+
+  disableSwitchCamera(): void {
+    this.eventEmitter.emit('disable switch');
+  }
 }

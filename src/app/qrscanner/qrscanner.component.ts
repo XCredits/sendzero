@@ -37,8 +37,12 @@ export class QRScannerComponent implements OnInit {
     });
 
     enumerateDevicesPromise
-        .then((devices: any) => {
+        .then((devices: Array<any>) => {
           self.devices = devices;
+          console.log(devices);
+          if (devices.length === 1) {
+            self.qrService.disableSwitchCamera();
+          }
           let device;
           devices.forEach(dev => {
             if (dev.label.includes('back') ||
@@ -59,7 +63,6 @@ export class QRScannerComponent implements OnInit {
   switchCamera(): void {
     const self = this;
     const allDevices = self.devices;
-    // TODO: Maybe disable switch camera button if we only have one device
     const currentDevice = self.deviceBeingUsed;
     const currentDeviceIndex
         = allDevices.findIndex(dev => dev.deviceId === currentDevice.deviceId);

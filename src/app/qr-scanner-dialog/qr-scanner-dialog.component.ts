@@ -7,8 +7,17 @@ import { QrService } from '../qr.service';
   styleUrls: ['./qr-scanner-dialog.component.scss']
 })
 export class QrScannerDialogComponent implements OnInit {
+  disableSwitchCamera = false;
 
-  constructor(private qrService: QrService) { }
+  constructor(private qrService: QrService) {
+    this.qrService.eventEmitter.subscribe(event => {
+      switch (event) {
+        case 'disable switch':
+          this.disableSwitchCamera = true;
+          break;
+      }
+    });
+   }
 
   public switchCamera(): void {
     this.qrService.switchScannerCamera();
