@@ -192,4 +192,19 @@ sudo iptables -I INPUT -p tcp -m tcp --dport 80 -j ACCEPT
 4) To set up a cronjob to take care of renewal for you, first run `crontab -e` to edit your cron jobs. Then add `0 0,12 * * * sudo certbot renew && sudo service nginx reload` at the bottom of the file and exit the editor. This will try renew your SSL certificates everyday at 12 AM and 12 PM. Easy as that!
 
 
+## Deploying a new version
+
+1) Log in to the Compute Engine VM.
+
+2) Go into the repo with `cd sendzero` and the pull the latest version using `git pull`.
+
+3) Run `npm install` if you've updated/installed any packages. Then run `ng build --prod` to build the app.
+
+4) Restart the `pm2` instance on the server using `sudo pm2 reload --env production -i 1 pm2.config.js`.
+
+5) Restart the `nginx` server using `sudo service nginx reload`.
+
+6) You can restart the TURN server by logging into its VM and first entering the `tmux` window using `tmux a` and then restarting with `sudo turnserver -L 10.152.0.4 -X 35.189.37.86 -v -a -f -r sendzero.net` after you have killed the current server using `ctrl + c`. Note that these values will change if you are using a different instance of Compute Engine. 
+
+7) You can exit `tmux` with `ctrl + b` and the `d`.
 
